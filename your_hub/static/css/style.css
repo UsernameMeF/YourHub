@@ -1,0 +1,530 @@
+/* SOCIAL_NETWORK/your_hub/static/css/style.css */
+
+/* ==== Стили Светлой Темы (Базовые) ==== */
+body {
+    margin: 0;
+    font-family: sans-serif;
+    min-height: 100vh;
+    background-color: #f0f2f5; /* Светлый фон */
+    color: #333; /* Темный текст */
+    /* Добавляем плавный переход для цветов фона и текста */
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Добавляем переходы к основным элементам, где цвета меняются */
+.header, .navbar, .dropdown-menu, .post-placeholder,
+.search-bar input, .auth-buttons a, .user-menu-button,
+.dropdown-menu a, form, form label,
+form input[type="text"], form input[type="password"], form input[type="email"],
+form button[type="submit"] {
+     transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+
+.header {
+    display: grid;
+    /* Изменяем определение колонок: центральная колонка теперь в 2 раза шире боковых */
+    /* 1fr - это одна "фракция" доступного пространства. 2fr - две фракции. */
+    grid-template-columns: 1fr 2fr 1fr; /* Теперь центральная колонка гибкая и шире */
+    align-items: center;
+    padding: 10px 20px;
+
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #23e2dd;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    /* Размещаем в первой колонке и прижимаем к началу ячейки */
+    grid-column: 1;
+    justify-self: start; /* Прижимает элемент к левому краю ячейки */
+    /* Убираем min-width, Grid управляет размерами */
+    /* min-width: 180px; */
+}
+
+.site-title:hover {
+    color: #1bcabc;
+}
+
+.site-title .hub-icon {
+     margin-right: 8px;
+     color: #1bcabc;
+}
+
+.search-bar input {
+    grid-column: 2;
+    justify-self: center;
+    min-width: 0;
+    max-width: 500px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    width: 100%; /* Поле ввода занимает 100% доступной ширины СВОЕГО родителя (.search-bar) */
+    /* ... остальные стили input остаются без изменений ... */
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+.search-bar input {
+    width: 100%; /* Поле ввода занимает 100% доступной ширины СВОЕГО родителя (.search-bar) */
+    /* ... остальные стили input остаются без изменений ... */
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+.search-bar input::placeholder {
+    color: #666;
+}
+
+.search-bar input:focus {
+    border-color: #23e2dd;
+    box-shadow: 0 0 5px rgba(35, 226, 221, 0.5);
+}
+
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    /* Убираем min-width */
+    /* min-width: 180px; */
+
+    /* Размещаем в третьей колонке и прижимаем к концу ячейки */
+    grid-column: 3;
+    justify-self: end; /* Прижимает элемент к правому краю ячейки */
+}
+
+.auth-buttons a {
+    margin-left: 10px;
+    text-decoration: none;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.auth-buttons a:hover {
+    background-color: #eee;
+}
+
+.auth-buttons .btn-primary {
+     border-color: #23e2dd;
+     color: #23e2dd;
+}
+.auth-buttons .btn-primary:hover {
+    background-color: #e9fcfb;
+}
+
+.auth-buttons .btn-secondary {
+    background-color: #23e2dd;
+    color: #fff;
+    border-color: #23e2dd;
+}
+.auth-buttons .btn-secondary:hover {
+    background-color: #1bcabc;
+}
+
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    color: #666; /* Цвет иконки/текста */
+}
+.user-menu-button:hover {
+    background-color: #eee;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    margin-top: 5px;
+}
+
+.dropdown-menu a {
+    color: #333;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+    font-size: 0.9em;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.navbar {
+    width: 220px;
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+}
+
+.navbar a {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #555;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar a:hover {
+    background-color: #e9fcfb;
+    color: #23e2dd;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+/* Стиль для заглушек постов */
+.post-placeholder {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.post-placeholder h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.post-placeholder p {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.9em;
+}
+
+/* Стиль для формы логина/регистрации */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+form input[type="text"]::placeholder,
+form input[type="password"]::placeholder,
+form input[type="email"]::placeholder {
+     color: #666;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus,
+form input[type="email"]:focus {
+     border-color: #23e2dd;
+     outline: none;
+     box-shadow: 0 0 5px rgba(35, 226, 221, 0.5);
+}
+
+form button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #23e2dd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+form button[type="submit"]:hover {
+    background-color: #1bcabc;
+}
+
+/* Стиль для ссылок под формой */
+form p a {
+    color: #23e2dd;
+}
+form p a:hover {
+    color: #1bcabc;
+}
+
+/* Стиль для кнопки переключения темы */
+.theme-switch-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: 10px; /* Отступ от других кнопок */
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666; /* Цвет иконки/текста */
+}
+
+.theme-switch-button:hover {
+    background-color: #eee;
+}
+
+.theme-switch-button svg {
+    width: 24px; /* Размер иконки */
+    height: 24px;
+}
+
+
+/* ==== Стили Темной Темы (Переопределяют Светлую) ==== */
+/* Используем html.dark-theme для применения стилей темной темы */
+html.dark-theme body {
+    background-color: #1a1a1a; /* Очень темный фон */
+    color: #f0f0f0; /* Светлый текст */
+}
+
+html.dark-theme .header {
+    background-color: #252526;
+    border-bottom-color: #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .site-title {
+    color: #00e600; /* Яркий зеленый акцент */
+}
+html.dark-theme .site-title:hover {
+     color: #00ff00;
+}
+
+html.dark-theme .site-title .hub-icon {
+     color: #00e600;
+}
+
+
+html.dark-theme .search-bar input {
+    background-color: #333;
+    color: #f0f0f0;
+    border-color: #555;
+}
+html.dark-theme .search-bar input::placeholder {
+    color: #bbb;
+}
+html.dark-theme .search-bar input:focus {
+    border-color: #00e600;
+    box-shadow: 0 0 5px rgba(0, 230, 0, 0.5);
+}
+
+
+html.dark-theme .auth-buttons a {
+    border-color: #555;
+    color: #f0f0f0;
+}
+html.dark-theme .auth-buttons a:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .auth-buttons .btn-primary {
+     border-color: #00e600;
+     color: #00e600;
+}
+html.dark-theme .auth-buttons .btn-primary:hover {
+    background-color: rgba(0, 230, 0, 0.1);
+}
+
+html.dark-theme .btn-secondary { /* Применяем к кнопке входа */
+    background-color: #00e600;
+    color: #1a1a1a;
+    border-color: #00e600;
+}
+html.dark-theme .btn-secondary:hover {
+    background-color: #00ff00;
+    border-color: #00ff00;
+    color: #0a0a0a;
+}
+
+html.dark-theme .user-menu-button {
+    color: #f0f0f0;
+}
+html.dark-theme .user-menu-button:hover {
+    background-color: #3a3a3a;
+}
+
+
+html.dark-theme .dropdown-menu {
+    background-color: #252526;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+}
+
+html.dark-theme .dropdown-menu a {
+    color: #f0f0f0;
+}
+html.dark-theme .dropdown-menu a:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .navbar {
+    background-color: #252526;
+    border-right-color: #3a3a3a;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .navbar a {
+    color: #ccc;
+}
+html.dark-theme .navbar a:hover {
+    background-color: rgba(0, 230, 0, 0.1);
+    color: #00e600;
+}
+
+html.dark-theme .post-placeholder {
+    background-color: #252526;
+    border-color: #3a3a3a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .post-placeholder h3 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .post-placeholder p {
+    color: #ccc;
+}
+
+/* Стили для форм в темной теме */
+html.dark-theme form {
+     background-color: #252526;
+     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+html.dark-theme form label {
+    color: #f0f0f0;
+}
+
+html.dark-theme form input[type="text"],
+html.dark-theme form input[type="password"],
+html.dark-theme form input[type="email"] {
+     background-color: #333;
+     color: #f0f0f0;
+     border-color: #555;
+}
+html.dark-theme form input[type="text"]::placeholder,
+html.dark-theme form input[type="password"]::placeholder,
+html.dark-theme form input[type="email"]::placeholder {
+     color: #bbb;
+}
+
+html.dark-theme form input[type="text"]:focus,
+html.dark-theme form input[type="password"]:focus,
+html.dark-theme form input[type="email"]:focus {
+     border-color: #00e600;
+     box-shadow: 0 0 5px rgba(0, 230, 0, 0.5);
+}
+
+html.dark-theme form button[type="submit"] {
+    background-color: #00e600;
+    color: #1a1a1a;
+}
+html.dark-theme form button[type="submit"]:hover {
+    background-color: #00ff00;
+    color: #0a0a0a;
+}
+
+/* Стиль для ссылок под формой */
+html.dark-theme form p a {
+    color: #00e600;
+}
+html.dark-theme form p a:hover {
+    color: #00ff00;
+}
+
+
+/* Стиль иконки в темной теме */
+html.dark-theme .theme-switch-button {
+     color: #f0f0f0;
+}
+html.dark-theme .theme-switch-button:hover {
+    background-color: #3a3a3a;
+}
+
+/* Скрываем одну иконку в зависимости от темы */
+.sun-icon { display: block; }
+.moon-icon { display: none; }
+
+html.dark-theme .sun-icon { display: none; }
+html.dark-theme .moon-icon { display: block; }
+
+
+/* Добавьте другие стили по необходимости */

@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}YourHub{% endblock %}</title> 
+
+    {# --- Маленький синхронный скрипт для предотвращения "вспышки" темы --- #}
+    {# Он читает тему из localStorage и добавляет класс к тегу <html> до загрузки CSS #}
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            // Если тема 'dark', добавляем класс 'dark-theme' к тегу <html> (document.documentElement)
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            }
+            // Если тема 'light' или не сохранена, класс dark-theme не добавляется (что соответствует светлой теме по умолчанию)
+        })();
+    </script>
+    {# --- Конец скрипта в HEAD --- #}
+
+    {# Подключаем наш собственный CSS файл (теперь класс темы уже может быть установлен на html) #}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {# Здесь могут быть другие общие стили или скрипты #}
+</head>
+{# У тега body не должно быть класса темы по умолчанию #}
+<body>
+
+    {# --- Начало Хэдера (Верхняя панель) --- #}
+    <header class="header"> {# Используем CSS класс header #}
+        {# Название сайта / Логотип - Ссылка на главную страницу #}
+        <a href="{% url 'index' %}" class="site-title"> {# Используем CSS класс site-title, делаем ссылкой на главную #}
+            {# Иконка Hub #}
+             <svg xmlns="http://www.w3.org/2000/svg" class="hub-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v7a1 1 0 01-1 1h-3a1 1 0 00-1 1v1a2 2 0 11-4 0v-1a1 1 0 00-1-1H7a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+            YourHub
+        </a>
+
+        {# Поиск (Заготовка) #}
+        <div class="search-bar"> {# Используем CSS класс search-bar #}
+            <input type="text" placeholder="Поиск по YourHub...">
+        </div>
+
+        {# Кнопки аутентификации или Меню пользователя #}
+        <div class="auth-buttons"> {# Используем CSS класс auth-buttons. Добавляем кнопку смены темы здесь. #}
+
+            {# Кнопка смены темы #}
+            <button class="theme-switch-button" id="theme-switch-button" aria-label="Переключить тему">
+                {# Иконка солнца (для светлой темы) #}
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                {# Иконка луны (для темной темы) #}
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.11 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+
+            {% if user.is_authenticated %}
+                {# Если пользователь авторизован: Меню пользователя (Три точки) #}
+                <div class="user-menu"> {# Используем CSS класс user-menu #}
+                    <button class="user-menu-button">...</button> {# Используем CSS класс user-menu-button #}
+                    <div class="dropdown-menu" id="user-dropdown-menu"> {# Используем CSS класс dropdown-menu, добавим ID для JS #}
+                        {# Ссылки-заглушки, которые никуда не ведут #}
+                        <a href="#">Профиль</a>
+                        <a href="#">Настройки</a>
+                        <a href="#">Выйти</a> {# Пока тоже заглушка, пока нет URL выхода #}
+                    </div>
+                </div>
+            {% else %}
+                {# Если пользователь не авторизован: Кнопки Зарегистрироваться и Войти #}
+                <a href="#" class="btn-primary">Зарегистрироваться</a> {# Ссылка-заглушка #}
+                <a href="#" class="btn-secondary">Войти</a> {# Ссылка-заглушка #}
+            {% endif %}
+        </div>
+    </header>
+    {# --- Конец Хэдера --- #}
+
+    {# Основной контейнер: Навбар слева, Контент справа #}
+    <div class="container"> {# Используем CSS класс container #}
+        {# Включаем навбар из отдельного файла #}
+        {% include 'navbar.html' %}
+
+        {# --- Начало Основного контента --- #}
+        <main class="content"> {# Используем CSS класс content #}
+            {% block content %}
+            {# Содержимое конкретной страницы будет вставляться здесь #}
+            {% endblock %}
+        </main>
+        {# --- Конец Основного контента --- #}
+    </div>
+
+    {# Ваши глобальные скрипты могут быть здесь #}
+
+    {# Скрипт для переключения выпадающего меню пользователя (без изменений) #}
+    <script>
+        document.querySelector('.user-menu-button').addEventListener('click', function() {
+            document.getElementById('user-dropdown-menu').classList.toggle('show');
+        });
+        // Скрыть меню при клике вне его
+        window.onclick = function(event) {
+          if (!event.target.matches('.user-menu-button') && !event.target.closest('.user-menu-button')) { // Добавил .closest для обработки кликов по содержимому кнопки
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+              var openDropdown = dropdowns[i];
+              if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+              }
+            }
+          }
+        }
+    </script>
+
+    {# --- Скрипт для переключения темы (основной, после загрузки DOM) --- #}
+    <script>
+        const themeSwitchButton = document.getElementById('theme-switch-button');
+        const htmlElement = document.documentElement; // Получаем тег <html>
+        const sunIcon = themeSwitchButton.querySelector('.sun-icon');
+        const moonIcon = themeSwitchButton.querySelector('.moon-icon');
+
+        // Функция для установки темы и обновления иконок
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                htmlElement.classList.add('dark-theme'); // Добавляем класс к <html>
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+                localStorage.setItem('theme', 'dark');
+            } else { // theme === 'light'
+                htmlElement.classList.remove('dark-theme'); // Удаляем класс с <html>
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // --- Логика при загрузке страницы (после того как DOM готов) ---
+        // Начальное состояние иконок определяем по наличию класса на <html>,
+        // который уже мог быть добавлен скриптом из HEAD.
+        const isInitiallyDark = htmlElement.classList.contains('dark-theme');
+        if (isInitiallyDark) {
+            // Если класс уже есть (добавлен скриптом в HEAD), просто показываем луну
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            // Если класса нет, показываем солнце (светлая тема)
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+
+        // --- Обработчик клика по кнопке ---
+        themeSwitchButton.addEventListener('click', () => {
+            const currentTheme = htmlElement.classList.contains('dark-theme') ? 'dark' : 'light';
+            if (currentTheme === 'dark') {
+                setTheme('light'); // Переключаемся на светлую
+            } else {
+                setTheme('dark'); // Переключаемся на темную
+            }
+        });
+    </script>
+    {# --- Конец Скрипта для переключения темы --- #}
+
+
+    {# Опционально: Отдельный блок для скриптов конкретной страницы #}
+    {% block extra_js %}{% endblock %} 
+</body>
+</html>
