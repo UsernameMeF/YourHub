@@ -526,5 +526,201 @@ html.dark-theme .theme-switch-button:hover {
 html.dark-theme .sun-icon { display: none; }
 html.dark-theme .moon-icon { display: block; }
 
+.header-icon-button, .header-button-create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    margin-left: 8px;
+    background-color: transparent;
+    border: 1px solid transparent; /* Можно добавить рамку при необходимости */
+    border-radius: 50%; /* Для круглых иконок */
+    color: #666; /* Цвет иконки по умолчанию */
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.header-icon-button svg {
+    width: 22px; /* Размер иконок */
+    height: 22px;
+}
+
+.header-button-create {
+    border-radius: 20px; /* Более прямоугольная кнопка с закруглениями */
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+.header-button-create svg {
+    width: 16px; /* Размер иконки плюса */
+    height: 16px;
+    margin-right: 6px;
+}
+
+.header-icon-button:hover, .header-button-create:hover {
+    background-color: #eee; /* Фон при наведении */
+    color: #333;
+}
+
+/* Стили для меню профиля */
+.user-profile-menu {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px; /* Отступ слева от других иконок */
+}
+
+.profile-avatar-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%; /* Делаем кнопку круглой для аватара */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Размер кнопки аватара */
+    height: 40px;
+    overflow: hidden; /* Чтобы изображение не вылезало за круглые края */
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Масштабирует изображение, чтобы оно заполнило контейнер, обрезая лишнее */
+    border-radius: 50%;
+    border: 2px solid transparent; /* Можно добавить рамку, например, при фокусе */
+    transition: border-color 0.2s ease;
+}
+
+.profile-avatar-button:hover .profile-avatar-img,
+.profile-avatar-button:focus .profile-avatar-img {
+    border-color: #23e2dd; /* Рамка при наведении/фокусе */
+}
+
+.profile-dropdown-menu { /* Использует общие стили .dropdown-menu, но можно добавить специфичные */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    margin-top: 5px;
+}
+
+/* Кнопка смены темы в выпадающем меню */
+.theme-switch-button-dropdown {
+    display: block; /* Чтобы занимала всю ширину элемента списка */
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333; /* Цвет текста как у ссылок в меню */
+    font-size: 0.9em; /* Размер текста как у ссылок */
+    transition: background-color 0.2s ease;
+}
+
+.theme-switch-button-dropdown:hover {
+    background-color: #f1f1f1;
+}
+.theme-switch-button-dropdown .sun-icon,
+.theme-switch-button-dropdown .moon-icon {
+    /* Стили для иконок, если решишь их добавить */
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+
+/* ==== Темная тема для новых элементов ==== */
+html.dark-theme .header-icon-button,
+html.dark-theme .header-button-create {
+    color: #f0f0f0;
+}
+
+html.dark-theme .header-icon-button:hover,
+html.dark-theme .header-button-create:hover {
+    background-color: #3a3a3a;
+    color: #00e600; /* Или другой акцентный цвет */
+}
+
+html.dark-theme .profile-avatar-button:hover .profile-avatar-img,
+html.dark-theme .profile-avatar-button:focus .profile-avatar-img {
+    border-color: #00e600;
+}
+
+html.dark-theme .theme-switch-button-dropdown {
+    color: #f0f0f0;
+}
+html.dark-theme .theme-switch-button-dropdown:hover {
+    background-color: #3a3a3a;
+}
+
+.auth-form-container {
+    max-width: 400px; /* Ограничиваем максимальную ширину формы */
+    margin: 40px auto; /* Автоматические отступы по бокам центрируют блок */
+    padding: 20px;
+    background-color: #fff; /* Светлый фон */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* Добавляем переходы */
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Стили для темной темы */
+html.dark-theme .auth-form-container {
+    background-color: #252526; /* Темный фон */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+
+/* Стиль для формы внутри контейнера */
+.auth-form-container form {
+     /* Убираем margin из общего правила form, если он есть и мешает центрированию */
+    margin-bottom: 0; /* Убираем нижний отступ у самой формы */
+}
+
+/* Стиль для абзаца под формой (например, "Уже есть аккаунт?") */
+.auth-form-container p {
+    text-align: center; /* Выравниваем текст по центру */
+    margin-top: 20px; /* Добавляем отступ сверху */
+    font-size: 0.9em; /* Уменьшаем размер шрифта */
+    color: #666; /* Более приглушенный цвет текста */
+    /* Добавляем переходы */
+    transition: color 0.5s ease;
+}
+
+/* Стили для темной темы */
+html.dark-theme .auth-form-container p {
+    color: #ccc; /* Светлый цвет текста в темной теме */
+}
+
+/* Стиль для ссылки внутри абзаца под формой */
+.auth-form-container p a {
+    color: #23e2dd; /* Цвет ссылки */
+    text-decoration: none; /* Убираем подчеркивание */
+    font-weight: bold; /* Делаем ссылку жирной */
+    /* Добавляем переходы */
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+/* Стиль для ссылки при наведении */
+.auth-form-container p a:hover {
+    color: #1bcabc; /* Цвет при наведении */
+    text-decoration: underline; /* Добавляем подчеркивание при наведении */
+}
+
+/* Стили для темной темы */
+html.dark-theme .auth-form-container p a {
+    color: #00e600; /* Цвет ссылки в темной теме */
+}
+html.dark-theme .auth-form-container p a:hover {
+    color: #00ff00; /* Цвет при наведении в темной теме */
+}
 
 /* Добавьте другие стили по необходимости */

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профиль пользователя: {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="profile-container"> {# Добавь CSS классы для стилизации страницы профиля #}
+    <h2>Профиль пользователя: {{ user.username }}</h2>
+
+    <div class="profile-header"> {# Класс для верхней части профиля (аватар, имя, контакты) #}
+        {# Отображаем аватар пользователя из user_profile #}
+        <img src="{% if user_profile.avatar %}{{ user_profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ user.username }} Аватар" class="profile-avatar-large"> {# Убедись, что у тебя есть CSS класс profile-avatar-large в style.css #}
+
+        <h3>{{ user.username }}</h3>
+        <p>Email: {{ user.email }}</p>
+        {# Добавь отображение других полей профиля, если они есть в модели Profile #}
+        <p>О себе: {{ user_profile.bio|default:"Нет информации" }}</p>
+        {# <p>Местоположение: {{ user_profile.location|default:"Нет информации" }}</p> #}
+        {# <p>Дата рождения: {{ user_profile.birth_date|default:"Нет информации" }}</p> #}
+
+        <p><a href="{% url 'edit_profile' %}">Редактировать профиль</a></p>
+    </div>
+
+    <div class="profile-sections"> {# Контейнер для разделов с публикациями, друзьями, активностью #}
+        <div class="profile-section"> {# Класс для каждого раздела #}
+            <h3>Публикации (Заглушка)</h3>
+            {% if user_posts %}
+                {# Здесь будет логика отображения реальных публикаций #}
+                {% for post in user_posts %}
+                    <div class="post-placeholder"> {# Используй существующий стиль заглушки поста #}
+                        <h4>{{ post.title|default:"Заголовок публикации" }}</h4>
+                        <p>{{ post.content|default:"Краткое описание публикации..." }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Пока нет публикаций.</p>
+            {% endif %}
+        </div>
+
+        <div class="profile-section">
+            <h3>Друзья (Заглушка)</h3>
+            {% if user_friends %}
+                {# Здесь будет логика отображения списка друзей #}
+                <ul>
+                    {% for friend in user_friends %}
+                        <li>{{ friend.username|default:"Имя друга" }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Пока нет друзей.</p>
+            {% endif %}
+        </div>
+
+        <div class="profile-section">
+            <h3>Активность (Заглушка)</h3>
+            {% if user_activity %}
+                {# Здесь будет логика отображения активности #}
+                <ul>
+                    {% for activity in user_activity %}
+                        <li>{{ activity|default:"Описание активности" }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Пока нет активности.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

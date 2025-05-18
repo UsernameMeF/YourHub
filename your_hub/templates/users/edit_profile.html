@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редактировать профиль{% endblock %}
+
+{% block content %}
+<div class="auth-form-container"> {# Используй тот же класс контейнера для форм #}
+    <h2>Редактировать профиль</h2>
+    <form method="post" enctype="multipart/form-data"> {# enctype="multipart/form-data" обязателен для загрузки файлов (аватара) #}
+        {% csrf_token %}
+        {# Отображаем форму для полей User (username, email) #}
+        {{ user_form.as_p }}
+        {# Отображаем форму для полей Profile (avatar) #}
+        {{ profile_form.as_p }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+    <p><a href="{% url 'profile' %}">Отменить</a></p>
+</div>
+{% endblock %}

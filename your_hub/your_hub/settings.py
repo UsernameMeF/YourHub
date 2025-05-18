@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +126,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
@@ -135,3 +138,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# REDIRECT
+LOGIN_REDIRECT_URL = '/' # <-- URL для перенаправления после успешного входа (например, на главную)
+LOGIN_URL = '/users/login/' # <-- URL страницы входа (куда перенаправлять неавторизованных пользователей)
+LOGOUT_REDIRECT_URL = '/'
