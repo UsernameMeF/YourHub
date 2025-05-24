@@ -16,6 +16,8 @@ def profile_avatar_upload_path(instance, filename):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(default='images/default-avatar.png', upload_to=profile_avatar_upload_path)
+    bio = models.TextField(max_length=100, blank=True, null=True)
+
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -63,3 +65,50 @@ def auto_delete_avatar_on_delete(sender, instance, **kwargs):
                 user_dir = os.path.dirname(instance.avatar.path)
                 if os.path.exists(user_dir) and not os.listdir(user_dir):
                      os.rmdir(user_dir)
+
+
+class Friendship(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Ожидает подтверждения'),
+        ('accepted', 'Принято'),
+    )
+
+    from_user = models.ForeignKey(User, related_name='sent_friend_requests', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='received_friend_requests', on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+        ordering = ['-created_at']
+
+
+    def __str__(self):
+        return f"Запрос дружбы от {self.from_user.username} к {self.to_user.username} ({self.status})"
+
+
+    def accept(self):
+        if self.status == 'pending':
+            self.status = 'accepted'
+            self.accepted_at = models.fields.timezone.now()
+            self.save()
+
+
+    def decline(self):
+        if self.status == 'pending':
+            self.delete()
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    
+    class Meta:
+        unique_together = ('follower', 'following')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.follower.username} подписан на {self.following.username}'

@@ -1,0 +1,63 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_auth_dark.css */
+
+/* ==== Темная тема для форм авторизации/регистрации ==== */
+html.dark-theme form {
+    background-color: #252526;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+html.dark-theme form label {
+    color: #f0f0f0;
+}
+
+html.dark-theme form input[type="text"],
+html.dark-theme form input[type="password"],
+html.dark-theme form input[type="email"] {
+    background-color: #333;
+    color: #f0f0f0;
+    border-color: #555;
+}
+html.dark-theme form input[type="text"]::placeholder,
+html.dark-theme form input[type="password"]::placeholder,
+html.dark-theme form input[type="email"]::placeholder {
+    color: #bbb;
+}
+
+html.dark-theme form input[type="text"]:focus,
+html.dark-theme form input[type="password"]:focus,
+html.dark-theme form input[type="email"]:focus {
+    border-color: #00e600;
+    box-shadow: 0 0 5px rgba(0, 230, 0, 0.5);
+}
+
+html.dark-theme form button[type="submit"] {
+    background-color: #00e600;
+    color: #1a1a1a;
+}
+html.dark-theme form button[type="submit"]:hover {
+    background-color: #00ff00;
+    color: #0a0a0a;
+}
+
+html.dark-theme form p a {
+    color: #00e600;
+}
+html.dark-theme form p a:hover {
+    color: #00ff00;
+}
+
+html.dark-theme .auth-form-container {
+    background-color: #252526;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .auth-form-container p {
+    color: #ccc;
+}
+
+html.dark-theme .auth-form-container p a {
+    color: #00e600;
+}
+html.dark-theme .auth-form-container p a:hover {
+    color: #00ff00;
+}

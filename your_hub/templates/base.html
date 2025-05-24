@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}YourHub{% endblock %}</title>
-
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
     <script>
         (function() {
             const theme = localStorage.getItem('theme');
@@ -16,10 +16,9 @@
     </script>
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    {# Font Awesome для иконок - если решишь использовать. Если нет, нужно будет добавить свои SVG или другие иконки. #}
     {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> #}
 
-    {# Дополнительные стили в head, если нужны #}
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -60,7 +59,7 @@
                         <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="profile-avatar-img">
                     </button>
                     <div class="dropdown-menu profile-dropdown-menu" id="profile-dropdown-menu">
-                        <a href="{% url 'profile' %}">Мой профиль</a> {# Обновлено для соответствия users.urls #}
+                        <a href="{% url 'user_profile' user.id %}">Мой профиль</a> {# Ссылка на свой профиль по ID #}
                         <a href="{% url 'edit_profile' %}">Редактировать профиль</a> {# Обновлено #}
                         
                         {# Кнопка смены темы теперь здесь для авторизованных #}

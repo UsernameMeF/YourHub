@@ -1,0 +1,16 @@
+/* SOCIAL_NETWORK/your_hub/static/css/core/_index_dark.css */
+
+/* ==== Темная тема для главной страницы (Заглушки постов) ==== */
+html.dark-theme .post-placeholder {
+    background-color: #252526;
+    border-color: #3a3a3a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .post-placeholder h3 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .post-placeholder p {
+    color: #ccc;
+}

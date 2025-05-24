@@ -1,31 +1,46 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Профиль пользователя: {{ user.username }}{% endblock %}
+{# Заголовок будет просто "Профиль" #}
+{% block title %}Профиль{% endblock %}
 
 {% block content %}
 <div class="profile-container"> {# Добавь CSS классы для стилизации страницы профиля #}
-    <h2>Профиль пользователя: {{ user.username }}</h2>
+    {# Заголовок профиля и контейнер для кнопок действий, расположенных справа #}
+    <div class="profile-header-top">
+        <h2>Профиль</h2> {# Изменено с "Профиль пользователя: {{ viewed_user.username }}" #}
 
-    <div class="profile-header"> {# Класс для верхней части профиля (аватар, имя, контакты) #}
-        {# Отображаем аватар пользователя из user_profile #}
-        <img src="{% if user_profile.avatar %}{{ user_profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ user.username }} Аватар" class="profile-avatar-large"> {# Убедись, что у тебя есть CSS класс profile-avatar-large в style.css #}
-
-        <h3>{{ user.username }}</h3>
-        <p>Email: {{ user.email }}</p>
-        {# Добавь отображение других полей профиля, если они есть в модели Profile #}
-        <p>О себе: {{ user_profile.bio|default:"Нет информации" }}</p>
-        {# <p>Местоположение: {{ user_profile.location|default:"Нет информации" }}</p> #}
-        {# <p>Дата рождения: {{ user_profile.birth_date|default:"Нет информации" }}</p> #}
-
-        <p><a href="{% url 'edit_profile' %}">Редактировать профиль</a></p>
+        {# --- Контейнер для кнопок Дружбы и Подписки (будет обновляться через AJAX) --- #}
+        {# Этот блок будет включать сниппет с кнопками #}
+        <div id="profile-actions" class="profile-actions-top">
+            {% include 'profile_actions_snippet.html' with user=user is_my_profile=is_my_profile friendship_status=friendship_status follow_status=follow_status viewed_user=viewed_user %}
+        </div>
     </div>
+
+    <div class="profile-header"> {# Остальная часть заголовка профиля (аватар, инфо) #}
+        {# Отображаем аватар просматриваемого пользователя из user_profile #}
+        {# user_profile связан с viewed_user #}
+        <img src="{% if user_profile.avatar %}{{ user_profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ viewed_user.username }} Аватар" class="profile-avatar-large">
+
+        <div class="profile-info"> {# Добавляем контейнер для инфо, чтобы выровнять с аватаром #}
+            <h3>{{ viewed_user.username }}</h3> {# Отображаем имя просматриваемого пользователя #}
+            <p>Email: {{ viewed_user.email }}</p> {# Отображаем email просматриваемого пользователя #}
+            {# Отображение поля bio из профиля просматриваемого пользователя #}
+            <p>О себе: {{ user_profile.bio|default:"Нет информации" }}</p>
+        </div>
+    </div>
+
+
+    {# TODO: Место для сообщений об успехе/ошибке AJAX на странице профиля #}
+    {# Сообщения будут отображаться здесь #}
+    <div id="ajax-messages" class="ajax-messages-container"></div>
+
 
     <div class="profile-sections"> {# Контейнер для разделов с публикациями, друзьями, активностью #}
         <div class="profile-section"> {# Класс для каждого раздела #}
             <h3>Публикации (Заглушка)</h3>
+            {# Здесь будет логика отображения реальных публикаций для viewed_user #}
             {% if user_posts %}
-                {# Здесь будет логика отображения реальных публикаций #}
                 {% for post in user_posts %}
                     <div class="post-placeholder"> {# Используй существующий стиль заглушки поста #}
                         <h4>{{ post.title|default:"Заголовок публикации" }}</h4>
@@ -38,23 +53,25 @@
         </div>
 
         <div class="profile-section">
-            <h3>Друзья (Заглушка)</h3>
+            <h3>Друзья</h3>
+            {# Отображаем список друзей просматриваемого пользователя (user_friends из контекста) #}
             {% if user_friends %}
-                {# Здесь будет логика отображения списка друзей #}
                 <ul>
                     {% for friend in user_friends %}
-                        <li>{{ friend.username|default:"Имя друга" }}</li>
+                        {# Ссылка на профиль друга по ID #}
+                        <li><a href="{% url 'user_profile' friend.id %}">{{ friend.username }}</a></li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>Пока нет друзей.</p>
+                <p>У {{ viewed_user.username }} пока нет друзей.</p> {# Текст для случая, когда друзей нет #}
             {% endif %}
         </div>
+
+        {# TODO: Отобразить списки подписчиков и подписок (optional) #}
 
         <div class="profile-section">
             <h3>Активность (Заглушка)</h3>
             {% if user_activity %}
-                {# Здесь будет логика отображения активности #}
                 <ul>
                     {% for activity in user_activity %}
                         <li>{{ activity|default:"Описание активности" }}</li>
@@ -66,4 +83,82 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileActionsDiv = document.getElementById('profile-actions'); 
+        const ajaxMessagesDiv = document.getElementById('ajax-messages'); 
+
+        function handleProfileFormSubmit(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const actionUrl = form.action;
+            const method = form.method;
+            const formData = new FormData(form);
+
+            fetch(actionUrl, {
+                method: method,
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message || 'Произошла ошибка.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.new_button_html && profileActionsDiv) {
+                    profileActionsDiv.innerHTML = data.new_button_html;
+                    attachSubmitListenersToNewForms();
+                }
+
+                // Убрано условие if (data.message)
+                // Теперь displayMessage вызывается всегда, но она сама проверит,
+                // нужно ли отображать сообщение.
+                displayMessage(data.message, data.status); 
+
+            })
+            .catch(error => {
+                console.error('AJAX error:', error);
+                displayMessage(error.message || 'Произошла ошибка при выполнении действия.', 'error');
+            });
+        }
+
+        function attachSubmitListenersToNewForms() {
+            const newForms = profileActionsDiv.querySelectorAll('.ajax-profile-action-form');
+            newForms.forEach(newForm => {
+                newForm.removeEventListener('submit', handleProfileFormSubmit);
+                newForm.addEventListener('submit', handleProfileFormSubmit);
+            });
+        }
+
+        attachSubmitListenersToNewForms();
+
+        function displayMessage(message, type) {
+            // *** Изменение здесь: не отображаем сообщение, если оно пустое ***
+            if (!message || message.trim() === '') {
+                ajaxMessagesDiv.innerHTML = ''; // Убедимся, что нет старых сообщений
+                return; // Не показываем пустые сообщения
+            }
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('ajax-message', `ajax-message-${type}`);
+            messageElement.textContent = message;
+
+            ajaxMessagesDiv.innerHTML = '';
+            ajaxMessagesDiv.appendChild(messageElement);
+
+            setTimeout(() => {
+                if (ajaxMessagesDiv.contains(messageElement)) {
+                    messageElement.remove();
+                }
+            }, 5000);
+        }
+    });
+</script>
 {% endblock %}
+{% endblock %} {# Закрываем блок content #}

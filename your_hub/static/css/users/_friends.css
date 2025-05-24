@@ -1,0 +1,236 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_friends.css */
+
+/* ==== Стили Светлой Темы (Страница друзей) ==== */
+
+/* Контейнер для всей страницы списка друзей */
+.friends-list-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Навигация между списками (Друзья / Запросы) */
+.friends-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Кнопки переключения разделов */
+.nav-button {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+    color: #555;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+}
+
+.nav-button:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+/* Активная кнопка навигации */
+.nav-button.active {
+    background-color: #23e2dd;
+    color: #fff;
+    border-color: #23e2dd;
+    font-weight: bold;
+}
+
+.nav-button.active:hover {
+    background-color: #1bcabc;
+    border-color: #1bcabc;
+}
+
+/* Секции списков (Друзья, Входящие, Отправленные) */
+.friends-section {
+    margin-top: 20px;
+}
+
+.friends-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    transition: color 0.5s ease;
+}
+
+/* Стили для списка друзей (сетка) */
+.friends-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+/* Стили для каждого элемента друга в сетке */
+.friend-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.friend-item:hover {
+    background-color: #eee;
+    border-color: #ccc;
+}
+
+/* Ссылка на профиль друга */
+.friend-item a {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.friend-item a:hover {
+    color: #23e2dd;
+}
+
+/* Аватар друга в списке */
+.friend-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.friend-item a:hover .friend-avatar {
+    border-color: #23e2dd;
+}
+
+/* Имя пользователя друга */
+.friend-username {
+    font-size: 0.9em;
+    word-break: break-word;
+}
+
+/* Стили для списков запросов (входящие, отправленные) */
+.request-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Стили для каждого элемента запроса */
+.request-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.request-item:last-child {
+    margin-bottom: 0;
+}
+
+.request-item:hover {
+    background-color: #eee;
+    border-color: #ccc;
+}
+
+/* Ссылка на профиль отправителя/получателя запроса */
+.request-item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    flex-grow: 1;
+    margin-right: 10px;
+    transition: color 0.3s ease;
+}
+
+.request-item a:hover {
+    color: #23e2dd;
+}
+
+/* Аватар отправителя/получателя запроса */
+.request-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.request-item a:hover .request-avatar {
+    border-color: #23e2dd;
+}
+
+
+/* Имя пользователя отправителя/получателя */
+.request-username {
+    font-size: 1em;
+    word-break: break-word;
+}
+
+/* Контейнер для кнопок действий с запросом */
+.request-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Базовые стили для кнопок действий в запросах */
+.request-actions .btn {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Стиль для кнопки "Принять" */
+.request-actions .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+.request-actions .btn-success:hover {
+    background-color: #218838;
+}
+
+/* Стиль для кнопки "Отклонить" / "Отменить" */
+.request-actions .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+.request-actions .btn-danger:hover {
+    background-color: #c82333;
+}
+/* Переопределяем btn-secondary, если используется для "Отменить", чтобы он был красным в этом контексте */
+.request-actions .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.request-actions .btn-secondary:hover {
+    background-color: #5a6268;
+}
