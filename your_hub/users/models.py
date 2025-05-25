@@ -1,10 +1,11 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_save, post_delete, post_save
 from django.dispatch import receiver
 from django.conf import settings 
 from PIL import Image 
+from django.utils import timezone
 
 
 def profile_avatar_upload_path(instance, filename):
@@ -14,9 +15,18 @@ def profile_avatar_upload_path(instance, filename):
 
 
 class Profile(models.Model):
+    STATUS_CHOICES = (
+        ('online', 'В сети'),
+        ('away', 'Нет на месте'),
+        ('dnd', 'Не беспокоить'),
+        ('invisible', 'Невидимый'),
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(default='images/default-avatar.png', upload_to=profile_avatar_upload_path)
     bio = models.TextField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="offline")
+    last_activity = models.DateTimeField(null=True, blank=True)
 
 
     def __str__(self):

@@ -1,164 +1,219 @@
+{# users/templates/users/profile.html #}
 {% extends 'base.html' %}
 {% load static %}
 
-{# Заголовок будет просто "Профиль" #}
-{% block title %}Профиль{% endblock %}
+{% block title %}{{ viewed_user.username }} Profile{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/users/_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/_profile_dark.css' %}">
+    {# Убедитесь, что Font Awesome подключен в base.html или здесь #}
+    {# Пример подключения Font Awesome (если еще нет в base.html): #}
+    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> #}
+{% endblock %}
 
 {% block content %}
-<div class="profile-container"> {# Добавь CSS классы для стилизации страницы профиля #}
-    {# Заголовок профиля и контейнер для кнопок действий, расположенных справа #}
-    <div class="profile-header-top">
-        <h2>Профиль</h2> {# Изменено с "Профиль пользователя: {{ viewed_user.username }}" #}
-
-        {# --- Контейнер для кнопок Дружбы и Подписки (будет обновляться через AJAX) --- #}
-        {# Этот блок будет включать сниппет с кнопками #}
-        <div id="profile-actions" class="profile-actions-top">
-            {% include 'profile_actions_snippet.html' with user=user is_my_profile=is_my_profile friendship_status=friendship_status follow_status=follow_status viewed_user=viewed_user %}
+    <div class="profile-container">
+        <div class="profile-header-top">
+            <h2>Профиль</h2>
+            <div class="profile-actions-top">
+                {% if is_my_profile %}
+                    <a href="{% url 'edit_profile' %}" class="btn-primary">Редактировать профиль</a>
+                {% else %}
+                    {# Проверяем статус дружбы для отображения кнопок #}
+                    {% include 'profile_actions_snippet.html' %}
+                {% endif %}
+            </div>
         </div>
-    </div>
 
-    <div class="profile-header"> {# Остальная часть заголовка профиля (аватар, инфо) #}
-        {# Отображаем аватар просматриваемого пользователя из user_profile #}
-        {# user_profile связан с viewed_user #}
-        <img src="{% if user_profile.avatar %}{{ user_profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ viewed_user.username }} Аватар" class="profile-avatar-large">
+        <div class="profile-header">
+            {# Контейнер для аватара и статуса #}
+            <div class="profile-avatar-wrapper">
+                <img src="{{ user_profile.avatar.url }}" alt="Аватар {{ viewed_user.username }}" class="profile-avatar-large">
+                
+                {# Иконка статуса #}
+                <div class="status-indicator status-{{ actual_status }}" 
+                     data-current-status="{{ user_profile.status }}" 
+                     {% if is_my_profile %}id="my-status-indicator"{% endif %}>
+                     <i class="status-icon"></i> 
+                </div>
 
-        <div class="profile-info"> {# Добавляем контейнер для инфо, чтобы выровнять с аватаром #}
-            <h3>{{ viewed_user.username }}</h3> {# Отображаем имя просматриваемого пользователя #}
-            <p>Email: {{ viewed_user.email }}</p> {# Отображаем email просматриваемого пользователя #}
-            {# Отображение поля bio из профиля просматриваемого пользователя #}
-            <p>О себе: {{ user_profile.bio|default:"Нет информации" }}</p>
-        </div>
-    </div>
-
-
-    {# TODO: Место для сообщений об успехе/ошибке AJAX на странице профиля #}
-    {# Сообщения будут отображаться здесь #}
-    <div id="ajax-messages" class="ajax-messages-container"></div>
-
-
-    <div class="profile-sections"> {# Контейнер для разделов с публикациями, друзьями, активностью #}
-        <div class="profile-section"> {# Класс для каждого раздела #}
-            <h3>Публикации (Заглушка)</h3>
-            {# Здесь будет логика отображения реальных публикаций для viewed_user #}
-            {% if user_posts %}
-                {% for post in user_posts %}
-                    <div class="post-placeholder"> {# Используй существующий стиль заглушки поста #}
-                        <h4>{{ post.title|default:"Заголовок публикации" }}</h4>
-                        <p>{{ post.content|default:"Краткое описание публикации..." }}</p>
+                {# Выпадающее меню статусов (видимо только для своего профиля) #}
+                {% if is_my_profile %}
+                <div class="status-dropdown" id="status-dropdown">
+                    <div class="status-option" data-status="online">
+                        <i class="status-dot fas fa-circle status-online"></i> В сети
                     </div>
-                {% endfor %}
-            {% else %}
-                <p>Пока нет публикаций.</p>
-            {% endif %}
+                    <div class="status-option" data-status="away">
+                        <i class="status-dot fas fa-moon status-away"></i> Неактивен
+                    </div>
+                    <div class="status-option" data-status="dnd">
+                        <i class="status-dot fas fa-minus-circle status-dnd"></i> Не беспокоить
+                    </div>
+                    <div class="status-option" data-status="invisible">
+                        <i class="status-dot fas fa-circle status-invisible"></i> Невидимый
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-info">
+                <h3>@{{ viewed_user.username }}</h3>
+                <p>Дата регистрации: {{ viewed_user.date_joined|date:"d.m.Y" }}</p>
+                {% if user_profile.bio %}
+                    <p>О себе: {{ user_profile.bio }}</p>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="profile-section">
-            <h3>Друзья</h3>
-            {# Отображаем список друзей просматриваемого пользователя (user_friends из контекста) #}
-            {% if user_friends %}
-                <ul>
-                    {% for friend in user_friends %}
-                        {# Ссылка на профиль друга по ID #}
-                        <li><a href="{% url 'user_profile' friend.id %}">{{ friend.username }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>У {{ viewed_user.username }} пока нет друзей.</p> {# Текст для случая, когда друзей нет #}
-            {% endif %}
-        </div>
+        <div class="profile-sections">
+            <div class="profile-section">
+                <h3>Публикации</h3>
+                {% if user_posts %}
+                    {# TODO: Отображение публикаций #}
+                    <ul>
+                        {% for post in user_posts %}
+                            <li>{{ post.title }} - {{ post.date_posted|date:"d.m.Y" }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>У пользователя пока нет публикаций.</p>
+                {% endif %}
+            </div>
 
-        {# TODO: Отобразить списки подписчиков и подписок (optional) #}
+            <div class="profile-section">
+                <h3>Друзья ({{ user_friends.count }})</h3>
+                {% if user_friends %}
+                    <ul>
+                        {% for friend in user_friends %}
+                            <li><a href="{% url 'user_profile' friend.id %}">{{ friend.username }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{{ viewed_user.username }} пока не имеет друзей.</p>
+                {% endif %}
+            </div>
 
-        <div class="profile-section">
-            <h3>Активность (Заглушка)</h3>
-            {% if user_activity %}
-                <ul>
-                    {% for activity in user_activity %}
-                        <li>{{ activity|default:"Описание активности" }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Пока нет активности.</p>
-            {% endif %}
+            <div class="profile-section">
+                <h3>Активность</h3>
+                {% if user_activity %}
+                    {# TODO: Отображение активности #}
+                    <ul>
+                        {% for activity in user_activity %}
+                            <li>{{ activity.description }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Последней активности нет.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const profileActionsDiv = document.getElementById('profile-actions'); 
-        const ajaxMessagesDiv = document.getElementById('ajax-messages'); 
+        // Выбираем индикатор статуса по классу, так как ID будет только у своего профиля.
+        // Убедитесь, что .profile-avatar-wrapper .status-indicator существует в DOM.
+        const statusIndicator = document.querySelector('.profile-avatar-wrapper .status-indicator');
+        const statusIcon = statusIndicator ? statusIndicator.querySelector('.status-icon') : null;
+        
+        // Эта функция отвечает за обновление иконки статуса. Она должна работать для всех профилей.
+        function updateStatusIcon(displayStatus) { 
+            if (!statusIcon) return; // Если иконка не найдена, выходим.
 
-        function handleProfileFormSubmit(event) {
-            event.preventDefault();
+            // Сбрасываем все текущие классы Font Awesome с иконки и добавляем базовый 'fas'
+            statusIcon.className = 'status-icon fas'; 
+            
+            // Сбрасываем классы статуса на контейнере и добавляем новый (например, 'status-online')
+            // Убедитесь, что 'status-indicator' всегда есть.
+            statusIndicator.className = 'status-indicator status-' + displayStatus;
 
-            const form = event.target;
-            const actionUrl = form.action;
-            const method = form.method;
-            const formData = new FormData(form);
-
-            fetch(actionUrl, {
-                method: method,
-                body: formData,
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Произошла ошибка.');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.new_button_html && profileActionsDiv) {
-                    profileActionsDiv.innerHTML = data.new_button_html;
-                    attachSubmitListenersToNewForms();
-                }
-
-                // Убрано условие if (data.message)
-                // Теперь displayMessage вызывается всегда, но она сама проверит,
-                // нужно ли отображать сообщение.
-                displayMessage(data.message, data.status); 
-
-            })
-            .catch(error => {
-                console.error('AJAX error:', error);
-                displayMessage(error.message || 'Произошла ошибка при выполнении действия.', 'error');
-            });
-        }
-
-        function attachSubmitListenersToNewForms() {
-            const newForms = profileActionsDiv.querySelectorAll('.ajax-profile-action-form');
-            newForms.forEach(newForm => {
-                newForm.removeEventListener('submit', handleProfileFormSubmit);
-                newForm.addEventListener('submit', handleProfileFormSubmit);
-            });
-        }
-
-        attachSubmitListenersToNewForms();
-
-        function displayMessage(message, type) {
-            // *** Изменение здесь: не отображаем сообщение, если оно пустое ***
-            if (!message || message.trim() === '') {
-                ajaxMessagesDiv.innerHTML = ''; // Убедимся, что нет старых сообщений
-                return; // Не показываем пустые сообщения
+            // Устанавливаем конкретную иконку Font Awesome в зависимости от статуса
+            if (displayStatus === 'online') {
+                statusIcon.classList.add('fa-circle'); // Круг
+            } else if (displayStatus === 'away') {
+                statusIcon.classList.add('fa-moon'); // Полумесяц
+            } else if (displayStatus === 'dnd') {
+                statusIcon.classList.add('fa-minus-circle'); // Минус в круге
+            } else if (displayStatus === 'invisible' || displayStatus === 'offline') {
+                statusIcon.classList.add('fa-circle'); // Круг для невидимого/оффлайн
             }
-
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('ajax-message', `ajax-message-${type}`);
-            messageElement.textContent = message;
-
-            ajaxMessagesDiv.innerHTML = '';
-            ajaxMessagesDiv.appendChild(messageElement);
-
-            setTimeout(() => {
-                if (ajaxMessagesDiv.contains(messageElement)) {
-                    messageElement.remove();
-                }
-            }, 5000);
         }
+
+        // Инициализация иконки при загрузке страницы для ЛЮБОГО профиля.
+        // Берем начальный отображаемый статус.
+        // Сначала пытаемся взять из текущих классов элемента (если уже установлены).
+        // Если не удалось, берем значение из контекста Django (которое передал views.py).
+        const initialDisplayStatus = statusIndicator.classList.value.split(' ').find(cls => cls.startsWith('status-') && cls !== 'status-indicator').replace('status-', '') || '{{ actual_status }}';
+        updateStatusIcon(initialDisplayStatus); 
+
+        // --- Этот блок JavaScript выполняется ТОЛЬКО для СВОЕГО профиля (для изменения статуса) ---
+        {% if is_my_profile %}
+        const statusDropdown = document.getElementById('status-dropdown');
+        const statusOptions = statusDropdown ? statusDropdown.querySelectorAll('.status-option') : null;
+        // Получаем CSRF токен для AJAX-запросов
+        const csrfToken = '{{ csrf_token }}';
+
+        if (statusIndicator && statusDropdown && statusOptions) {
+            // Обработчик клика по индикатору статуса для открытия/закрытия выпадающего меню
+            statusIndicator.addEventListener('click', function(event) {
+                event.stopPropagation(); // Предотвращаем всплытие события, чтобы не закрывать меню сразу
+                statusDropdown.classList.toggle('active'); // Переключаем класс 'active' для отображения/скрытия
+            });
+
+            // Обработчик клика вне выпадающего меню для его закрытия
+            document.addEventListener('click', function(event) {
+                if (!statusDropdown.contains(event.target) && !statusIndicator.contains(event.target)) {
+                    statusDropdown.classList.remove('active');
+                }
+            });
+
+            // Обработчики кликов для каждой опции статуса в выпадающем меню
+            statusOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const newChosenStatus = this.dataset.status; // Получаем выбранный статус из data-атрибута
+                    
+                    // Отправляем AJAX POST-запрос на сервер для обновления статуса
+                    fetch('{% url "set_user_status" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded', // Тип данных в теле запроса
+                            'X-CSRFToken': csrfToken // Передаем CSRF токен для безопасности
+                        },
+                        body: `status_type=${newChosenStatus}` // Тело запроса с новым статусом
+                    })
+                    .then(response => {
+                        // Проверяем, успешен ли ответ сервера (код 2xx)
+                        if (!response.ok) {
+                            // Если не успешен, пытаемся прочитать текст ошибки и выбросить исключение
+                            return response.text().then(text => { throw new Error(text) });
+                        }
+                        // Если успешен, парсим JSON-ответ
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Обрабатываем успешный ответ от сервера
+                        if (data.status === 'success') {
+                            updateStatusIcon(data.new_status); // Обновляем иконку на основе актуального статуса, полученного от сервера
+                            statusIndicator.dataset.currentStatus = data.chosen_status; // Сохраняем выбранный статус в data-атрибуте
+                            
+                            statusDropdown.classList.remove('active'); // Закрываем выпадающее меню
+                            console.log('Статус успешно обновлен до:', data.chosen_status, 'Отображаемый статус:', data.new_status);
+                        } else {
+                            // Если сервер вернул статус 'error'
+                            console.error('Ошибка при обновлении статуса:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        // Обработка ошибок AJAX-запроса (например, проблемы с сетью, некорректный JSON)
+                        console.error('Ошибка AJAX запроса:', error);
+                    });
+                });
+            });
+        }
+        {% endif %} 
     });
 </script>
-{% endblock %}
-{% endblock %} {# Закрываем блок content #}
+{% endblock %} {# Закрывающий тег для block extra_js #}

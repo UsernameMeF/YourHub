@@ -76,16 +76,138 @@
     flex-wrap: wrap;
 }
 
+/* Оболочка для аватара и индикатора статуса */
+.profile-avatar-wrapper {
+    position: relative;
+    display: inline-block; /* Чтобы div занимал только необходимое пространство */
+}
+
 /* Большой аватар на странице профиля */
 .profile-avatar-large {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #23e2dd;
     flex-shrink: 0;
     transition: border-color 0.3s ease;
 }
+
+/* Иконка статуса */
+.status-indicator {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px; /* Отступ от нижней границы аватара */
+    right: 5px; /* Отступ от правой границы аватара */
+    border: 2px solid #fff; /* Белая обводка, чтобы выделить на темном фоне аватара */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    display: flex; /* Используем flexbox для центрирования иконки */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+}
+
+.status-indicator .status-icon {
+    font-size: 14px; /* Размер иконки внутри кружка */
+    color: #fff; /* Цвет самой иконки по умолчанию - белый */
+    line-height: 1; /* Убрать лишний отступ */
+}
+
+/* Цвета для статусов */
+.status-online {
+    background-color: #28a745; /* Зеленый */
+}
+
+.status-away {
+    background-color: #ffc107; /* Желтый */
+}
+
+.status-dnd {
+    background-color: #dc3545; /* Красный */
+}
+
+/* "Невидимый" и "Не в сети" выглядят одинаково */
+.status-invisible,
+.status-offline {
+    background-color: #6c757d; /* Серый */
+}
+
+/* Выпадающее меню статусов */
+.status-dropdown {
+    position: absolute;
+    top: calc(100% + 10px); 
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 170px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px); 
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    padding: 5px 0;
+}
+
+.status-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    cursor: pointer;
+    color: #333;
+}
+
+.status-option:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для маленьких иконок в выпадающем меню */
+.status-option .status-dot { /* Теперь это иконка, а не просто точка */
+    width: 20px; /* Увеличиваем размер для иконок */
+    height: 20px;
+    border-radius: 50%; /* Чтобы круги были кругами */
+    margin-right: 10px;
+    display: flex; /* Flexbox для центрирования иконки */
+    justify-content: center;
+    align-items: center;
+    color: #fff; /* Цвет иконки внутри кружка */
+    font-size: 12px; /* Размер иконки */
+    box-sizing: border-box; /* Важно для box-model */
+    border: none; /* Убираем бордер, если был */
+}
+
+.status-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid #ccc; /* Легкая обводка для точек */
+}
+
+/* Цвета точек в выпадающем меню */
+.status-option .status-online {
+    background-color: #28a745;
+}
+.status-option .status-away {
+    background-color: #ffc107;
+}
+.status-option .status-dnd {
+    background-color: #dc3545;
+}
+.status-option .status-invisible {
+    background-color: #6c757d;
+}
+
 
 /* Контейнер для основной информации профиля */
 .profile-info {

@@ -1,10 +1,10 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_ajax_messages_dark.css */
 
 /* ==== Темная тема для AJAX сообщений ==== */
-html.dark-theme .ajax-messages-container {
+/* html.dark-theme .ajax-messages-container { */
     /* Фон и цвет текста меняются на основе типа сообщения, поэтому здесь общие стили минимальны */
     /* Можно добавить общую рамку или тень */
-}
+/* } */
 
 html.dark-theme .ajax-message.ajax-message-success {
    background-color: #214d2a; /* Темно-зеленый фон */

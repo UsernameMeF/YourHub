@@ -42,5 +42,5 @@ urlpatterns = [
     # Используется формами на странице профиля другого пользователя
     path('unfollow/<int:user_id>/', views.unfollow_user, name='unfollow_user'),
 
-
+    path('set-status/', views.set_user_status, name='set_user_status'),
 ]

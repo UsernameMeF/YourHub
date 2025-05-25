@@ -14,7 +14,9 @@ from django.views.generic import FormView
 from django.utils import timezone
 from django.http import JsonResponse # Для AJAX
 from django.views.decorators.http import require_POST
-from django.template.loader import render_to_string # Импортируем для рендеринга HTML сниппетов
+from django.template.loader import render_to_string# HTML сниппеты
+
+ONLINE_THRESHOLD_MINUTES = 5 # "Порог" времени для определения статуса онлайн
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -45,6 +47,9 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            if hasattr(request.user, 'profile'):
+                request.user.profile.last_activity = timezone.now()
+                request.user.profile.save(update_fields=['last_activity'])
 
             next_url = request.GET.get('next')
             if next_url:
@@ -71,38 +76,66 @@ def custom_logout_view(request):
 # @login_required # Профиль может быть доступен и неавторизованным пользователям для просмотра (но не для действий)
 def profile_view(request, user_id):
     """Представление для отображения профиля любого пользователя по ID."""
-    # Получаем пользователя, чей профиль просматриваем
     viewed_user = get_object_or_404(User, pk=user_id)
-    user_profile = viewed_user.profile # Получаем связанный профиль
+    user_profile = viewed_user.profile 
 
-    # Проверяем, является ли просматриваемый профиль профилем текущего авторизованного пользователя
     is_my_profile = (request.user == viewed_user)
 
-    # --- Определение статуса отношений между текущим пользователем и просматриваемым ---
-    # Эти переменные будут переданы в шаблон для отображения кнопок
-    friendship_status = None # Возможные значения: 'not_friends', 'pending_sent', 'pending_received', 'friends'
-    follow_status = False # True если текущий пользователь подписан на просматриваемого
+    # --- Корректное определение actual_status для отображения ---
+    current_status = user_profile.status # Берем текущий статус из профиля пользователя
 
-    sent_request = None # Инициализируем None
-    received_request = None # Инициализируем None
+    # Инициализируем статус, который будет отображаться
+    calculated_actual_status = 'offline' 
 
-    # Определяем статус отношений только если пользователь авторизован и смотрит не свой профиль
+    if user_profile.last_activity:
+        time_since_last_activity = timezone.now() - user_profile.last_activity
+        
+        # Если пользователь был активен недавно
+        if time_since_last_activity < timezone.timedelta(minutes=ONLINE_THRESHOLD_MINUTES):
+            # Логика для "невидимого" статуса:
+            if current_status == 'invisible':
+                if is_my_profile:
+                    # Если это мой профиль и я "невидимый", показываем "невидимый"
+                    calculated_actual_status = 'invisible'
+                else:
+                    # Если это ЧУЖОЙ профиль и он "невидимый", показываем "оффлайн"
+                    calculated_actual_status = 'offline'
+            else:
+                # Если статус не "невидимый" и пользователь активен, показываем его реальный статус
+                calculated_actual_status = current_status
+        else:
+            # Если пользователь неактивен дольше ONLINE_THRESHOLD_MINUTES, он всегда "оффлайн"
+            calculated_actual_status = 'offline'
+    else: 
+        # Если нет информации о последней активности, считаем оффлайн
+        calculated_actual_status = 'offline'
+
+    # Дополнительная проверка на случай, если status_profile был пуст или содержал невалидное значение
+    # Хотя благодаря default='offline' в модели Profile и Profile.STATUS_CHOICES, это менее вероятно.
+    if calculated_actual_status not in [choice[0] for choice in Profile.STATUS_CHOICES] + ['offline']:
+        calculated_actual_status = 'offline' # Устанавливаем дефолтное значение, если что-то пошло не так.
+
+
+    # --- Остальная часть вашей функции (без изменений, так как она уже работает) ---
+    friendship_status = None 
+    follow_status = False
+
+    sent_request = None 
+    received_request = None 
+
     if request.user.is_authenticated and not is_my_profile:
-        # Проверяем, отправлял ли текущий пользователь запрос на дружбу просматриваемому
         sent_request = Friendship.objects.filter(
             from_user=request.user,
             to_user=viewed_user,
             status='pending'
         ).first()
 
-        # Проверяем, получал ли текущий пользователь запрос на дружбу от просматриваемого
         received_request = Friendship.objects.filter(
             from_user=viewed_user,
             to_user=request.user,
             status='pending'
         ).first()
 
-        # Проверяем, являются ли они друзьями (проверяем accepted статус в обе стороны)
         are_friends = Friendship.objects.filter(
             (Q(from_user=request.user, to_user=viewed_user) | Q(from_user=viewed_user, to_user=request.user)),
             status='accepted'
@@ -117,39 +150,34 @@ def profile_view(request, user_id):
         else:
             friendship_status = 'not_friends'
 
-        # Проверяем, подписан ли текущий пользователь на просматриваемого
         if Follow.objects.filter(follower=request.user, following=viewed_user).exists():
             follow_status = True
 
 
-    user_posts = [] # TODO: Получать публикации пользователя (viewed_user)
-
-
+    user_posts = [] 
     user_friends = User.objects.filter(
         Q(sent_friend_requests__to_user=viewed_user, sent_friend_requests__status='accepted') |
         Q(received_friend_requests__from_user=viewed_user, received_friend_requests__status='accepted')
-    ).distinct().order_by('username') # Сортируем друзей по имени пользователя
+    ).distinct().order_by('username')
 
 
-    user_activity = [] # TODO: Получать активность пользователя (viewed_user)
+    user_activity = []
 
     context = {
-        'viewed_user': viewed_user, # Пользователь, чей профиль отображается
-        'user_profile': user_profile, # Профиль просматриваемого пользователя
-        'is_my_profile': is_my_profile, # True, если просматривается свой профиль
-        'friendship_status': friendship_status, # Статус дружбы текущего пользователя с просматриваемым
-        'follow_status': follow_status, # True, если текущий пользователь подписан на просматриваемого
+        'viewed_user': viewed_user, 
+        'user_profile': user_profile, 
+        'is_my_profile': is_my_profile, 
+        'friendship_status': friendship_status, 
+        'follow_status': follow_status, 
 
-        # Данные заглушки или реальные данные
         'user_posts': user_posts,
-        'user_friends': user_friends, # Список друзей просматриваемого пользователя
+        'user_friends': user_friends, 
         'user_activity': user_activity,
 
-        # Передаем объекты запросов, если они существуют, для использования в шаблоне профиля
         'sent_request': sent_request,
         'received_request': received_request,
+        'actual_status': calculated_actual_status, # Передаем вычисленный статус в контекст
     }
-    # Render the profile template, passing the context
     return render(request, 'users/profile.html', context)
 
 
@@ -181,6 +209,69 @@ def edit_profile_view(request):
         'profile_form': profile_form,
     }
     return render(request, 'users/edit_profile.html', context)
+
+
+# users/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse 
+from django.views.decorators.http import require_POST
+from .models import Profile # Убедитесь, что Profile импортирован правильно
+from django.utils import timezone # Добавьте импорт timezone
+
+@require_POST
+@login_required
+def set_user_status(request):
+    # Эта проверка хороша, но если profile не существует,
+    # request.user.profile все равно вызовет DoesNotExist
+    # до того, как эта проверка сработает, если access profile через related_name.
+    # Более надежно это делать через try-except Profile.DoesNotExist, как я предлагал ранее,
+    # или убедиться, что у всех пользователей есть профили.
+    if not hasattr(request.user, 'profile'):
+        # Это сработает, если request.user.profile не был создан.
+        return JsonResponse({'status': 'error', 'message': 'Не удалось найти профиль пользователя.'}, status=404) # Добавьте status=404
+
+    chosen_status = request.POST.get('status_type')
+
+    # Убедитесь, что Profile импортирован, иначе Profile.STATUS_CHOICES вызовет NameError
+    try: # Добавим try-except вокруг получения valid_statuses на случай, если Profile не импортирован или проблема с атрибутом
+        valid_statuses = [choice[0] for choice in Profile.STATUS_CHOICES]
+    except AttributeError:
+        return JsonResponse({'status': 'error', 'message': 'Ошибка: Не могу получить список статусов. Проверьте модель Profile.'}, status=500)
+    except NameError:
+         return JsonResponse({'status': 'error', 'message': 'Ошибка: Модель Profile не импортирована или недоступна.'}, status=500)
+
+
+    if chosen_status not in valid_statuses:
+        return JsonResponse({'status': 'error', 'message': 'Недопустимый статус'}, status=400) # Добавьте status=400
+
+    
+    try:
+        profile = request.user.profile
+        profile.status = chosen_status
+        profile.last_activity = timezone.now() # Добавьте это, если у вас есть поле last_activity
+        profile.save(update_fields=['status', 'last_activity'])
+
+        # Исправлено:
+        display_status = 'offline' if chosen_status == 'invisible' else chosen_status
+
+
+        return JsonResponse({
+            'status': 'success', # Здесь было 'succes', изменил на 'success'
+            'message': '',
+            'new_status': display_status, # Это фактический статус для отображения
+            'chosen_status': chosen_status # Это статус, который выбрал пользователь
+        })
+
+    except Exception as e:
+        # Важно: В продакшене не выводите str(e) напрямую пользователю,
+        # но для отладки это полезно
+        print(f"Ошибка при изменении статуса: {e}") # Это сообщение появится в консоли Django-сервера
+        return JsonResponse({'status': 'error', 'message': f'Произошла ошибка при изменении статуса: {str(e)}'}, status=500)
+
+
+
 
 
 # --- Представления для Друзей и Подписок ---
