@@ -34,6 +34,12 @@
         </div>
 
         <div class="auth-buttons">
+            {# Кнопка смены темы теперь всегда видна #}
+            <button class="theme-switch-button" id="theme-switch-button" aria-label="Переключить тему">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.11 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+
             {% if user.is_authenticated %}
                 {# Пользователь авторизован #}
                 <a href="#" class="header-icon-button" title="Открыть чат">
@@ -43,8 +49,7 @@
 
                 <a href="#" class="header-button-create" title="Создать пост">
                     {# SVG иконка плюса (пример) #}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Создать
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </a>
 
                 <a href="#" class="header-icon-button" title="Уведомления">
@@ -60,28 +65,19 @@
                     </button>
                     <div class="dropdown-menu profile-dropdown-menu" id="profile-dropdown-menu">
                         <a href="{% url 'user_profile' user.id %}">Мой профиль</a> {# Ссылка на свой профиль по ID #}
-                        <a href="{% url 'edit_profile' %}">Редактировать профиль</a> {# Обновлено #}
+                        <a href="{% url 'edit_profile' %}">Редактировать профиль</a>
                         
-                        {# Кнопка смены темы теперь здесь для авторизованных #}
-                        <button class="theme-switch-button-dropdown" id="theme-switch-button-dropdown" aria-label="Переключить тему">
-                            {# Иконки будут подгружаться JS, либо можно оставить текст "Сменить тему" #}
-                             <span class="theme-switch-text">Сменить тему</span>
-                             {# Или так, если хочешь иконки прямо тут (понадобится немного JS для их обновления) #}
-                             </button>
+                        {# Кнопка смены темы удалена отсюда #}
                         
                         <a href="#">Настройки</a> {# Заглушка #}
-                        <a href="{% url 'logout' %}">Выход</a> {# Обновлено для соответствия users.urls #}
+                        <a href="{% url 'logout' %}">Выход</a>
                     </div>
                 </div>
 
             {% else %}
-                {# Пользователь не авторизован - Кнопка смены темы остается снаружи #}
-                <button class="theme-switch-button" id="theme-switch-button-loggedout" aria-label="Переключить тему">
-                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.11 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-                <a href="{% url 'register' %}" class="btn-primary">Зарегистрироваться</a> {# Обновлено #}
-                <a href="{% url 'login' %}" class="btn-secondary">Войти</a> {# Обновлено #}
+                {# Пользователь не авторизован #}
+                <a href="{% url 'register' %}" class="btn-primary">Зарегистрироваться</a>
+                <a href="{% url 'login' %}" class="btn-secondary">Войти</a>
             {% endif %}
         </div>
     </header>
@@ -122,7 +118,7 @@
         const htmlElement = document.documentElement;
         let currentTheme = htmlElement.classList.contains('dark-theme') ? 'dark' : 'light';
 
-        // Функция для установки темы и обновления иконок (если они есть на кнопке)
+        // Функция для установки темы и обновления иконок на **основной** кнопке
         function applyTheme(theme) {
             if (theme === 'dark') {
                 htmlElement.classList.add('dark-theme');
@@ -133,49 +129,30 @@
                 localStorage.setItem('theme', 'light');
                 currentTheme = 'light';
             }
-            updateThemeButtonIcons(); // Обновляем состояние всех кнопок смены темы
+            updateThemeButtonIcons(); // Обновляем состояние кнопки смены темы
         }
 
-        // Функция для обновления состояния иконок/текста на кнопках смены темы
+        // Функция для обновления состояния иконок на основной кнопке смены темы
         function updateThemeButtonIcons() {
             const isDark = htmlElement.classList.contains('dark-theme');
-
-            // Кнопка в header для неавторизованных
-            const themeSwitchButtonLoggedOut = document.getElementById('theme-switch-button-loggedout');
-            if (themeSwitchButtonLoggedOut) {
-                const sunIcon = themeSwitchButtonLoggedOut.querySelector('.sun-icon');
-                const moonIcon = themeSwitchButtonLoggedOut.querySelector('.moon-icon');
+            const themeSwitchButton = document.getElementById('theme-switch-button'); // Теперь у нас только одна кнопка
+            if (themeSwitchButton) {
+                const sunIcon = themeSwitchButton.querySelector('.sun-icon');
+                const moonIcon = themeSwitchButton.querySelector('.moon-icon');
                 if (sunIcon && moonIcon) {
                     sunIcon.style.display = isDark ? 'none' : 'block';
                     moonIcon.style.display = isDark ? 'block' : 'none';
                 }
             }
-
-            // Кнопка в выпадающем меню для авторизованных
-            const themeSwitchButtonDropdown = document.getElementById('theme-switch-button-dropdown');
-            if (themeSwitchButtonDropdown) {
-                // Здесь можно менять текст или показывать/скрывать иконки, если ты их добавишь
-                const themeText = themeSwitchButtonDropdown.querySelector('.theme-switch-text');
-                 if (themeText) {
-                    themeText.textContent = isDark ? 'Светлая тема' : 'Темная тема';
-                }
-            }
         }
         
-        // Инициализация состояния кнопок при загрузке
+        // Инициализация состояния кнопки при загрузке
         updateThemeButtonIcons();
 
-        // Обработчики для кнопок смены темы
-        const themeSwitchButtonLoggedOut = document.getElementById('theme-switch-button-loggedout');
-        if (themeSwitchButtonLoggedOut) {
-            themeSwitchButtonLoggedOut.addEventListener('click', () => {
-                applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-            });
-        }
-
-        const themeSwitchButtonDropdown = document.getElementById('theme-switch-button-dropdown');
-        if (themeSwitchButtonDropdown) {
-            themeSwitchButtonDropdown.addEventListener('click', () => {
+        // Обработчик для основной кнопки смены темы
+        const themeSwitchButton = document.getElementById('theme-switch-button');
+        if (themeSwitchButton) {
+            themeSwitchButton.addEventListener('click', () => {
                 applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
             });
         }

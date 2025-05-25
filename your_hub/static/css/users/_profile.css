@@ -11,6 +11,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    overflow: hidden; /* Важно, чтобы баннер и аватар не выходили за границы */
 }
 
 /* Контейнер для заголовка профиля и кнопок действий */

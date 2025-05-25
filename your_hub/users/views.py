@@ -166,7 +166,7 @@ def edit_profile_view(request):
             user_form.save()
             profile_form.save()
             # messages.success(request, 'Профиль успешно обновлен!') # Убираем это сообщение
-            return redirect('profile')
+            return redirect('user_profile', user.id)
         # else:
              # Ошибки формы будут отображены в шаблоне
              # pass

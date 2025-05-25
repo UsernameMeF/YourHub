@@ -12,6 +12,7 @@ html.dark-theme form label {
 
 html.dark-theme form input[type="text"],
 html.dark-theme form input[type="password"],
+html.dark-theme form textarea,
 html.dark-theme form input[type="email"] {
     background-color: #333;
     color: #f0f0f0;
@@ -19,15 +20,22 @@ html.dark-theme form input[type="email"] {
 }
 html.dark-theme form input[type="text"]::placeholder,
 html.dark-theme form input[type="password"]::placeholder,
+html.dark-theme form textarea::placeholder,
 html.dark-theme form input[type="email"]::placeholder {
     color: #bbb;
 }
 
 html.dark-theme form input[type="text"]:focus,
 html.dark-theme form input[type="password"]:focus,
+html.dark-theme form textarea:focus,
 html.dark-theme form input[type="email"]:focus {
     border-color: #00e600;
     box-shadow: 0 0 5px rgba(0, 230, 0, 0.5);
+}
+
+html.dark-theme form textarea {
+    min-height: 100px; /* Минимальная высота, можно настроить */
+    resize: none; /* Разрешить изменение размера только по вертикали */
 }
 
 html.dark-theme form button[type="submit"] {

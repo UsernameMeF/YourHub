@@ -19,6 +19,7 @@ form label {
 
 form input[type="text"],
 form input[type="password"],
+form textarea,
 form input[type="email"] {
     width: 100%;
     padding: 10px;
@@ -33,16 +34,23 @@ form input[type="email"] {
 
 form input[type="text"]::placeholder,
 form input[type="password"]::placeholder,
+form textarea::placeholder,
 form input[type="email"]::placeholder {
     color: #666;
 }
 
 form input[type="text"]:focus,
 form input[type="password"]:focus,
+form textarea:focus,
 form input[type="email"]:focus {
     border-color: #23e2dd;
     outline: none;
     box-shadow: 0 0 5px rgba(35, 226, 221, 0.5);
+}
+
+form textarea {
+    min-height: 100px; /* Минимальная высота, можно настроить */
+    resize: none; /* Разрешить изменение размера только по вертикали */
 }
 
 form button[type="submit"] {

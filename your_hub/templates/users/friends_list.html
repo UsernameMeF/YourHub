@@ -31,7 +31,6 @@
                             <img src="{% if friend.profile and friend.profile.avatar %}{{ friend.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ friend.username }} Аватар" class="friend-avatar">
                             <span class="friend-username">{{ friend.username }}</span>
                         </a>
-                        {# TODO: Опционально: кнопка "Удалить из друзей" (потребуется AJAX) #}
                         {# <form method="post" action="{% url 'remove_friend' user_id=friend.id %}" class="ajax-remove-friend-form" data-user-id="{{ friend.id }}" style="display:inline;"> {% csrf_token %} <button type="submit">Удалить</button> </form> #}
                     </li>
                 {% endfor %}
@@ -94,11 +93,11 @@
                                 <span class="request-username">{{ request.to_user.username }}</span>
                             </a>
                             <div class="request-actions">
-                                - Ожидает подтверждения
+                                {#- Ожидает подтверждения#}
                                 {# Форма для отмены запроса - с классом для AJAX #}
                                 <form method="post" action="{% url 'cancel_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-secondary">Отменить</button>
+                                    <button type="submit" class="btn btn-danger">Отменить</button>
                                 </form>
                             </div>
                         </li>

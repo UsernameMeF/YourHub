@@ -30,4 +30,4 @@ class UserUpdateForm(UserChangeForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('avatar',)
+        fields = ('bio', 'avatar',)

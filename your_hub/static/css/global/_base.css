@@ -15,7 +15,7 @@ body {
 .search-bar input, .auth-buttons a, .user-menu-button,
 .dropdown-menu a, form, form label,
 form input[type="text"], form input[type="password"], form input[type="email"],
-form button[type="submit"] {
+form button[type="submit"], form textarea {
      transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
 

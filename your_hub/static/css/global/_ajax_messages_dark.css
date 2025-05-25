@@ -23,3 +23,8 @@ html.dark-theme .ajax-message.ajax-message-info {
    color: #cfe2ff; /* Светло-голубой текст */
    border-color: #0a53be;
 }
+html.dark-theme .ajax-friend-request-form {
+   background: transparent;
+   border: none;
+   box-shadow: none;
+}
