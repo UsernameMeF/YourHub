@@ -113,107 +113,187 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Выбираем индикатор статуса по классу, так как ID будет только у своего профиля.
-        // Убедитесь, что .profile-avatar-wrapper .status-indicator существует в DOM.
-        const statusIndicator = document.querySelector('.profile-avatar-wrapper .status-indicator');
-        const statusIcon = statusIndicator ? statusIndicator.querySelector('.status-icon') : null;
-        
-        // Эта функция отвечает за обновление иконки статуса. Она должна работать для всех профилей.
-        function updateStatusIcon(displayStatus) { 
-            if (!statusIcon) return; // Если иконка не найдена, выходим.
-
-            // Сбрасываем все текущие классы Font Awesome с иконки и добавляем базовый 'fas'
-            statusIcon.className = 'status-icon fas'; 
-            
-            // Сбрасываем классы статуса на контейнере и добавляем новый (например, 'status-online')
-            // Убедитесь, что 'status-indicator' всегда есть.
-            statusIndicator.className = 'status-indicator status-' + displayStatus;
-
-            // Устанавливаем конкретную иконку Font Awesome в зависимости от статуса
-            if (displayStatus === 'online') {
-                statusIcon.classList.add('fa-circle'); // Круг
-            } else if (displayStatus === 'away') {
-                statusIcon.classList.add('fa-moon'); // Полумесяц
-            } else if (displayStatus === 'dnd') {
-                statusIcon.classList.add('fa-minus-circle'); // Минус в круге
-            } else if (displayStatus === 'invisible' || displayStatus === 'offline') {
-                statusIcon.classList.add('fa-circle'); // Круг для невидимого/оффлайн
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // --- НАЧАЛО: JavaScript для обновления СТАТУСА пользователя (ваш существующий код) ---
+    const statusIndicator = document.querySelector('.profile-avatar-wrapper .status-indicator');
+    const statusIcon = statusIndicator ? statusIndicator.querySelector('.status-icon') : null;
+    
+    function updateStatusIcon(displayStatus) { 
+        if (!statusIcon) return;
+        statusIcon.className = 'status-icon fas'; 
+        if (!statusIndicator) return; // Добавлена проверка для statusIndicator
+        statusIndicator.className = 'status-indicator status-' + displayStatus;
+        if (displayStatus === 'online') {
+            statusIcon.classList.add('fa-circle');
+        } else if (displayStatus === 'away') {
+            statusIcon.classList.add('fa-moon');
+        } else if (displayStatus === 'dnd') {
+            statusIcon.classList.add('fa-minus-circle');
+        } else if (displayStatus === 'invisible' || displayStatus === 'offline') {
+            statusIcon.classList.add('fa-circle');
         }
+    }
 
-        // Инициализация иконки при загрузке страницы для ЛЮБОГО профиля.
-        // Берем начальный отображаемый статус.
-        // Сначала пытаемся взять из текущих классов элемента (если уже установлены).
-        // Если не удалось, берем значение из контекста Django (которое передал views.py).
-        const initialDisplayStatus = statusIndicator.classList.value.split(' ').find(cls => cls.startsWith('status-') && cls !== 'status-indicator').replace('status-', '') || '{{ actual_status }}';
+    if (statusIndicator) { // Проверяем, что statusIndicator существует
+        const initialDisplayStatusClass = Array.from(statusIndicator.classList).find(cls => cls.startsWith('status-') && cls !== 'status-indicator');
+        const initialDisplayStatus = initialDisplayStatusClass ? initialDisplayStatusClass.replace('status-', '') : '{{ actual_status }}';
         updateStatusIcon(initialDisplayStatus); 
+    }
 
-        // --- Этот блок JavaScript выполняется ТОЛЬКО для СВОЕГО профиля (для изменения статуса) ---
-        {% if is_my_profile %}
-        const statusDropdown = document.getElementById('status-dropdown');
-        const statusOptions = statusDropdown ? statusDropdown.querySelectorAll('.status-option') : null;
-        // Получаем CSRF токен для AJAX-запросов
-        const csrfToken = '{{ csrf_token }}';
+    {% if is_my_profile %}
+    const statusDropdown = document.getElementById('status-dropdown');
+    const statusOptions = statusDropdown ? statusDropdown.querySelectorAll('.status-option') : null;
+    // CSRF токен для AJAX-запросов статуса (убедитесь, что он корректно передается, если не используется FormData)
+    const csrfTokenForStatus = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
 
-        if (statusIndicator && statusDropdown && statusOptions) {
-            // Обработчик клика по индикатору статуса для открытия/закрытия выпадающего меню
-            statusIndicator.addEventListener('click', function(event) {
-                event.stopPropagation(); // Предотвращаем всплытие события, чтобы не закрывать меню сразу
-                statusDropdown.classList.toggle('active'); // Переключаем класс 'active' для отображения/скрытия
-            });
 
-            // Обработчик клика вне выпадающего меню для его закрытия
-            document.addEventListener('click', function(event) {
-                if (!statusDropdown.contains(event.target) && !statusIndicator.contains(event.target)) {
-                    statusDropdown.classList.remove('active');
-                }
-            });
+    if (statusIndicator && statusDropdown && statusOptions) {
+        statusIndicator.addEventListener('click', function(event) {
+            event.stopPropagation();
+            statusDropdown.classList.toggle('active');
+        });
 
-            // Обработчики кликов для каждой опции статуса в выпадающем меню
-            statusOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const newChosenStatus = this.dataset.status; // Получаем выбранный статус из data-атрибута
-                    
-                    // Отправляем AJAX POST-запрос на сервер для обновления статуса
-                    fetch('{% url "set_user_status" %}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded', // Тип данных в теле запроса
-                            'X-CSRFToken': csrfToken // Передаем CSRF токен для безопасности
-                        },
-                        body: `status_type=${newChosenStatus}` // Тело запроса с новым статусом
-                    })
-                    .then(response => {
-                        // Проверяем, успешен ли ответ сервера (код 2xx)
-                        if (!response.ok) {
-                            // Если не успешен, пытаемся прочитать текст ошибки и выбросить исключение
-                            return response.text().then(text => { throw new Error(text) });
-                        }
-                        // Если успешен, парсим JSON-ответ
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Обрабатываем успешный ответ от сервера
-                        if (data.status === 'success') {
-                            updateStatusIcon(data.new_status); // Обновляем иконку на основе актуального статуса, полученного от сервера
-                            statusIndicator.dataset.currentStatus = data.chosen_status; // Сохраняем выбранный статус в data-атрибуте
-                            
-                            statusDropdown.classList.remove('active'); // Закрываем выпадающее меню
-                            console.log('Статус успешно обновлен до:', data.chosen_status, 'Отображаемый статус:', data.new_status);
-                        } else {
-                            // Если сервер вернул статус 'error'
-                            console.error('Ошибка при обновлении статуса:', data.message);
-                        }
-                    })
-                    .catch(error => {
-                        // Обработка ошибок AJAX-запроса (например, проблемы с сетью, некорректный JSON)
-                        console.error('Ошибка AJAX запроса:', error);
-                    });
+        document.addEventListener('click', function(event) {
+            if (statusDropdown && !statusDropdown.contains(event.target) && !statusIndicator.contains(event.target)) {
+                statusDropdown.classList.remove('active');
+            }
+        });
+
+        statusOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const newChosenStatus = this.dataset.status;
+                fetch('{% url "set_user_status" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfTokenForStatus
+                    },
+                    body: `status_type=${newChosenStatus}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text || 'Ошибка ответа сервера при обновлении статуса') });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateStatusIcon(data.new_status);
+                        if(statusIndicator) statusIndicator.dataset.currentStatus = data.chosen_status;
+                        if(statusDropdown) statusDropdown.classList.remove('active');
+                        console.log('Статус успешно обновлен до:', data.chosen_status, 'Отображаемый статус:', data.new_status);
+                    } else {
+                        console.error('Ошибка при обновлении статуса:', data.message);
+                         displayMessage(data.message || 'Не удалось обновить статус.', 'error'); // Отображение ошибки пользователю
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка AJAX запроса для статуса:', error);
+                    displayMessage(error.message || 'Сетевая ошибка при обновлении статуса.', 'error');
                 });
             });
+        });
+    }
+    {% endif %} 
+    // --- КОНЕЦ: JavaScript для обновления СТАТУСА пользователя ---
+
+
+    // --- НАЧАЛО: JavaScript для AJAX-обработки ДЕЙСТВИЙ В ПРОФИЛЕ (из "старой версии", адаптированный) ---
+    const profileActionsDiv = document.querySelector('.profile-actions-top'); // Обновленный селектор
+    const ajaxMessagesDiv = document.getElementById('ajax-messages');     // Для отображения сообщений
+
+    // Функция для отображения сообщений (из "старой версии" с небольшими улучшениями)
+    function displayMessage(message, type) {
+        if (!ajaxMessagesDiv) {
+            console.warn("Элемент #ajax-messages не найден. Сообщение не будет отображено:", message);
+            return;
         }
-        {% endif %} 
-    });
+        if (!message || message.trim() === '') {
+            ajaxMessagesDiv.innerHTML = ''; // Очищаем, если сообщение пустое
+            return; 
+        }
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('ajax-message'); // Базовый класс для стилизации
+        if (type) { // type это 'success', 'error', 'info' и т.д.
+            messageElement.classList.add(`ajax-message-${type}`);
+        } else {
+            messageElement.classList.add('ajax-message-info'); // По умолчанию info, если тип не указан
+        }
+        messageElement.textContent = message;
+        
+        ajaxMessagesDiv.innerHTML = ''; // Заменяем предыдущее сообщение новым
+        ajaxMessagesDiv.appendChild(messageElement);
+
+        setTimeout(() => {
+            if (ajaxMessagesDiv.contains(messageElement)) {
+                messageElement.remove();
+            }
+        }, 5000); // Сообщение видно 5 секунд
+    }
+    
+    function handleProfileFormSubmit(event) {
+        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        const form = event.target;
+        const actionUrl = form.action;
+        const method = form.method;
+        const formData = new FormData(form); // FormData автоматически включает CSRF-токен из формы
+
+        fetch(actionUrl, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Для Django, чтобы идентифицировать AJAX-запрос
+            }
+        })
+        .then(response => {
+            // Пытаемся получить JSON в любом случае, чтобы обработать сообщения об ошибках от сервера
+            return response.json().then(data => ({
+                ok: response.ok,      // boolean: true если статус 200-299
+                data: data            // распарсенный JSON
+            }));
+        })
+        .then(result => {
+            const data = result.data; // JSON-ответ от сервера {status, message, new_button_html}
+            
+            if (!result.ok) { // Если HTTP статус НЕ успешный (например, 400, 403, 500)
+                // Пытаемся использовать сообщение из JSON, если оно есть, иначе стандартное
+                throw new Error(data.message || `Ошибка сервера: ${result.status_code}. Попробуйте позже.`);
+            }
+
+            // HTTP статус успешный (2xx)
+            if (data.new_button_html && profileActionsDiv) {
+                profileActionsDiv.innerHTML = data.new_button_html;
+                attachSubmitListenersToNewForms(); // Переназначаем обработчики на новые формы
+            }
+            // Отображаем сообщение от сервера (если оно есть)
+            // data.status это поле из JSON ('success', 'error', 'info')
+            displayMessage(data.message, data.status); 
+        })
+        .catch(error => {
+            console.error('Ошибка AJAX запроса для действий профиля:', error);
+            displayMessage(error.message || 'Произошла ошибка. Пожалуйста, попробуйте еще раз.', 'error');
+        });
+    }
+
+    function attachSubmitListenersToNewForms() {
+        if (profileActionsDiv) { // Убедимся, что контейнер кнопок существует
+            const newForms = profileActionsDiv.querySelectorAll('.ajax-profile-action-form');
+            newForms.forEach(newForm => {
+                // Удаляем предыдущий обработчик (если был) перед добавлением нового,
+                // чтобы избежать многократного срабатывания на одной форме.
+                newForm.removeEventListener('submit', handleProfileFormSubmit);
+                newForm.addEventListener('submit', handleProfileFormSubmit);
+            });
+        }
+    }
+
+    // Первоначальное назначение обработчиков при загрузке страницы
+    // Эта проверка важна, если .profile-actions-top может отсутствовать или быть пустым
+    if (profileActionsDiv && profileActionsDiv.querySelector('.ajax-profile-action-form')) {
+         attachSubmitListenersToNewForms();
+    }
+    // --- КОНЕЦ: JavaScript для AJAX-обработки ДЕЙСТВИЙ В ПРОФИЛЕ ---
+
+});
 </script>
-{% endblock %} {# Закрывающий тег для block extra_js #}
+{% endblock %}

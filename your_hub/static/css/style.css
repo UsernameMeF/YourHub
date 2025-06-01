@@ -1,7 +1,7 @@
 /* SOCIAL_NETWORK/your_hub/static/css/style.css */
 
 /* ==================================== */
-/* ГЛОБАЛЬНЫЕ СТИЛИ                       */
+/* ГЛОБАЛЬНЫЕ СТИЛИ                       */
 /* Стили, общие для всего сайта: body, header, navbar, основные кнопки, поиск, дропдауны, сообщения */
 /* ==================================== */
 
@@ -9,17 +9,22 @@
 @import url('global/_base.css');
 /* Общие компоненты (кнопки, дропдауны, поиск, иконки в шапке, меню профиля) */
 @import url('global/_components.css');
+/* модали */
+@import url('global/_modal.css'); /* Этот импорт уже есть и это правильно */
+@import url('global/_modal_dark.css');
 /* Стили для AJAX сообщений */
 @import url('global/_ajax_messages.css');
 
 
 /* ==================================== */
-/* СТИЛИ ПРИЛОЖЕНИЙ                       */
+/* СТИЛИ ПРИЛОЖЕНИЙ                       */
 /* Стили, специфичные для конкретных Django-приложений */
 /* ==================================== */
 
 /* App: core (Главная страница с заглушками постов) */
 @import url('core/_index.css');
+@import url('core/_posts.css'); 
+@import url('core/_post_form.css');
 
 /* App: users (Авторизация, Профиль, Друзья) */
 @import url('users/_auth.css');
@@ -28,7 +33,7 @@
 
 
 /* ==================================== */
-/* ТЕМНАЯ ТЕМА (ПЕРЕОПРЕДЕЛЕНИЯ)           */
+/* ТЕМНАЯ ТЕМА (ПЕРЕОПРЕДЕЛЕНИЯ)           */
 /* Стили темной темы, которые переопределяют светлые стили. */
 /* Важно: эти импорты должны идти ПОСЛЕ соответствующих светлых тем. */
 /* ==================================== */
@@ -42,8 +47,11 @@
 
 /* Темная тема для App: core */
 @import url('core/_index_dark.css');
+@import url('core/_posts_dark.css'); /* НОВЫЙ ИМПОРТ */
+@import url('core/_post_form_dark.css');
 
 /* Темная тема для App: users */
 @import url('users/_auth_dark.css');
 @import url('users/_profile_dark.css');
 @import url('users/_friends_dark.css');
+

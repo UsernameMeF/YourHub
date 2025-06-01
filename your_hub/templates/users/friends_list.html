@@ -185,7 +185,7 @@
                     if (!response.ok) {
                         // Если статус не 2xx, парсим JSON ошибки и бросаем исключение
                         return response.json().then(errorData => {
-                             throw new Error(errorData.message || 'Произошла ошибка.');
+                            throw new Error(errorData.message || 'Произошла ошибка.');
                         });
                     }
                     // Если статус 2xx, парсим JSON ответ
@@ -205,7 +205,7 @@
                         }
                     } else {
                          // Обрабатываем ответ со статусом 'error' из нашего JsonResponse
-                         displayMessage(data.message || 'Произошла ошибка.', 'error'); // Показать сообщение об ошибке
+                        displayMessage(data.message || 'Произошла ошибка.', 'error'); // Показать сообщение об ошибке
                     }
                 })
                 .catch(error => {

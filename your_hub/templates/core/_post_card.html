@@ -1,0 +1,57 @@
+{# templates/core/_post_card.html #}
+{% load static %}
+
+<div class="post-card" id="post-{{ post.id }}">
+    <div class="post-header">
+        <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="post-author-avatar">
+        <div class="post-info">
+            <a href="{% url 'user_profile' post.author.id %}" class="post-author-username">{{ post.author.username }}</a>
+            <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
+            {% if post.updated_at and post.created_at != post.updated_at %}
+                <span class="post-date">(обновлено: {{ post.updated_at|date:"d M Y H:i" }})</span>
+            {% endif %}
+        </div>
+        {% if user.is_authenticated and user == post.author %}
+            <div class="post-actions-dropdown">
+                <button class="post-actions-button">...</button>
+                <div class="dropdown-menu">
+                    <a href="#" onclick="event.preventDefault(); openEditPostModal({{ post.id }}, '{{ post.title|escapejs }}', '{{ post.content|escapejs }}');">Редактировать</a>
+                    <a href="#" onclick="event.preventDefault(); openDeletePostModal({{ post.id }});">Удалить</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2 class="post-title"><a href="{% url 'core:post_detail' post.id %}">{{ post.title }}</a></h2>
+    
+    {# --- ИЗМЕНЕНИЯ ЗДЕСЬ: Текст поста без обрезания --- #}
+    <div class="post-content-wrapper"> {# Оставляем обёртку для консистентности стилей, если это нужно #}
+        <p class="post-content">{{ post.content|safe }}</p> {# Полный текст, без |truncatechars_html #}
+    </div>
+    {# --- КОНЕЦ ИЗМЕНЕНИЙ --- #}
+
+    {% if post.attachments.first %} {# Проверяем, есть ли хотя бы одно вложение #}
+        <div class="post-images-grid">
+            <img src="{{ post.attachments.first.image.url }}" alt="Вложение к посту" class="post-grid-image">
+        </div>
+    {% endif %}
+
+    <div class="post-actions">
+        <button class="action-button like-button {% if is_liked %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'like')">
+            <i class="fas fa-thumbs-up"></i> <span class="likes-count">{{ post.total_likes }}</span>
+        </button>
+        <button class="action-button dislike-button {% if is_disliked %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'dislike')">
+            <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">{{ post.total_dislikes }}</span>
+        </button>
+        <button class="action-button repost-button {% if is_reposted %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'repost')">
+            <i class="fas fa-retweet"></i> <span class="reposts-count">{{ post.total_reposts }}</span>
+        </button>
+        <a href="{% url 'core:post_detail' post.id %}" class="action-button">
+            <i class="fas fa-comment"></i> <span class="comments-count total-comments-{{ post.id }}">{{ post.total_comments }}</span>
+        </a>
+    </div>
+
+    {% if show_full_comments %}
+        {# Комментарии будут отображаться только на странице детального просмотра #}
+    {% endif %}
+</div>

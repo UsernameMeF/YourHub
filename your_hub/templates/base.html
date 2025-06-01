@@ -15,8 +15,8 @@
         })();
     </script>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 
     {% block extra_head %}{% endblock %}
@@ -24,7 +24,7 @@
 <body>
 
     <header class="header">
-        <a href="{% url 'index' %}" class="site-title">
+        <a href="{% url 'core:index' %}" class="site-title">
             <svg xmlns="http://www.w3.org/2000/svg" class="hub-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v7a1 1 0 01-1 1h-3a1 1 0 00-1 1v1a2 2 0 11-4 0v-1a1 1 0 00-1-1H7a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
             YourHub
         </a>
@@ -43,33 +43,26 @@
             {% if user.is_authenticated %}
                 {# Пользователь авторизован #}
                 <a href="#" class="header-icon-button" title="Открыть чат">
-                    {# SVG иконка чата (пример) - замени на свою или используй Font Awesome #}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </a>
 
-                <a href="#" class="header-button-create" title="Создать пост">
-                    {# SVG иконка плюса (пример) #}
+                {# Кнопка "Создать пост" - добавим ID для JS и уберем href="#" #}
+                <button type="button" class="header-button-create" id="create-post-button" title="Создать пост">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </a>
+                </button>
 
                 <a href="#" class="header-icon-button" title="Уведомления">
-                    {# SVG иконка колокольчика (пример) #}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                 </a>
 
                 <div class="user-profile-menu">
                     <button class="profile-avatar-button" id="profile-avatar-button">
-                        {# Отображаем аватар пользователя, если он есть, иначе дефолтный #}
-                        {# Предполагается, что у тебя будет user.profile.avatar.url #}
                         <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="profile-avatar-img">
                     </button>
                     <div class="dropdown-menu profile-dropdown-menu" id="profile-dropdown-menu">
-                        <a href="{% url 'user_profile' user.id %}">Мой профиль</a> {# Ссылка на свой профиль по ID #}
+                        <a href="{% url 'user_profile' user.id %}">Мой профиль</a>
                         <a href="{% url 'edit_profile' %}">Редактировать профиль</a>
-                        
-                        {# Кнопка смены темы удалена отсюда #}
-                        
-                        <a href="#">Настройки</a> {# Заглушка #}
+                        <a href="#">Настройки</a>
                         <a href="{% url 'logout' %}">Выход</a>
                     </div>
                 </div>
@@ -90,52 +83,115 @@
         </main>
     </div>
 
+    {# --- Модальные окна (добавляем в конец body) --- #}
+
+    {# Модальное окно для создания/редактирования поста #}
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-post-modal">&times;</span>
+            <h2 id="post-modal-title">Создать новый пост</h2>
+            <form id="post-form" method="post" enctype="multipart/form-data" action="{% url 'core:post_create' %}">
+                {% csrf_token %}
+                {{ post_form.title }}
+                {{ post_form.content }}
+
+                {# Контейнер для существующих изображений (только для режима редактирования) #}
+                <div id="existing-images-container" class="existing-images-container">
+                    <h3>Текущие изображения:</h3>
+                    <div id="existing-images-preview" class="image-preview-container">
+                        {# Изображения будут динамически добавляться сюда через JS #}
+                    </div>
+                </div>
+                
+                {# Контейнер для добавления НОВЫХ изображений с динамическими полями #}
+                <div id="new-images-upload-container">
+                    <label>Добавить новые фотографии (до 5 штук):</label>
+                    <div id="new-image-inputs-wrapper">
+                        {# Dynamic image inputs will be added here by JS #}
+                    </div>
+                    <button type="button" id="add-new-image-button" class="btn-secondary add-another-button">
+                        <i class="fas fa-plus-circle"></i> Добавить еще фото
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-primary">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+
+    {# Модальное окно для подтверждения удаления поста #}
+    <div id="delete-post-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close-button" id="close-delete-modal">&times;</span>
+            <h2>Подтвердите удаление</h2>
+            <p>Вы уверены, что хотите удалить этот пост? Это действие необратимо.</p>
+            <form id="delete-post-form" method="post" action=""> {# action будет устанавливаться через JS #}
+                {% csrf_token %}
+                <input type="hidden" name="confirm" value="true"> {# Скрытое поле для подтверждения #}
+                <button type="submit" class="btn-danger">Удалить</button>
+                <button type="button" class="btn-secondary" id="cancel-delete-post">Отмена</button>
+            </form>
+        </div>
+    </div>
+
     {# --- JavaScript --- #}
     <script>
-        // Обработчик для выпадающего меню профиля
+        // Получение CSRF-токена
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // --- Обработчик для выпадающего меню профиля ---
         const profileAvatarButton = document.getElementById('profile-avatar-button');
         const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
 
         if (profileAvatarButton) {
             profileAvatarButton.addEventListener('click', function(event) {
-                event.stopPropagation(); // Предотвращаем всплытие, чтобы не сработал window.onclick
+                event.stopPropagation();
                 profileDropdownMenu.classList.toggle('show');
             });
         }
 
-        // Глобальный обработчик кликов для закрытия выпадающих меню
         window.addEventListener('click', function(event) {
-            // Закрытие меню профиля
             if (profileDropdownMenu && profileDropdownMenu.classList.contains('show')) {
                 if (!profileAvatarButton.contains(event.target) && !profileDropdownMenu.contains(event.target)) {
                     profileDropdownMenu.classList.remove('show');
                 }
             }
-            // Добавь сюда логику для других выпадающих меню, если они появятся
         });
 
         // --- Логика переключения темы ---
         const htmlElement = document.documentElement;
         let currentTheme = htmlElement.classList.contains('dark-theme') ? 'dark' : 'light';
 
-        // Функция для установки темы и обновления иконок на **основной** кнопке
         function applyTheme(theme) {
             if (theme === 'dark') {
                 htmlElement.classList.add('dark-theme');
                 localStorage.setItem('theme', 'dark');
                 currentTheme = 'dark';
-            } else { // theme === 'light'
+            } else {
                 htmlElement.classList.remove('dark-theme');
                 localStorage.setItem('theme', 'light');
                 currentTheme = 'light';
             }
-            updateThemeButtonIcons(); // Обновляем состояние кнопки смены темы
+            updateThemeButtonIcons();
         }
 
-        // Функция для обновления состояния иконок на основной кнопке смены темы
         function updateThemeButtonIcons() {
             const isDark = htmlElement.classList.contains('dark-theme');
-            const themeSwitchButton = document.getElementById('theme-switch-button'); // Теперь у нас только одна кнопка
+            const themeSwitchButton = document.getElementById('theme-switch-button');
             if (themeSwitchButton) {
                 const sunIcon = themeSwitchButton.querySelector('.sun-icon');
                 const moonIcon = themeSwitchButton.querySelector('.moon-icon');
@@ -146,16 +202,660 @@
             }
         }
         
-        // Инициализация состояния кнопки при загрузке
         updateThemeButtonIcons();
 
-        // Обработчик для основной кнопки смены темы
         const themeSwitchButton = document.getElementById('theme-switch-button');
         if (themeSwitchButton) {
             themeSwitchButton.addEventListener('click', () => {
                 applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
             });
         }
+
+        {# --- Модальные окна: Логика открытия/закрытия и отправки форм --- #}
+        const postModal = document.getElementById('post-modal');
+        const createPostButton = document.getElementById('create-post-button');
+        const closePostModalButton = document.getElementById('close-post-modal');
+        const postForm = document.getElementById('post-form');
+        const postModalTitle = document.getElementById('post-modal-title');
+        const postFormTitle = postForm.querySelector('[name="title"]');
+        const postFormContent = postForm.querySelector('[name="content"]');
+        
+        // Новые элементы для управления изображениями
+        const newImagesUploadContainer = document.getElementById('new-images-upload-container');
+        const newImageInputsWrapper = document.getElementById('new-image-inputs-wrapper');
+        const addNewImageButton = document.getElementById('add-new-image-button');
+
+        const existingImagesContainer = document.getElementById('existing-images-container'); 
+        const existingImagesPreview = document.getElementById('existing-images-preview');     
+
+        const deletePostModal = document.getElementById('delete-post-modal');
+        const closeDeleteModalButton = document.getElementById('close-delete-modal');
+        const cancelDeletePostButton = document.getElementById('cancel-delete-post');
+        const deletePostForm = document.getElementById('delete-post-form');
+
+        // Максимальное количество изображений (существующие + новые)
+        const MAX_TOTAL_IMAGES = 5;
+
+        // Функции для открытия/закрытия модалок
+        function openModal(modal) {
+            modal.style.display = 'block';
+            document.body.classList.add('modal-open'); // Добавляем класс для предотвращения прокрутки
+        }
+
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open'); // Убираем класс
+        }
+
+        // Функция для предпросмотра одиночного изображения (для каждого инпута)
+        function previewImage(file, previewContainer) {
+            previewContainer.innerHTML = ''; // Очищаем предыдущее превью
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('image-preview');
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.innerHTML = 'Нет выбранного файла.';
+            }
+        }
+
+        // Функция для создания нового поля загрузки файла и его предпросмотра
+        let fileInputCounter = 0; // Для уникальных ID
+        function createNewImageInput() {
+            const currentNewInputs = newImageInputsWrapper.querySelectorAll('.image-input-wrapper').length;
+            const currentExistingImages = existingImagesPreview.querySelectorAll('.image-preview-wrapper:not(.deleted)').length;
+
+            if (currentNewInputs + currentExistingImages >= MAX_TOTAL_IMAGES) {
+                alert(`Вы не можете добавить более ${MAX_TOTAL_IMAGES} изображений (включая уже загруженные и помеченные к сохранению).`);
+                addNewImageButton.style.display = 'none'; // Скрываем кнопку, если достигнут лимит
+                return;
+            }
+
+            const inputWrapper = document.createElement('div');
+            inputWrapper.classList.add('image-input-wrapper');
+
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('form-group-inline');
+
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.name = 'images'; // Важно: все инпуты должны иметь имя 'images'
+            fileInput.accept = 'image/*';
+            fileInput.classList.add('custom-file-input');
+            const uniqueId = `file-input-${fileInputCounter++}`;
+            fileInput.id = uniqueId;
+            
+            const fileLabel = document.createElement('label');
+            fileLabel.htmlFor = uniqueId; // Связываем label с input
+            fileLabel.textContent = 'Выберите файл';
+            fileLabel.classList.add('custom-file-label');
+            fileInput.dataset.label = 'Файл не выбран'; 
+            
+            // Контейнер для предпросмотра этого конкретного файла
+            const imagePreview = document.createElement('div');
+            imagePreview.classList.add('image-preview-container-single');
+
+            fileInput.addEventListener('change', function() {
+                const fileName = this.files.length > 0 ? this.files[0].name : 'Файл не выбран';
+                this.dataset.label = fileName; 
+                fileLabel.textContent = fileName;
+                previewImage(this.files[0], imagePreview); 
+            });
+
+            const removeInputButton = document.createElement('button');
+            removeInputButton.type = 'button';
+            removeInputButton.classList.add('btn-remove-input');
+            removeInputButton.innerHTML = '&times;'; 
+            removeInputButton.title = 'Удалить это поле для загрузки';
+            removeInputButton.addEventListener('click', () => {
+                inputWrapper.remove(); 
+                // После удаления поля, возможно, снова можно добавить новые фото
+                const newInputsCountAfterRemoval = newImageInputsWrapper.querySelectorAll('.image-input-wrapper').length;
+                const currentExistingImagesCount = existingImagesPreview.querySelectorAll('.image-preview-wrapper:not(.deleted)').length;
+                if (newInputsCountAfterRemoval + currentExistingImagesCount < MAX_TOTAL_IMAGES) {
+                    addNewImageButton.style.display = 'block';
+                }
+            });
+            
+            inputGroup.appendChild(fileLabel); // Лейбл перед инпутом для стилизации
+            inputGroup.appendChild(fileInput); // Скрытый инпут
+            inputGroup.appendChild(removeInputButton);
+            inputWrapper.appendChild(inputGroup);
+            inputWrapper.appendChild(imagePreview);
+            
+            newImageInputsWrapper.appendChild(inputWrapper);
+
+            // Если только что добавленное поле достигло лимита, скрываем кнопку "Добавить еще фото"
+            if (currentNewInputs + currentExistingImages + 1 >= MAX_TOTAL_IMAGES) {
+                addNewImageButton.style.display = 'none';
+            }
+        }
+
+
+        // Открытие модалки создания поста
+        if (createPostButton) {
+            createPostButton.addEventListener('click', () => {
+                postModalTitle.textContent = 'Создать новый пост';
+                postForm.action = '{% url "core:post_create" %}'; // Устанавливаем URL для создания
+                postFormTitle.value = '';
+                postFormContent.value = '';
+                
+                // Очищаем и инициализируем новые инпуты для создания
+                newImageInputsWrapper.innerHTML = ''; 
+                createNewImageInput(); // Создаем первое поле для загрузки
+                addNewImageButton.style.display = 'block'; // Показываем кнопку "Добавить еще"
+
+                existingImagesPreview.innerHTML = ''; // Очищаем предпросмотр СУЩЕСТВУЮЩИХ изображений
+                existingImagesContainer.style.display = 'none'; // Скрываем контейнер существующих изображений
+                openModal(postModal);
+            });
+        }
+
+        // Закрытие модалки по крестику
+        if (closePostModalButton) {
+            closePostModalButton.addEventListener('click', () => closeModal(postModal));
+        }
+        if (closeDeleteModalButton) {
+            closeDeleteModalButton.addEventListener('click', () => closeModal(deletePostModal));
+        }
+        if (cancelDeletePostButton) {
+            cancelDeletePostButton.addEventListener('click', () => closeModal(deletePostModal));
+        }
+
+        // Закрытие модалки по клику вне её
+        window.addEventListener('click', (event) => {
+            if (event.target === postModal) {
+                closeModal(postModal);
+            }
+            if (event.target === deletePostModal) {
+                closeModal(deletePostModal);
+            }
+        });
+        
+        // Listener для кнопки "Добавить еще фото"
+        if (addNewImageButton) {
+            addNewImageButton.addEventListener('click', createNewImageInput);
+        }
+
+        // Универсальная функция для отправки Ajax-форм
+        async function sendForm(formElement, successCallback, errorCallback) {
+            const formData = new FormData(formElement);
+            
+            try {
+                const response = await fetch(formElement.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { // Status 2xx
+                    successCallback(data);
+                } else { // Status 4xx, 5xx
+                    errorCallback(data);
+                }
+            } catch (error) {
+                console.error('Ошибка сети или парсинга:', error);
+                errorCallback({ success: false, message: 'Произошла ошибка сети. Попробуйте еще раз.' });
+            }
+        }
+
+        // Отправка формы создания/редактирования поста
+        if (postForm) {
+            postForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Предотвращаем стандартную отправку формы
+                const submitButton = postForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true; // Отключаем кнопку, чтобы избежать двойной отправки
+
+                const formData = new FormData(postForm);
+
+                // Собираем ID существующих изображений, которые НЕ были помечены как удаленные
+                const existingImageIds = [];
+                existingImagesPreview.querySelectorAll('.image-preview-wrapper:not(.deleted)').forEach(wrapper => {
+                    const imageId = wrapper.dataset.imageId;
+                    if (imageId) {
+                        existingImageIds.push(imageId);
+                    }
+                });
+                formData.append('existing_image_ids', JSON.stringify(existingImageIds));
+
+                // Проверка общего количества изображений перед отправкой
+                const newFilesCount = newImageInputsWrapper.querySelectorAll('input[type="file"]:not([value=""])').length; // Считаем только выбранные файлы
+                if (existingImageIds.length + newFilesCount > MAX_TOTAL_IMAGES) {
+                    alert(`Общее количество изображений (существующие + новые) не может превышать ${MAX_TOTAL_IMAGES}.`);
+                    submitButton.disabled = false;
+                    return;
+                }
+
+                await sendForm(
+                    postForm,
+                    (data) => {
+                        alert(data.message);
+                        closeModal(postModal);
+                        // TODO: Добавить логику для динамического добавления/обновления поста на страницу
+                        // Это потребует рендеринга HTML на клиенте или получения отрендеренного HTML от сервера.
+                        // Пока просто перезагрузим страницу для демонстрации, позже сделаем динамическое обновление.
+                        window.location.reload(); 
+                    },
+                    (data) => {
+                        let errorMessage = data.message || 'Произошла ошибка.';
+                        if (data.errors) {
+                            try {
+                                const errors = JSON.parse(data.errors);
+                                for (const key in errors) {
+                                    errorMessage += `\n${key}: ${errors[key][0].message}`;
+                                }
+                            } catch (e) {
+                                console.error('Ошибка парсинга ошибок:', e);
+                            }
+                        }
+                        alert('Ошибка: ' + errorMessage);
+                        submitButton.disabled = false; // Включаем кнопку обратно
+                    }
+                );
+            });
+        }
+
+        // Функция для открытия модалки редактирования поста
+        // Теперь она принимает postId, title, content, и images (массив объектов {id, url})
+        function openEditPostModal(postId, title, content, images = []) {
+            postModalTitle.textContent = 'Редактировать пост';
+            postForm.action = `/post/${postId}/edit/`; 
+            postFormTitle.value = title;
+            postFormContent.value = content;
+            
+            // Очищаем и инициализируем новые инпуты для редактирования
+            newImageInputsWrapper.innerHTML = ''; 
+            createNewImageInput(); // Создаем первое поле для загрузки новых фото
+            addNewImageButton.style.display = 'block'; // Показываем кнопку "Добавить еще"
+
+            // Отображаем существующие изображения
+            existingImagesPreview.innerHTML = ''; 
+            if (images && images.length > 0) {
+                existingImagesContainer.style.display = 'block'; 
+                images.forEach(imgData => {
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.classList.add('image-preview-wrapper'); 
+                    imgWrapper.dataset.imageId = imgData.id; 
+
+                    const img = document.createElement('img');
+                    img.src = imgData.url;
+                    img.classList.add('image-preview');
+                    imgWrapper.appendChild(img);
+
+                    // Добавляем имя файла рядом с изображением
+                    const fileNameSpan = document.createElement('span');
+                    // Извлекаем имя файла из URL
+                    const fileName = imgData.url.split('/').pop(); 
+                    fileNameSpan.textContent = fileName;
+                    fileNameSpan.classList.add('image-filename');
+                    imgWrapper.appendChild(fileNameSpan);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.classList.add('delete-image-button');
+                    deleteButton.innerHTML = '&times;'; 
+                    deleteButton.type = 'button'; 
+                    deleteButton.title = 'Удалить это изображение';
+                    deleteButton.addEventListener('click', () => {
+                        imgWrapper.classList.toggle('deleted'); 
+                        if (imgWrapper.classList.contains('deleted')) {
+                             img.style.opacity = '0.5'; 
+                             img.style.filter = 'grayscale(100%)'; 
+                             deleteButton.title = 'Восстановить изображение';
+                        } else {
+                             img.style.opacity = '1';
+                             img.style.filter = 'none';
+                             deleteButton.title = 'Удалить это изображение';
+                        }
+                        // Проверяем, нужно ли снова отобразить кнопку "Добавить еще фото"
+                        const currentNewInputsCount = newImageInputsWrapper.querySelectorAll('.image-input-wrapper').length;
+                        const currentExistingImagesCount = existingImagesPreview.querySelectorAll('.image-preview-wrapper:not(.deleted)').length;
+                        if (currentNewInputsCount + currentExistingImagesCount < MAX_TOTAL_IMAGES) {
+                            addNewImageButton.style.display = 'block';
+                        }
+                    });
+                    imgWrapper.appendChild(deleteButton);
+
+                    existingImagesPreview.appendChild(imgWrapper);
+                });
+            } else {
+                existingImagesContainer.style.display = 'none'; 
+            }
+            
+            // Если количество существующих изображений уже достигло лимита, скрываем кнопку "Добавить еще"
+            const initialExistingImagesCount = existingImagesPreview.querySelectorAll('.image-preview-wrapper:not(.deleted)').length;
+            if (initialExistingImagesCount >= MAX_TOTAL_IMAGES) {
+                 addNewImageButton.style.display = 'none';
+            } else {
+                 addNewImageButton.style.display = 'block'; // В противном случае, показываем
+            }
+
+            openModal(postModal);
+        }
+
+        // Функция для открытия модалки удаления поста (будет вызываться из элемента поста)
+        let currentPostIdToDelete = null; // Переменная для хранения ID поста, который нужно удалить
+
+        function openDeletePostModal(postId) {
+            currentPostIdToDelete = postId;
+            deletePostForm.action = `/post/${postId}/delete/`; // Устанавливаем URL для удаления
+            openModal(deletePostModal);
+        }
+
+        // Отправка формы удаления поста
+        if (deletePostForm) {
+            deletePostForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const submitButton = deletePostForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+
+                await sendForm(
+                    deletePostForm,
+                    (data) => {
+                        alert(data.message);
+                        closeModal(deletePostModal);
+                        // TODO: Динамически удалить пост из DOM
+                        const postElement = document.getElementById(`post-${data.deleted_post_id}`);
+                        if (postElement) {
+                            postElement.remove();
+                        } else {
+                            window.location.reload(); // Если не нашли, то перезагрузим
+                        }
+                    },
+                    (data) => {
+                        alert('Ошибка: ' + (data.message || 'Не удалось удалить пост.'));
+                        submitButton.disabled = false;
+                    }
+                );
+            });
+        }
+
+        // TODO: Функции для обработки лайков, дизлайков, репостов и комментариев
+        // Эти функции будут вызываться при клике на соответствующие кнопки в шаблоне поста.
+        // Они будут отправлять Ajax-запрос на /post/<pk>/like/, /post/<pk>/dislike/, etc.
+        // и обновлять счетчики на странице.
+        
+        // Пример для лайка/дизлайка (потребует элементов в шаблоне поста)
+        async function handlePostAction(postId, actionType) {
+            const url = `/post/${postId}/${actionType}/`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // *** КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ЗДЕСЬ ***
+                    // Находим КОНТЕЙНЕР ПОСТА по его уникальному ID
+                    const postElement = document.getElementById(`post-${postId}`);
+        
+                    if (postElement) { // Убедимся, что элемент поста найден
+                        // Ищем кнопки и счетчики ВНУТРИ ЭТОГО КОНТЕЙНЕРА (postElement)
+                        const likeButton = postElement.querySelector(`.like-button`);
+                        const dislikeButton = postElement.querySelector(`.dislike-button`);
+                        const repostButton = postElement.querySelector(`.repost-button`);
+                        
+                        // Используем УНИКАЛЬНЫЕ ID для поиска спанов со счетчиками ВНУТРИ ЭТОГО ПОСТА
+                        // Хотя ты можешь использовать и .likes-count, если они будут уникальными в рамках postElement
+                        // Но для безопасности и однозначности, лучше использовать ID, если они есть.
+                        const likesCountSpan = postElement.querySelector(`.likes-count`); // или postElement.querySelector(`#likes-count-${postId}`);
+                        const dislikesCountSpan = postElement.querySelector(`.dislikes-count`); // или postElement.querySelector(`#dislikes-count-${postId}`);
+                        const repostsCountSpan = postElement.querySelector(`.reposts-count`); // или postElement.querySelector(`#reposts-count-${postId}`);
+                        
+                        // Для комментариев, если обновляется счетчик на главной ленте (не только на детальной странице)
+                        const commentsCountSpan = postElement.querySelector(`.comments-count`);
+        
+                        if (actionType === 'like' || actionType === 'dislike') {
+                            if (likesCountSpan) likesCountSpan.textContent = data.likes_count;
+                            if (dislikesCountSpan) dislikesCountSpan.textContent = data.dislikes_count;
+                            
+                            // Управление активными классами для лайка и дизлайка
+                            if (likeButton) {
+                                if (data.action === 'liked') {
+                                    likeButton.classList.add('active');
+                                    likeButton.title = 'Убрать лайк';
+                                    // Если был дизлайк, убираем его
+                                    if (dislikeButton && dislikeButton.classList.contains('active')) {
+                                        dislikeButton.classList.remove('active');
+                                        dislikeButton.title = 'Поставить дизлайк';
+                                    }
+                                } else { // 'unliked'
+                                    likeButton.classList.remove('active');
+                                    likeButton.title = 'Поставить лайк';
+                                }
+                            }
+                            if (dislikeButton) {
+                                if (data.action === 'disliked') {
+                                    dislikeButton.classList.add('active');
+                                    dislikeButton.title = 'Убрать дизлайк';
+                                    // Если был лайк, убираем его
+                                    if (likeButton && likeButton.classList.contains('active')) {
+                                        likeButton.classList.remove('active');
+                                        likeButton.title = 'Поставить лайк';
+                                    }
+                                } else { // 'undisliked'
+                                    dislikeButton.classList.remove('active');
+                                    dislikeButton.title = 'Поставить дизлайк';
+                                }
+                            }
+                        } else if (actionType === 'repost') {
+                            if (repostsCountSpan) repostsCountSpan.textContent = data.reposts_count;
+                            
+                            if (repostButton) {
+                                if (data.action === 'reposted') {
+                                    repostButton.classList.add('active');
+                                    repostButton.title = 'Отменить репост';
+                                } else { // 'unreposted'
+                                    repostButton.classList.remove('active');
+                                    repostButton.title = 'Сделать репост';
+                                }
+                            }
+                        }
+                        // Для комментариев, если ты добавил обновление comments_count в Django View
+                        if (commentsCountSpan && data.total_comments !== undefined) {
+                            commentsCountSpan.textContent = data.total_comments;
+                        }
+        
+                        console.log(`Action ${actionType} successful for post ${postId}:`, data);
+                    } else {
+                        console.warn(`Post element with ID post-${postId} not found. This might happen if on a detail page without a wrapper ID.`);
+                        // Если пост не найден (возможно, это детальная страница, где нет общего ID обертки, 
+                        // но элементы все равно нужно обновить), можно попробовать обновить глобально, 
+                        // но это менее надежно для главной страницы.
+                        // В твоем случае, на детальной странице есть id="post-{{ post.id }}", 
+                        // так что это предупреждение не должно появляться.
+                    }
+                } else {
+                    alert('Ошибка: ' + (data.message || `Не удалось выполнить ${actionType}.`));
+                }
+            } catch (error) {
+                console.error(`Ошибка при выполнении ${actionType}:`, error);
+                alert('Произошла ошибка сети.');
+            }
+        }
+
+                // --- JavaScript для обрезания текста "Показать полностью" ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.read-more-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.dataset.postId;
+                    const shortContent = document.getElementById(`post-content-${postId}`);
+                    const fullContent = document.getElementById(`full-post-content-${postId}`);
+
+                    if (shortContent && fullContent) {
+                        // Скрываем короткий текст, показываем полный
+                        shortContent.classList.add('hidden');
+                        fullContent.classList.remove('hidden');
+                        this.style.display = 'none'; // Скрываем кнопку "Показать полностью"
+                    }
+                });
+            });
+
+            // --- JavaScript для галереи вложений ---
+            document.querySelectorAll('.post-attachments-gallery').forEach(gallery => {
+                const postId = gallery.id.replace('post-gallery-', '');
+                const imagesContainer = gallery.querySelector('.gallery-images-container');
+                const images = Array.from(gallery.querySelectorAll('.post-image'));
+                const prevArrow = gallery.querySelector('.prev-arrow');
+                const nextArrow = gallery.querySelector('.next-arrow');
+                const dots = Array.from(gallery.querySelectorAll('.indicator-dot'));
+
+                let currentIndex = 0;
+
+                function updateGallery() {
+                    // Сначала скрываем все изображения
+                    images.forEach(img => img.classList.remove('active'));
+                    // Затем показываем только текущее
+                    if (images[currentIndex]) {
+                        images[currentIndex].classList.add('active');
+                    }
+
+                    // Обновляем активную точку
+                    dots.forEach((dot, index) => {
+                        if (index === currentIndex) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
+                }
+
+                // Инициализация галереи при загрузке страницы
+                updateGallery();
+
+                // Обработчики для стрелок
+                if (prevArrow) {
+                    prevArrow.addEventListener('click', () => {
+                        currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+                        updateGallery();
+                    });
+                }
+
+                if (nextArrow) {
+                    nextArrow.addEventListener('click', () => {
+                        currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+                        updateGallery();
+                    });
+                }
+
+                // Обработчики для точек
+                dots.forEach(dot => {
+                    dot.addEventListener('click', function() {
+                        currentIndex = parseInt(this.dataset.slideTo);
+                        updateGallery();
+                    });
+                });
+            });
+        });
+        
+        // Пример вызова: onclick="handlePostAction({{ post.id }}, 'like')"
+        // и onclick="handlePostAction({{ post.id }}, 'dislike')"
+        // и onclick="handlePostAction({{ post.id }}, 'repost')"
+
+        // Обработчик для отправки комментария (привязывается к форме комментария в post_detail.html)
+        async function handleCommentSubmit(event, postId) {
+            event.preventDefault();
+            const form = event.target;
+            const commentTextarea = form.querySelector('textarea[name="text"]');
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Получаем текущий CSRF-токен, если он еще не определен в глобальной области
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+            submitButton.disabled = true; // Отключаем кнопку, чтобы предотвратить повторные отправки
+        
+            const formData = new FormData(form);
+            formData.append('post', postId); // Убедимся, что ID поста передается
+        
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken, // Используем актуальный токен
+                        // 'Content-Type': 'application/json' - не нужно для FormData
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+        
+                if (response.ok && data.success) {
+                    // alert('Комментарий добавлен!'); // Этот алерт можно убрать для лучшего UX
+                    commentTextarea.value = ''; // Очищаем поле ввода
+                    submitButton.disabled = false; // Включаем кнопку обратно
+        
+                    const commentsContainer = document.getElementById(`comments-container-${postId}`);
+                    const noCommentsMessage = commentsContainer.querySelector('.no-comments');
+                    
+                    // Если есть сообщение "Пока нет комментариев", удаляем его
+                    if (noCommentsMessage) {
+                        noCommentsMessage.remove();
+                    }
+        
+                    // Создаем HTML-элемент для нового комментария
+                    // Используем интерполяцию для данных из data.comment
+                    const newCommentHtml = `
+                        <div class="comment">
+                            <strong>${data.comment.author_username}</strong>
+                            <span>${new Date(data.comment.created_at).toLocaleString('ru-RU', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</span>
+                            <p>${data.comment.text}</p>
+                        </div>
+                    `;
+                    // Добавляем новый комментарий в начало списка (если хотите новые сверху)
+                    // commentsContainer.insertAdjacentHTML('afterbegin', newCommentHtml);
+                    // Или в конец списка (как было, если хотите старые сверху)
+                    commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+        
+        
+                    // Обновляем счетчик комментариев на кнопке
+                    const totalCommentsSpan = document.querySelector(`.total-comments-${postId}`);
+                    if (totalCommentsSpan) {
+                        totalCommentsSpan.textContent = data.comment.total_comments;
+                    }
+        
+                } else {
+                    let errorMessage = data.message || 'Не удалось добавить комментарий.';
+                    if (data.errors) {
+                        try {
+                            // Парсим JSON-строку с ошибками
+                            const errors = JSON.parse(data.errors);
+                            for (const key in errors) {
+                                // Предполагаем, что errors[key] это массив объектов с ключом 'message'
+                                errorMessage += `\n${key}: ${errors[key].map(err => err.message).join(', ')}`;
+                            }
+                        } catch (e) {
+                            console.error('Ошибка парсинга ошибок комментария:', e);
+                        }
+                    }
+                    alert('Ошибка: ' + errorMessage);
+                    submitButton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Ошибка сети при добавлении комментария:', error);
+                alert('Произошла ошибка сети.');
+                submitButton.disabled = false;
+            }
+        }
+    
+        
 
     </script>
     {# --- Конец Скрипта для переключения темы и меню --- #}

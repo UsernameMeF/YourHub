@@ -1,0 +1,304 @@
+/* ========================================= */
+/* === ТЕМНАЯ ТЕМА: АДАПТИРОВАНО ПОД ТВОИ ЦВЕТА === */
+/* ========================================= */
+
+html.dark-theme .posts-container {
+    /* Фон для контейнера, если нужен */
+}
+
+/* Общие стили для карточек в темной теме */
+html.dark-theme .post-card,
+html.dark-theme .post-detail-card {
+    background-color: #252526; /* Твой цвет */
+    border-color: #3a3a3a; /* Твой цвет */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+html.dark-theme .post-header {
+    border-bottom-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+
+html.dark-theme .post-author-avatar,
+html.dark-theme .post-detail-card .author-avatar {
+    border-color: #4a4a4a;
+}
+
+html.dark-theme .post-author-username,
+html.dark-theme .post-detail-card .author-username {
+    color: #f0f0f0; /* Твой цвет */
+}
+html.dark-theme .post-author-username:hover,
+html.dark-theme .post-detail-card .author-username:hover {
+    color: #00e600; /* Твой зеленый */
+}
+
+html.dark-theme .post-date {
+    color: #aaa; /* Твой цвет */
+}
+
+html.dark-theme .post-actions-button {
+    color: #b0b0b0; /* Твой светлый текст */
+}
+html.dark-theme .post-actions-button:hover {
+    background-color: #333333;
+}
+
+html.dark-theme .post-actions-dropdown .dropdown-menu {
+    background-color: #333333;
+    border-color: #4a4a4a;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+html.dark-theme .post-actions-dropdown .dropdown-menu a {
+    color: #f0f0f0;
+}
+html.dark-theme .post-actions-dropdown .dropdown-menu a:hover {
+    background-color: #444444;
+}
+
+html.dark-theme .post-title a {
+    color: #00e600; /* Твой зеленый для заголовков */
+}
+html.dark-theme .post-title a:hover {
+    color: #00ff00; /* Твой более светлый зеленый */
+}
+
+html.dark-theme .post-content {
+    color: #ccc; /* Твой цвет */
+}
+
+/* Сетка изображений в ленте */
+html.dark-theme .post-grid-image {
+    border-color: #3a3a3a; /* Твоя граница */
+}
+
+/* Общие action-button для темной темы */
+html.dark-theme .action-button {
+    color: #b0b0b0; /* Твой цвет */
+}
+html.dark-theme .action-button:hover {
+    background-color: #333333; /* Темный фон при наведении */
+    color: #f0f0f0; /* Твой светлый текст */
+}
+html.dark-theme .action-button.active {
+    color: #00e600; /* Твой зеленый для активных */
+}
+/* Специфичные цвета для активных кнопок в ленте, если они не заданы бэкграундом */
+html.dark-theme .action-button.like-button.active {
+    color: #00e600; /* Твой зеленый */
+}
+html.dark-theme .action-button.dislike-button.active {
+    color: #cc4444; /* Твой красный */
+}
+html.dark-theme .action-button.repost-button.active {
+    color: #6a8e3d; /* Твой репост-зеленый */
+}
+html.dark-theme .action-card .action-button a { /* Ссылка для комментариев на карточке */
+    color: #b0b0b0;
+}
+html.dark-theme .action-card .action-button a:hover {
+    color: #f0f0f0;
+}
+
+
+/* Тёмная тема для детальной страницы поста (post_detail.html) */
+html.dark-theme .post-detail-container {
+    background-color: #1a1a1a; /* Твой цвет */
+}
+
+html.dark-theme .post-detail-card {
+    background-color: #252526; /* Твой цвет */
+    border-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+
+html.dark-theme .post-detail-card .post-title {
+    color: #f0f0f0; /* Твой цвет */
+}
+html.dark-theme .post-detail-card .post-content {
+    color: #ccc; /* Твой цвет */
+}
+
+/* Галерея вложений на детальной странице */
+html.dark-theme .post-attachments-gallery {
+    background-color: #252526; /* Твой фон карточек, хорошо подходит для галереи */
+}
+/* Стрелки навигации в галерее */
+html.dark-theme .gallery-arrow {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #f0f0f0;
+}
+html.dark-theme .gallery-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Индикаторы-кружки галереи */
+html.dark-theme .indicator-dot {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+html.dark-theme .indicator-dot.active {
+    background-color: #00e600; /* Твой зеленый */
+    border-color: #00e600;
+}
+
+/* Специфические кнопки действий на детальной странице в темной теме (с фоном) */
+html.dark-theme .post-detail-card .action-button {
+    background-color: #3a3a3a; /* Темный фон для кнопок */
+    border-color: #4a4a4a;
+    color: #f0f0f0; /* Твой светлый текст */
+}
+html.dark-theme .post-detail-card .action-button:hover {
+    background-color: #4a4a4a;
+    color: #00e600; /* Твой зеленый при наведении */
+}
+
+html.dark-theme .post-detail-card .like-button.active {
+    background-color: #00e600; /* Твой цвет */
+    color: #1a1a1a; /* Твой цвет */
+    border-color: #00e600;
+}
+html.dark-theme .post-detail-card .like-button.active:hover {
+    background-color: #00ff00; /* Твой цвет */
+    border-color: #00ff00;
+}
+
+html.dark-theme .post-detail-card .dislike-button.active {
+    background-color: #cc4444; /* Твой цвет */
+    color: #f0f0f0; /* Твой цвет */
+    border-color: #cc4444;
+}
+html.dark-theme .post-detail-card .dislike-button.active:hover {
+    background-color: #ff5555; /* Твой цвет */
+    border-color: #ff5555;
+}
+
+html.dark-theme .post-detail-card .repost-button.active {
+    background-color: #6a8e3d; /* Твой цвет */
+    color: #f0f0f0; /* Твой цвет */
+    border-color: #6a8e3d;
+}
+html.dark-theme .post-detail-card .repost-button.active:hover {
+    background-color: #7ba24e; /* Твой цвет */
+    border-color: #7ba24e;
+}
+
+html.dark-theme .post-detail-card .comment-button {
+    background-color: #444444; /* Твой цвет */
+    color: #f0f0f0; /* Твой цвет */
+    border-color: #444444;
+}
+html.dark-theme .post-detail-card .comment-button:hover {
+    background-color: #555555;
+    border-color: #555555;
+}
+
+html.dark-theme .post-detail-card .edit-post-button {
+    background-color: #e6b300; /* Твой цвет */
+    color: #1a1a1a; /* Твой цвет */
+    border-color: #e6b300;
+}
+html.dark-theme .post-detail-card .edit-post-button:hover {
+    background-color: #cc9900; /* Твой цвет */
+    border-color: #cc9900;
+}
+
+html.dark-theme .post-detail-card .delete-post-button {
+    background-color: #cc4444; /* Твой цвет */
+    color: #f0f0f0; /* Твой цвет */
+    border-color: #cc4444;
+}
+html.dark-theme .post-detail-card .delete-post-button:hover {
+    background-color: #ff5555; /* Твой цвет */
+    border-color: #ff5555;
+}
+
+
+/* Секция комментариев в темной теме */
+html.dark-theme .comments-section {
+    background-color: #252526; /* Твой фон карточек */
+    border-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+html.dark-theme .comments-section h3 {
+    color: #f0f0f0; /* Твой светлый текст */
+    border-bottom-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+html.dark-theme .comments-list {
+    border-top-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+html.dark-theme .comment {
+    background-color: #2c2c2c; /* Темнее, чем карточка, но светлее body */
+    border-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+html.dark-theme .comment:last-child {
+    border-bottom: none;
+}
+html.dark-theme .comment-avatar {
+    border-color: #4a4a4a;
+}
+html.dark-theme .comment-author-username {
+    color: #00e600; /* Твой зеленый для ссылок */
+}
+html.dark-theme .comment-author-username:hover {
+    color: #00ff00; /* Твой более светлый зеленый */
+}
+html.dark-theme .comment-date {
+    color: #aaa; /* Твой цвет */
+}
+html.dark-theme .comment-text {
+    color: #ccc; /* Твой цвет */
+}
+html.dark-theme .no-comments {
+    color: #b0b0b0; /* Твой цвет */
+}
+html.dark-theme .comment-form textarea {
+    background-color: #252526; /* Твой фон карточек */
+    border-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+    color: #f0f0f0; /* Твой светлый текст */
+}
+html.dark-theme .comment-form textarea::placeholder {
+    color: #aaa; /* Твой цвет */
+}
+html.dark-theme .comment-form button {
+    background-color: #6a8e3d; /* Твой репост-зеленый */
+    color: #f0f0f0; /* Твой светлый текст */
+}
+html.dark-theme .comment-form button:hover {
+    background-color: #7ba24e; /* Твой репост-зеленый при наведении */
+}
+html.dark-theme .comments-section p.auth-prompt {
+    color: #b0b0b0;
+}
+html.dark-theme .comments-section p.auth-prompt a {
+    color: #00e600; /* Твой зеленый */
+}
+html.dark-theme .comments-section p.auth-prompt a:hover {
+    color: #00ff00;
+}
+
+/* Темная тема для предпросмотра изображений */
+html.dark-theme .image-preview-container {
+    border-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+    color: #b0b0b0;
+}
+html.dark-theme .existing-images-container {
+    border-top-color: #3a3a3a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+html.dark-theme .existing-images-container h3 {
+    color: #b0b0b0;
+}
+html.dark-theme .image-preview-wrapper {
+    border-color: #4a4a4a; /* ИСПРАВЛЕНИЕ: Граница для темной темы */
+}
+html.dark-theme .delete-image-button {
+    background-color: #cc4444; /* Твой красный */
+    color: #f0f0f0;
+}
+html.dark-theme .delete-image-button:hover {
+    background-color: #ff5555;
+}
+html.dark-theme .image-preview-wrapper.deleted .delete-image-button {
+    background-color: #00e600; /* Твой зеленый */
+}
+html.dark-theme .image-preview-wrapper.deleted .delete-image-button:hover {
+    background-color: #00ff00;
+}

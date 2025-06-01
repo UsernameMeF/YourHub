@@ -1,0 +1,69 @@
+/* SOCIAL_NETWORK/your_hub/static/css/core/_post_form_dark.css */
+
+/* Dark theme specific styles for post form elements */
+.dark-theme .custom-file-label {
+    background-color: #444444; /* Dark theme button background */
+    color: #f0f0f0; /* Dark theme button text color */
+    border-color: #666666; /* Dark theme border color */
+}
+.dark-theme .custom-file-label:hover {
+    background-color: #555555; /* Dark theme button hover background */
+}
+
+.dark-theme #new-images-upload-container label {
+    color: #aaaaaa; /* Dark theme secondary text color */
+}
+.dark-theme .image-input-wrapper {
+    border-color: #666666; /* Dark theme border color */
+}
+.dark-theme .btn-remove-input {
+    background-color: #cc4444; /* Dark theme danger color */
+    color: #f0f0f0; /* Dark theme button text color */
+}
+.dark-theme .btn-remove-input:hover {
+    background-color: #ff5555; /* Dark theme danger color hover */
+}
+.dark-theme .image-preview-container-single {
+    border-color: #666666; /* Dark theme border color */
+    background-color: #3a3a3a; /* Dark theme light background color */
+    color: #aaaaaa; /* Dark theme secondary text color */
+}
+
+.dark-theme .existing-images-container {
+    border-top-color: #666666; /* Dark theme border color */
+}
+.dark-theme .existing-images-container h3 {
+    color: #aaaaaa; /* Dark theme secondary text color */
+}
+.dark-theme .image-preview-wrapper {
+    border-color: #666666; /* Dark theme border color */
+}
+.dark-theme .image-preview-wrapper .image-filename {
+    color: #aaaaaa; /* Dark theme secondary text color */
+}
+.dark-theme .image-preview-wrapper.deleted .image-filename {
+    color: #777777; /* Dark theme faded secondary text color */
+}
+.dark-theme .delete-image-button {
+    background-color: #cc4444; /* Dark theme danger color */
+    color: #f0f0f0; /* Dark theme button text color */
+}
+.dark-theme .delete-image-button:hover {
+    background-color: #ff5555; /* Dark theme danger color hover */
+}
+.dark-theme .image-preview-wrapper.deleted .delete-image-button {
+    background-color: #6a8e3d; /* Dark theme accent color */
+}
+.dark-theme .image-preview-wrapper.deleted .delete-image-button:hover {
+    background-color: #7ba24e; /* Dark theme accent color hover */
+}
+
+.dark-theme .add-another-button {
+    background-color: #333333; /* Dark theme secondary button background */
+    color: #f0f0f0; /* Dark theme secondary button text color */
+    border-color: #555555; /* Dark theme secondary button border */
+}
+.dark-theme .add-another-button:hover {
+    background-color: #444444; /* Dark theme secondary button hover background */
+    border-color: #666666; /* Dark theme secondary button hover border */
+}
