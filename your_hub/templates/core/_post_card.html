@@ -5,7 +5,7 @@
     <div class="post-header">
         <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="post-author-avatar">
         <div class="post-info">
-            <a href="{% url 'user_profile' post.author.id %}" class="post-author-username">{{ post.author.username }}</a>
+            <a href="{% url 'users:user_profile' post.author.id %}" class="post-author-username">{{ post.author.username }}</a>
             <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
             {% if post.updated_at and post.created_at != post.updated_at %}
                 <span class="post-date">(обновлено: {{ post.updated_at|date:"d M Y H:i" }})</span>

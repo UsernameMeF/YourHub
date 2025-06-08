@@ -128,7 +128,7 @@ def get_post_reposts_list(request, post_id):
 
     for user in all_repost_users:
         # Убедимся, что user.profile существует, чтобы избежать AttributeError
-        avatar_url = user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else '/static/images/default-avatar.png'
+        avatar_url = user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else '/media/images/default-avatar.png'
         
         if user == current_user:
             repost_users_data.append({

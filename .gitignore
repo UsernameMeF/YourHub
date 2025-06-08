@@ -181,4 +181,5 @@ cython_debug/
 # Ignore contents of specific materials media directories
 your_hub/media/profile_avatars/**
 your_hub/media/post_attachments/**
+your_hub/media/chat_attachments/**
 # -------------------

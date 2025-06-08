@@ -7,7 +7,7 @@
 <div class="post-detail-container">
     <div class="post-detail-card" id="post-{{ post.id }}">
         <div class="post-header">
-            <a href="{% url 'user_profile' post.author.id %}" class="author-info"> {# Исправил user.id на post.author.id #}
+            <a href="{% url 'users:user_profile' post.author.id %}" class="author-info"> {# Исправил user.id на post.author.id #}
                 <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="author-avatar">
                 <span class="author-username">{{ post.author.username }}</span>
             </a>
@@ -83,12 +83,12 @@
             <div id="comments-container-{{ post.id }}" class="comments-list">
                 {% for comment in post.comments.all %}
                 <div class="comment">
-                    <a href="{% url 'user_profile' comment.author.id %}" class="comment-author-link">
+                    <a href="{% url 'users:user_profile' comment.author.id %}" class="comment-author-link">
                         <img src="{% if comment.author.profile.avatar %}{{ comment.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="comment-avatar">
                     </a>
                     <div class="comment-content">
                         <div class="comment-header">
-                            <a href="{% url 'user_profile' comment.author.id %}" class="comment-author-username">
+                            <a href="{% url 'users:user_profile' comment.author.id %}" class="comment-author-username">
                                 <strong>{{ comment.author.username }}</strong>
                             </a>
                             <span class="comment-date">{{ comment.created_at|date:"d M Y, H:i" }}</span>

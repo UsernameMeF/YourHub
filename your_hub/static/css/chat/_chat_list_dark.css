@@ -1,0 +1,43 @@
+/* social_network/your_hub/static/css/chat/chat_list_dark.css */
+
+html.dark-theme .chat_list-container { /* Изменено */
+    background-color: #2a2a2a; /* Темный фон контейнера */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .chat_list-container h1 { /* Изменено */
+    color: #f0f0f0;
+}
+
+html.dark-theme .chat_list-item { /* Изменено */
+    border-bottom-color: #3c3c3c; /* Темная граница */
+}
+
+html.dark-theme .chat_list-item:hover { /* Изменено */
+    background-color: #383838; /* Темный ховер */
+}
+
+html.dark-theme .chat_list-item a { /* Изменено */
+    color: #f0f0f0; /* Светлый цвет текста для всей ссылки */
+}
+
+html.dark-theme .chat_avatar { /* Изменено */
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05); /* Светлая тень */
+}
+
+html.dark-theme .chat_name { /* Изменено */
+    color: #f0f0f0; /* Светлый цвет имени */
+}
+
+html.dark-theme .chat_last-message { /* Изменено */
+    color: #b0b0b0; /* Светло-серый для сообщения */
+}
+
+html.dark-theme .chat_timestamp { /* Изменено */
+    color: #b0b0b0; /* Светло-серый для времени */
+}
+
+html.dark-theme .chat_unread-count { /* Изменено */
+    background-color: #00e600; /* Ярко-зеленый для темной темы */
+    color: #1a1a1a; /* Темный текст на зеленом фоне */
+}

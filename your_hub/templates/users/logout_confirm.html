@@ -7,7 +7,7 @@
     <h2>Вы уверены, что хотите выйти?</h2>
     <p>Выход завершит вашу текущую сессию на этом сайте.</p>
 
-    <form method="post" action="{% url 'logout' %}"> {# Форма отправляет POST запрос на этот же URL #}
+    <form method="post" action="{% url 'users:logout' %}"> {# Форма отправляет POST запрос на этот же URL #}
         {% csrf_token %}
         <button type="submit" class="btn-primary">Выйти</button> {# Добавь подходящий CSS класс для кнопки #}
     </form>

@@ -6,32 +6,37 @@
     {# Добавляем ID для удобства поиска в JS #}
     {# Добавляем класс для стилизации позиционирования #}
     <div class="profile-actions-buttons-wrapper"> {# Используйте этот класс для горизонтального расположения #}
+        {# --- Кнопка "Написать сообщение" --- #}
+        {# Показываем кнопку чата, если это не свой профиль #}
+        <a href="{% url 'chat:start_private_chat' other_user_id=viewed_user.id %}" class="header-icon-button" title="Написать сообщение">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </a>
         {# Логика для кнопок дружбы #}
         {% if friendship_status == 'not_friends' %}
             {# Форма для отправки запроса на дружбу - добавляем класс для AJAX #}
-            <form method="post" action="{% url 'send_friend_request' to_user_id=viewed_user.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:send_friend_request' to_user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Добавить в друзья</button>
             </form>
         {% elif friendship_status == 'pending_sent' and sent_request %}
             {# Статус: запрос отправлен текущим пользователем. Кнопка "Отменить запрос" #}
-            <form method="post" action="{% url 'cancel_friend_request' friendship_id=sent_request.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:cancel_friend_request' friendship_id=sent_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-secondary">Отменить запрос</button>
             </form>
         {% elif friendship_status == 'pending_received' and received_request %}
             {# Статус: текущий пользователь получил запрос от просматриваемого. Кнопки "Принять" / "Отклонить" #}
-            <form method="post" action="{% url 'accept_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:accept_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success">Принять</button>
             </form>
-            <form method="post" action="{% url 'decline_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:decline_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Отклонить</button>
             </form>
         {% elif friendship_status == 'friends' %}
             {# Статус: текущий пользователь и просматриваемый - друзья. Кнопка "Удалить из друзей" #}
-            <form method="post" action="{% url 'remove_friend' user_id=viewed_user.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:remove_friend' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Удалить из друзей</button>
             </form>
@@ -41,13 +46,13 @@
         {# Она может быть видна независимо от статуса дружбы, если это ваша логика #}
         {% if follow_status %}
             {# Статус: текущий пользователь подписан на просматриваемого - форма для отписки #}
-            <form method="post" action="{% url 'unfollow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:unfollow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-secondary">Отписаться</button>
             </form>
         {% else %}
             {# Статус: текущий пользователь НЕ подписан на просматриваемого - форма для подписки #}
-            <form method="post" action="{% url 'follow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
+            <form method="post" action="{% url 'users:follow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Подписаться</button>
             </form>
@@ -57,5 +62,5 @@
 
 {# Ссылка на редактирование профиля (отображается только если это СВОЙ профиль) #}
 {% if is_my_profile %}
-    <p><a href="{% url 'edit_profile' %}" class="btn-primary">Редактировать профиль</a></p>
+    <p><a href="{% url 'users:edit_profile' %}" class="btn-primary">Редактировать профиль</a></p>
 {% endif %}

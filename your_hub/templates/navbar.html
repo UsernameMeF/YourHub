@@ -3,7 +3,7 @@
     {# Ссылки навбара, ведут на URL-адреса в core/urls.py #}
     <a href="{% url 'core:index' %}">Главная страница</a>
     <a href="#">Новости от друзей</a>
-    <a href="{% url 'friends_list' %}">Друзья</a>
-    <a href="#">Группы</a>
+    <a href="{% url 'users:friends_list' %}">Друзья</a>
+    <a href="#">Сообщества</a>
     {# Добавьте другие ссылки навбара здесь #}
 </nav>

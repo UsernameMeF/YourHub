@@ -42,7 +42,7 @@
 
             {% if user.is_authenticated %}
                 {# Пользователь авторизован #}
-                <a href="#" class="header-icon-button" title="Открыть чат">
+                <a href="{% url 'chat:chat_list' %}" class="header-icon-button" title="Открыть чат">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </a>
 
@@ -60,17 +60,17 @@
                         <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="profile-avatar-img">
                     </button>
                     <div class="dropdown-menu profile-dropdown-menu" id="profile-dropdown-menu">
-                        <a href="{% url 'user_profile' user.id %}">Мой профиль</a>
-                        <a href="{% url 'edit_profile' %}">Редактировать профиль</a>
+                        <a href="{% url 'users:user_profile' user.id %}">Мой профиль</a>
+                        <a href="{% url 'users:edit_profile' %}">Редактировать профиль</a>
                         <a href="#">Настройки</a>
-                        <a href="{% url 'logout' %}">Выход</a>
+                        <a href="{% url 'users:logout' %}">Выход</a>
                     </div>
                 </div>
 
             {% else %}
                 {# Пользователь не авторизован #}
-                <a href="{% url 'register' %}" class="btn-primary">Зарегистрироваться</a>
-                <a href="{% url 'login' %}" class="btn-secondary">Войти</a>
+                <a href="{% url 'users:register' %}" class="btn-primary">Зарегистрироваться</a>
+                <a href="{% url 'users:login' %}" class="btn-secondary">Войти</a>
             {% endif %}
         </div>
     </header>

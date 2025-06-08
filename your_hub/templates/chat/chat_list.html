@@ -1,0 +1,105 @@
+{% extends 'base.html' %} {# Убедитесь, что 'base.html' - это ваш основной шаблон #}
+{% load static %} {# Если используете статические файлы #}
+
+{% block title %}Ваши Чаты{% endblock %}
+
+{% block extra_head %}
+    {# Стили для страницы списка чатов #}
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list_dark.css' %}">
+    {# Font Awesome (если используется для иконок) #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="chat_list-container">
+    <h1>Ваши Чаты</h1>
+
+    {% if chat_rooms %}
+        <ul class="chat_list">
+            {% for chat_room in chat_rooms %}
+                <li class="chat_list-item">
+                    <a href="{% url 'chat:chat_room' room_id=chat_room.id %}">
+                        {# Найдем участника чата, который не является текущим пользователем #}
+                        {# Итерация по всем, но используем только первого подходящего для аватара и имени #}
+                        {% for participant in chat_room.participants.all %}
+                            {% if participant != request.user %}
+                                {% comment %} Предполагаем, что у вашей модели пользователя есть поле avatar (например, в Profile) {% endcomment %}
+                                <img src="{% if participant.profile.avatar %}{{ participant.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар" class="chat_avatar">
+                                {% comment %} ВНИМАНИЕ: Здесь НЕ должно быть {% break %}, так как Django Templates его не поддерживают. #}
+                                {% comment %} Если это 1-на-1 чат, то можно просто взять первого попавшегося.
+                                     Для групповых чатов, возможно, потребуется другое отображение.
+                                     Использование 'with' поможет определить имя один раз.
+                                {% endcomment %}
+                                {% with chat_display_name=participant.username %}
+                                {% endwith %}
+                            {% endif %}
+                        {% empty %}
+                            {# Если чат только с собой или нет других участников #}
+                            <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="chat_avatar">
+                            {% with chat_display_name="Мои заметки" %}{% endwith %}
+                        {% endfor %}
+
+                        <div class="chat_info">
+                            <span class="chat_name">
+                                {# Здесь выводим имя, которое мы определили выше. #}
+                                {# Для 1-на-1 чатов будет имя собеседника. Для групп, возможно, другое. #}
+                                {% comment %} В групповом чате здесь может быть название чата. {% endcomment %}
+                                {% if chat_display_name %}
+                                    {{ chat_display_name }}
+                                {% else %}
+                                    {% comment %} Если это групповой чат без явного названия, можно вывести список участников {% endcomment %}
+                                    {% for p in chat_room.participants.all %}
+                                        {% if p != request.user %}
+                                            {{ p.username }}{% if not forloop.last %}, {% endif %}
+                                        {% endif %}
+                                    {% empty %}
+                                        Мои заметки
+                                    {% endfor %}
+                                {% endif %}
+                            </span>
+                            <span class="chat_last-message">
+                                {% if chat_room.last_message %}
+                                    {% if chat_room.last_message.sender == request.user %}
+                                        Вы:
+                                    {% else %}
+                                        {{ chat_room.last_message.sender.username }}:
+                                    {% endif %}
+                                    {% if chat_room.last_message.content %}
+                                        {{ chat_room.last_message.content|truncatechars:50 }}
+                                    {% elif chat_room.last_message.attachments.exists %}
+                                        [Вложение]
+                                    {% else %}
+                                        Нет текста
+                                    {% endif %}
+                                {% else %}
+                                    Начните общение...
+                                {% endif %}
+                            </span>
+                        </div>
+                        <span class="chat_timestamp">
+                            {% if chat_room.last_message %}
+                                {% if chat_room.last_message.timestamp|date:"Y-m-d" == today_date %}
+                                    {{ chat_room.last_message.timestamp|date:"H:i" }}
+                                {% elif chat_room.last_message.timestamp|date:"Y" == today_date|date:"Y" %}
+                                    {{ chat_room.last_message.timestamp|date:"d M" }}
+                                {% else %}
+                                    {{ chat_room.last_message.timestamp|date:"d.m.Y" }}
+                                {% endif %}
+                            {% else %}
+                                &nbsp; {# Пустое пространство, чтобы не смещать элементы #}
+                            {% endif %}
+                        </span>
+
+                        {# Пока просто заглушка для счетчика непрочитанных сообщений, его нужно реализовать отдельно #}
+                        {# <span class="chat_unread-count">5</span> #}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У вас пока нет активных чатов.</p>
+        <p>Вы можете начать чат с другом, перейдя на его профиль.</p>
+    {% endif %}
+</div>
+{% endblock %}

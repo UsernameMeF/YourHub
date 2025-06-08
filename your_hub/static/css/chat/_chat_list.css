@@ -1,0 +1,115 @@
+/* social_network/your_hub/static/css/chat/chat_list.css */
+
+.chat_list-container { /* Изменено */
+    padding: 10px;
+    max-width: 700px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.chat_list-container h1 { /* Изменено */
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.chat_list { /* Изменено */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chat_list-item { /* Изменено */
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s ease;
+    position: relative; /* Для позиционирования времени/счетчика */
+}
+
+.chat_list-item:last-child { /* Изменено */
+    border-bottom: none;
+}
+
+.chat_list-item:hover { /* Изменено */
+    background-color: #f5f5f5;
+}
+
+.chat_list-item a { /* Изменено */
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.chat_avatar { /* Изменено */
+    width: 55px; /* Чуть больше размер аватара */
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px; /* Отступ справа от аватара */
+    flex-shrink: 0; /* Не сжимать аватар */
+    border: none; /* Убираем рамку, если не нужна */
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05); /* Легкая тень для объема */
+}
+
+.chat_info { /* Изменено */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Важно для обрезания текста */
+}
+
+.chat_name { /* Изменено */
+    font-weight: 600; /* Более сильное жирное начертание */
+    font-size: 1.05em; /* Чуть крупнее */
+    color: #333; /* По умолчанию темный цвет */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Троеточие */
+    margin-bottom: 2px; /* Отступ между именем и сообщением */
+}
+
+.chat_last-message { /* Изменено */
+    font-size: 0.9em;
+    color: #888; /* Более серый цвет для сообщения */
+    white-space: nowrap; /* Не переносить строку */
+    overflow: hidden; /* Обрезаем, если длинное */
+    text-overflow: ellipsis; /* Добавляем троеточие */
+    max-width: 100%; /* Ограничение ширины для троеточия */
+}
+
+.chat_timestamp { /* Изменено */
+    font-size: 0.8em;
+    color: #999;
+    margin-left: auto; /* Прижимает к правому краю */
+    flex-shrink: 0; /* Не сжимать время */
+    text-align: right;
+    width: 60px; /* Фиксированная ширина для времени/даты */
+}
+
+.chat_unread-count { /* Изменено */
+    background-color: #007bff; /* Синий кружок */
+    color: white;
+    font-size: 0.75em;
+    font-weight: bold;
+    border-radius: 10px; /* Круглая форма */
+    padding: 3px 8px; /* Внутренние отступы */
+    margin-left: 10px; /* Отступ от времени */
+    flex-shrink: 0;
+    min-width: 20px; /* Минимальная ширина для одной цифры */
+    text-align: center;
+    box-sizing: border-box;
+    display: flex; /* Для центрирования текста */
+    align-items: center;
+    justify-content: center;
+    height: 20px; /* Фиксированная высота для круглости */
+}

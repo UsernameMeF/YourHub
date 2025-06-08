@@ -18,7 +18,7 @@
             <h2>Профиль</h2>
             <div class="profile-actions-top">
                 {% if is_my_profile %}
-                    <a href="{% url 'edit_profile' %}" class="btn-primary">Редактировать профиль</a>
+                    <a href="{% url 'users:edit_profile' %}" class="btn-primary">Редактировать профиль</a>
                 {% else %}
                     {# Проверяем статус дружбы для отображения кнопок #}
                     {% include 'profile_actions_snippet.html' %}
@@ -86,7 +86,7 @@
                 {% if user_friends %}
                     <ul>
                         {% for friend in user_friends %}
-                            <li><a href="{% url 'user_profile' friend.id %}">{{ friend.username }}</a></li>
+                            <li><a href="{% url 'users:user_profile' friend.id %}">{{ friend.username }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         statusOptions.forEach(option => {
             option.addEventListener('click', function() {
                 const newChosenStatus = this.dataset.status;
-                fetch('{% url "set_user_status" %}', {
+                fetch('{% url "users:set_user_status" %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
