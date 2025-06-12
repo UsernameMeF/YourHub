@@ -41,3 +41,70 @@ html.dark-theme .chat_unread-count { /* Изменено */
     background-color: #00e600; /* Ярко-зеленый для темной темы */
     color: #1a1a1a; /* Темный текст на зеленом фоне */
 }
+
+html.dark-theme .chat_list-container {
+    background-color: #1a1a1a; /* Из _base_dark.css */
+    color: #eee;
+}
+
+html.dark-theme .chat_list-container h1 {
+    color: #fff;
+}
+
+/* Изменения для кнопок категорий в темной теме */
+html.dark-theme .chat_category-buttons button {
+    border: 1px solid #00e600; /* Используем акцентный зеленый для рамки по умолчанию */
+    background-color: #333; /* Темный фон кнопки */
+    color: #00e600; /* Акцентный зеленый для текста */
+}
+
+html.dark-theme .chat_category-buttons button:hover {
+    background-color: #4a4a4a; /* Темнее фон при наведении */
+    color: #00cc00; /* Чуть темнее зеленый для текста при наведении */
+    border-color: #00cc00;
+}
+
+html.dark-theme .chat_category-buttons button.active {
+    background-color: #00e600; /* Активный фон - акцентный зеленый */
+    color: white; /* Белый текст */
+    border-color: #00e600;
+    box-shadow: 0 2px 5px rgba(0, 230, 0, 0.25); /* Тень от зеленого */
+}
+
+/* Остальные стили для темной темы, которые были ранее или соответствуют вашим примерам */
+
+html.dark-theme .chat_list-item {
+    border: 1px solid #333;
+    background-color: #2b2b2b;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+html.dark-theme .chat_list-item a {
+    color: #eee;
+}
+
+html.dark-theme .no-chats-message {
+    background-color: #333;
+    border: 1px dashed #555;
+    color: #bbb;
+}
+
+html.dark-theme .no-chats-message a {
+    color: #00e600; /* Используем акцентный цвет */
+}
+
+html.dark-theme .chat_name {
+    color: #fff;
+}
+
+html.dark-theme .chat_last-message {
+    color: #aaa;
+}
+
+html.dark-theme .chat_timestamp {
+    color: #888;
+}
+
+html.dark-theme .group-chat-item .chat_name .fas {
+    color: #a0a0a0;
+}

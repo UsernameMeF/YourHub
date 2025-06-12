@@ -113,3 +113,123 @@
     justify-content: center;
     height: 20px; /* Фиксированная высота для круглости */
 }
+
+/* Контейнер для кнопок */
+.chat_list-container .chat_category-buttons {
+    display: flex;
+    justify-content: center; /* Центрируем кнопки */
+    margin-bottom: 20px; /* Отступ снизу */
+    gap: 10px; /* Расстояние между кнопками */
+    flex-wrap: wrap; /* Позволяет кнопкам переноситься на новую строку на маленьких экранах */
+}
+
+/* Стили для каждой кнопки */
+.chat_list-container .chat_category-buttons button {
+    padding: 10px 20px;
+    border: 1px solid #007bff; /* Цвет рамки по умолчанию */
+    background-color: #f8f9fa; /* Светлый фон */
+    color: #007bff; /* Цвет текста */
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem; /* Относительный размер шрифта */
+    transition: all 0.3s ease; /* Плавный переход для hover и active состояний */
+    min-width: 120px; /* Минимальная ширина для кнопок */
+    text-align: center;
+}
+
+/* Состояние при наведении */
+.chat_list-container .chat_category-buttons button:hover {
+    background-color: #e2e6ea; /* Чуть темнее фон при наведении */
+    border-color: #0056b3;
+}
+
+/* Активная (выбранная) кнопка */
+.chat_list-container .chat_category-buttons button.active {
+    background-color: #007bff; /* Основной цвет */
+    color: white; /* Белый текст */
+    border-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2); /* Небольшая тень для активной кнопки */
+    pointer-events: none; /* Отключаем события указателя для активной кнопки */
+}
+
+/* Дополнительные стили для списков, если они нужны для отступов или flexbox */
+.chat_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chat_list-item {
+    margin-bottom: 10px; /* Отступ между элементами списка */
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chat_list-item a {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Стили для сообщения "нет чатов" */
+.no-chats-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+}
+
+.no-chats-message a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Стили для элементов чата (аватар, имя, последнее сообщение, время) */
+.chat_avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 1px solid #ddd;
+}
+
+.chat_info {
+    flex-grow: 1;
+}
+
+.chat_name {
+    font-weight: bold;
+    font-size: 1.1em;
+    display: block;
+    color: #333;
+}
+
+.chat_last-message {
+    font-size: 0.9em;
+    color: #666;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 15px); /* Учитываем возможный отступ */
+}
+
+.chat_timestamp {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: auto; /* Прижимает к правой стороне */
+    white-space: nowrap;
+}
+
+.group-chat-item .chat_name .fas {
+    margin-right: 5px; /* Отступ для иконки группы */
+    color: #6c757d; /* Цвет для иконки группы */
+}

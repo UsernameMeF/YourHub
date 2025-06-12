@@ -1,0 +1,120 @@
+/* social_network/your_hub/static/css/forms/form_style.css */
+
+.main-container {
+    padding: 10px;
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.form-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px 30px; /* Увеличенные внутренние отступы */
+}
+
+.form-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 25px; /* Увеличенный отступ */
+    text-align: center; /* Центрируем заголовок */
+}
+
+.form-field-wrapper {
+    margin-bottom: 20px; /* Отступ между полями формы */
+}
+
+.form-label {
+    display: block; /* Каждая метка на новой строке */
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px; /* Отступ между меткой и полем */
+    font-size: 0.95em;
+}
+
+/* Стилизация текстовых полей и textarea */
+.form-card input[type="text"],
+.form-card textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+    box-sizing: border-box; /* Учитываем padding и border в общей ширине */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-card input[type="text"]:focus,
+.form-card textarea:focus {
+    border-color: #007bff; /* Акцентный цвет при фокусе */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Легкая тень при фокусе */
+    outline: none; /* Убираем стандартный outline браузера */
+}
+
+.form-card textarea {
+    min-height: 100px; /* Минимальная высота для textarea */
+    resize: vertical; /* Разрешаем изменение размера только по вертикали */
+}
+
+.form-help-text {
+    font-size: 0.85em;
+    color: #888;
+    margin-top: 5px;
+}
+
+.form-error-message {
+    font-size: 0.85em;
+    color: #dc3545; /* Красный цвет для ошибок */
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Стили для чекбоксов (участников) */
+.checkbox-group {
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+    max-height: 250px; /* Ограничиваем высоту, чтобы был скролл */
+    overflow-y: auto; /* Позволяем скролл, если участников много */
+    background-color: #f9f9f9;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px; /* Отступ между элементами списка участников */
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    /* Можно добавить свои стили для чекбокса, если стандартный не подходит */
+}
+
+.checkbox-item label {
+    margin-bottom: 0; /* Убираем нижний отступ у метки чекбокса */
+    color: #333;
+    font-weight: normal; /* Обычный шрифт для меток чекбоксов */
+    cursor: pointer;
+}
+
+/* Стили для кнопки отправки */
+.submit-button {
+    display: block;
+    width: 100%; /* Кнопка на всю ширину */
+    padding: 12px 20px;
+    background-color: #007bff; /* Основной синий цвет */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 30px; /* Отступ сверху */
+}
+
+.submit-button:hover {
+    background-color: #0056b3; /* Темнее при наведении */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}

@@ -1,0 +1,54 @@
+/* social_network/your_hub/static/css/forms/form_style_dark.css */
+
+html.dark-theme .form-card {
+    background-color: #2a2a2a; /* Темный фон карточки */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .form-title {
+    color: #f0f0f0; /* Светлый заголовок */
+}
+
+html.dark-theme .form-label {
+    color: #bbb; /* Светлее метки */
+}
+
+html.dark-theme .form-card input[type="text"],
+html.dark-theme .form-card textarea {
+    background-color: #333; /* Темный фон полей */
+    border-color: #444; /* Темная рамка */
+    color: #f0f0f0; /* Светлый текст */
+}
+
+html.dark-theme .form-card input[type="text"]:focus,
+html.dark-theme .form-card textarea:focus {
+    border-color: #00e600; /* Зеленый акцент при фокусе */
+    box-shadow: 0 0 0 3px rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .form-help-text {
+    color: #aaa; /* Светлее подсказки */
+}
+
+html.dark-theme .form-error-message {
+    color: #ff6b6b; /* Красный для темной темы */
+}
+
+html.dark-theme .checkbox-group {
+    background-color: #313131; /* Темный фон для группы чекбоксов */
+    border-color: #4a4a4a;
+}
+
+html.dark-theme .checkbox-item label {
+    color: #f0f0f0; /* Светлый текст меток чекбоксов */
+}
+
+html.dark-theme .submit-button {
+    background-color: #00e600; /* Зеленая кнопка */
+    color: #1a1a1a; /* Темный текст на зеленом */
+}
+
+html.dark-theme .submit-button:hover {
+    background-color: #00cc00; /* Темнее зеленый при наведении */
+    box-shadow: 0 4px 10px rgba(0, 230, 0, 0.3);
+}

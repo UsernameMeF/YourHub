@@ -56,3 +56,6 @@
 @import url('users/_friends_dark.css');
 
 
+/* Чаты */
+@import url('chat/_form_style.css');
+@import url('chat/_form_style_dark.css');
