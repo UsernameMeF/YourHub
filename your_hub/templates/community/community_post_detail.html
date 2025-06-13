@@ -1,0 +1,482 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - YourHub{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="post-detail-container">
+    <div class="post-detail-card" id="post-{{ post.id }}">
+        <div class="post-header">
+            {# ИСПРАВЛЕНИЕ: Логика для автора поста (пользователь или сообщество) #}
+            {% if post.community %} {# Если пост принадлежит сообществу #}
+                <a href="{% url 'community:community_detail' post.community.pk %}" class="author-info">
+                    <img src="{% if post.community.avatar %}{{ post.community.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар сообщества" class="author-avatar">
+                    <span class="author-username">{{ post.community.name }}</span>
+                </a>
+            {% elif post.author %} {# Если пост принадлежит пользователю и автор существует #}
+                <a href="{% url 'users:user_profile' post.author.id %}" class="author-info">
+                    <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар" class="author-avatar">
+                    <span class="author-username">{{ post.author.username }}</span>
+                </a>
+            {% else %} {# Если автор поста удален и это не пост сообщества #}
+                <span class="author-info">
+                    <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="author-avatar">
+                    <span class="author-username">[Удаленный пользователь]</span>
+                </span>
+            {% endif %}
+            <span class="post-date">{{ post.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+
+        <h1 class="post-title">{{ post.title }}</h1>
+        <p class="post-content">{{ post.content|linebreaksbr }}</p>
+
+
+        <div class="post-actions">
+            <button class="action-button like-button {% if is_liked %}active{% endif %}"
+                    onclick="handlePostAction({{ post.id }}, 'like')"
+                    title="{% if is_liked %}Убрать лайк{% else %}Поставить лайк{% endif %}">
+                <i class="fas fa-thumbs-up"></i> <span class="likes-count">{{ post.total_likes }}</span>
+            </button>
+            <button class="action-button dislike-button {% if is_disliked %}active{% endif %}"
+                    onclick="handlePostAction({{ post.id }}, 'dislike')"
+                    title="{% if is_disliked %}Убрать дизлайк{% else %}Поставить дизлайк{% endif %}">
+                <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">{{ post.total_dislikes }}</span>
+            </button>
+            <button class="action-button comment-button">
+                <i class="fas fa-comment"></i> Комментарии (<span class="total-comments-{{ post.id }}">{{ post.total_comments }}</span>)
+            </button>
+            <button class="action-button repost-button {% if is_reposted %}active{% endif %}"
+                    onclick="handlePostAction({{ post.id }}, 'repost')"
+                    title="{% if is_reposted %}Отменить репост{% else %}Сделать репост{% endif %}">
+                <i class="fas fa-retweet"></i> <span class="reposts-count">{{ post.total_reposts }}</span>
+            </button>
+            {# НОВАЯ КНОПКА "СПИСОК РЕПОСТОВ" #}
+            {% if user.is_authenticated %}
+                <button class="action-button reposts-list-button" id="show-reposts-button" data-post-id="{{ post.id }}">
+                    <i class="fas fa-list-alt"></i> Репосты
+                </button>
+            {% endif %}
+            {% if user.is_authenticated %}
+            {% if user == post.posted_by or is_community_admin %}
+                <button class="delete-post-button" onclick="openDeletePostModal('{{ post.pk }}')" title="Удалить пост">
+                    <i class="fas fa-trash-alt"></i> Удалить{# Иконка корзины, если используешь FontAwesome #}
+                </button>
+            {% endif %}
+        {% endif %}
+        </div>
+        {# Комментарии #}
+        <div class="comments-section">
+            <h3>Комментарии</h3>
+            <div id="comments-container-{{ post.id }}" class="comments-list">
+                {% for comment in post.comments.all %}
+                <div class="comment">
+                    {# ИСПРАВЛЕНИЕ: Логика для автора комментария #}
+                    {% if comment.author %}
+                        <a href="{% url 'users:user_profile' comment.author.id %}" class="comment-author-link">
+                            <img src="{% if comment.author.profile.avatar %}{{ comment.author.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар" class="comment-avatar">
+                        </a>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <a href="{% url 'users:user_profile' comment.author.id %}" class="comment-author-username">
+                                    <strong>{{ comment.author.username }}</strong>
+                                </a>
+                                <span class="comment-date">{{ comment.created_at|date:"d M Y, H:i" }}</span>
+                            </div>
+                            <p class="comment-text">{{ comment.text|linebreaksbr }}</p>
+                        </div>
+                    {% else %}
+                        <span class="comment-author-link">
+                            <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="comment-avatar">
+                        </span>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author-username">
+                                    <strong>[Удаленный пользователь]</strong>
+                                </span>
+                                <span class="comment-date">{{ comment.created_at|date:"d M Y, H:i" }}</span>
+                            </div>
+                            <p class="comment-text">{{ comment.text|linebreaksbr }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                    <p class="no-comments">Пока нет комментариев. Будьте первым!</p>
+                {% endfor %}
+            </div>
+            {% if user.is_authenticated %}
+            {# ИСПРАВЛЕНИЕ: Передаем post.community.pk в handleCommunityCommentSubmit, если оно есть #}
+            <form class="comment-form" onsubmit="handleCommunityCommentSubmit(event, {{ post.community.pk|default:'null' }}, {{ post.id }})" method="post">
+                {% csrf_token %}
+                {{ comment_form.text }}
+                <button type="submit" class="btn-primary">Отправить комментарий</button>
+            </form>
+            {% else %}
+            <p>Чтобы оставить комментарий, <a href="{% url 'users:login' %}">войдите</a> или <a href="{% url 'users:register' %}">зарегистрируйтесь</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# Модальное окно списка репостов #}
+<div id="repostsModal" class="reposts-modal">
+    <div class="reposts-modal-content">
+        <span class="reposts-close-button" onclick="closeModal(document.getElementById('repostsModal'))">&times;</span>
+        <h2>Список репостов</h2>
+        <div class="reposts-list-container">
+            <p class="reposts-modal-loading">Загрузка списка репостов...</p>
+            <ul id="reposts-list" class="reposts-list">
+                {# Здесь будут отображаться пользователи, сделавшие репост #}
+            </ul>
+            <p id="reposts-modal-empty" class="reposts-modal-empty" style="display: none;">Никто еще не репостнул этот пост.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const communityPk = "{{ community.pk|default:'null' }}"; 
+        const postPk = "{{ post.pk }}";
+
+        function updateButtonState(button, is_active, countElement, newCount) {
+            if (is_active) {
+                button.addClass('active');
+            } else {
+                button.removeClass('active');
+            }
+            
+            if (button.hasClass('like-button')) {
+                button.attr('title', is_active ? 'Убрать лайк' : 'Поставить лайк');
+            } else if (button.hasClass('dislike-button')) {
+                button.attr('title', is_active ? 'Убрать дизлайк' : 'Поставить дизлайк');
+            } else if (button.hasClass('repost-button')) {
+                button.attr('title', is_active ? 'Отменить репост' : 'Сделать репост');
+            }
+            
+            if (countElement) { // Добавим проверку на существование элемента
+                countElement.textContent = newCount; 
+            }
+        }
+
+        async function updateRepostsCountOnButton() {
+            // Эта функция теперь только обновляет счетчик на кнопке "Репосты"
+            const showRepostsButton = document.getElementById('show-reposts-button');
+            if (!showRepostsButton) return; 
+
+            const postId = showRepostsButton.dataset.postId;
+            const repostButton = $('.repost-button'); // Основная кнопка "репостнуть"
+            
+            try {
+                const url = communityPk !== 'null' 
+                    ? `/community/${communityPk}/posts/${postId}/reposts/ajax/`
+                    : `/post/${postId}/reposts/ajax/`; 
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Обновляем счетчик на основной кнопке репоста
+                const mainRepostsCountSpan = repostButton.find('.reposts-count');
+                if (mainRepostsCountSpan) {
+                    mainRepostsCountSpan.textContent = data.reposts_count;
+                }
+                // Обновляем счетчик на кнопке "Репосты" для модального окна
+                const buttonRepostsCountSpan = showRepostsButton.querySelector('.reposts-count');
+                if (buttonRepostsCountSpan) {
+                    buttonRepostsCountSpan.textContent = data.reposts_count;
+                }
+
+            } catch (error) {
+                console.error('Ошибка при загрузке счетчика репостов:', error);
+            }
+        }
+
+        {% if user.is_authenticated %}
+        updateRepostsCountOnButton(); 
+        {% endif %}
+
+        const repostsModal = document.getElementById('repostsModal');
+        const showRepostsButton = document.getElementById('show-reposts-button');
+        const repostsListUl = document.getElementById('reposts-list');
+        const repostsModalEmpty = document.getElementById('reposts-modal-empty');
+        const repostsModalLoading = repostsModal.querySelector('.reposts-modal-loading');
+
+        if (showRepostsButton && repostsModal) {
+            showRepostsButton.addEventListener('click', async () => {
+                const postId = showRepostsButton.dataset.postId;
+                openModal(repostsModal);
+
+                repostsListUl.innerHTML = '';
+                repostsModalEmpty.style.display = 'none';
+                repostsModalLoading.style.display = 'block';
+
+                try {
+                    const url = communityPk !== 'null' 
+                        ? `/community/${communityPk}/posts/${postId}/reposts/ajax/`
+                        : `/post/${postId}/reposts/ajax/`; 
+
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+
+                    repostsModalLoading.style.display = 'none';
+
+                    if (data.reposts && data.reposts.length > 0) {
+                        data.reposts.forEach(user => {
+                            const li = document.createElement('li');
+                            li.classList.add('reposts-user-item');
+                            li.innerHTML = `
+                                <a href="/users/${user.id}" class="reposts-user-link">
+                                    <img src="${user.avatar_url}" alt="${user.username}" class="reposts-user-avatar">
+                                    <span class="reposts-username">${user.username} (${user.relationship})</span> 
+                                </a>
+                            `;
+                            repostsListUl.appendChild(li);
+                        });
+                    } else {
+                        repostsModalEmpty.style.display = 'block';
+                    }
+
+                    // Обновляем счетчик на кнопке "Репосты" модального окна
+                    // Это отображает общее количество репостов, не только отфильтрованных
+                    const buttonRepostsCountSpan = showRepostsButton.querySelector('.reposts-count');
+                    if (buttonRepostsCountSpan) {
+                        buttonRepostsCountSpan.textContent = data.reposts_count;
+                    }
+
+                } catch (error) {
+                    console.error('Ошибка при загрузке списка репостов для модального окна:', error);
+                    repostsModalLoading.textContent = 'Не удалось загрузить список репостов.';
+                    repostsModalLoading.style.color = 'red';
+                    repostsModalLoading.style.display = 'block';
+                }
+            });
+        }
+
+        window.handlePostAction = async (postId, actionType) => {
+            let url;
+            if (communityPk !== 'null') { 
+                url = `/community/${communityPk}/posts/${postId}/${actionType}/`;
+            } else { 
+                url = `/post/${postId}/${actionType}/`; 
+            }
+            
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({})
+                });
+
+                if (!response.ok) {
+                    // Парсим JSON-ошибку, если есть
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const postCard = document.getElementById(`post-${postId}`);
+                    if (!postCard) return;
+
+                    const likesCountSpan = postCard.querySelector('.likes-count');
+                    const dislikesCountSpan = postCard.querySelector('.dislikes-count');
+                    const repostsCountSpan = postCard.querySelector('.reposts-count'); 
+
+                    const likeButton = $(postCard).find('.like-button');
+                    const dislikeButton = $(postCard).find('.dislike-button');
+                    const repostButton = $(postCard).find('.repost-button');
+
+                    if (actionType === 'like') {
+                        updateButtonState(likeButton, data.action === 'liked', likesCountSpan, data.likes_count);
+                        if (data.action === 'liked' && dislikeButton.hasClass('active')) {
+                            updateButtonState(dislikeButton, false, dislikesCountSpan, data.dislikes_count);
+                        }
+                    } else if (actionType === 'dislike') {
+                        updateButtonState(dislikeButton, data.action === 'disliked', dislikesCountSpan, data.dislikes_count);
+                        if (data.action === 'disliked' && likeButton.hasClass('active')) {
+                            updateButtonState(likeButton, false, likesCountSpan, data.likes_count);
+                        }
+                    } else if (actionType === 'repost') {
+                        updateButtonState(repostButton, data.action === 'reposted', repostsCountSpan, data.reposts_count);
+                        updateRepostsCountOnButton(); 
+                    }
+                } else {
+                    console.error('Ошибка в ответе сервера:', data.message);
+                    alert(data.message || 'Произошла ошибка.');
+                }
+            } catch (error) {
+                console.error('Ошибка AJAX-запроса:', error);
+                alert('Произошла ошибка при выполнении действия. Детали: ' + error.message);
+            }
+        };
+
+        window.handleCommunityCommentSubmit = async (event, communityId, postId) => {
+            event.preventDefault();
+
+            const form = event.target;
+            const commentTextarea = form.querySelector('textarea[name="text"]');
+            const commentsContainer = document.getElementById(`comments-container-${postId}`);
+            const totalCommentsSpan = document.querySelector(`.total-comments-${postId}`);
+            const noCommentsMessage = commentsContainer.querySelector('.no-comments');
+
+            let url;
+            if (communityId !== 'null') { 
+                url = `/community/${communityId}/posts/${postId}/comment/`;
+            } else { 
+                url = `/post/${postId}/comment/`; 
+            }
+            
+            const csrfToken = form.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            const commentText = commentTextarea.value.trim(); // Обрезаем пробелы
+
+            if (!commentText) {
+                alert('Комментарий не может быть пустым.');
+                return;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        'text': commentText 
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errorMessage = 'Произошла ошибка при добавлении комментария.';
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (errorData.errors && errorData.errors.text) {
+                        // Если есть конкретные ошибки валидации для поля 'text'
+                        try {
+                            const parsedErrors = JSON.parse(errorData.errors.text);
+                            errorMessage = parsedErrors[0].message; // Берем первое сообщение об ошибке
+                        } catch (e) {
+                            errorMessage = JSON.stringify(errorData.errors);
+                        }
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const comment = data.comment;
+                    const newCommentHtml = `
+                        <div class="comment">
+                            <a href="/users/${comment.author_id}" class="comment-author-link">
+                                <img src="${comment.author_avatar_url}" alt="${comment.author_username}" class="comment-avatar">
+                            </a>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <a href="/users/${comment.author_id}" class="comment-author-username">
+                                        <strong>${comment.author_username}</strong>
+                                    </a>
+                                    <span class="comment-date">${comment.created_at}</span>
+                                </div>
+                                <p class="comment-text">${comment.text.replace(/\n/g, '<br>')}</p>
+                            </div>
+                        </div>
+                    `;
+                    commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+                    commentTextarea.value = ''; 
+                    totalCommentsSpan.textContent = comment.total_comments; 
+                    
+                    if (noCommentsMessage) {
+                        noCommentsMessage.style.display = 'none'; 
+                    }
+                } else {
+                    console.error('Ошибка при добавлении комментария:', data.message);
+                    alert(data.message || 'Произошла ошибка при добавлении комментария.');
+                }
+            } catch (error) {
+                console.error('Ошибка AJAX-запроса:', error);
+                alert('Произошла ошибка при отправке комментария: ' + error.message);
+            }
+        };
+
+        window.openDeletePostModal = (postId) => {
+            if (confirm('Вы уверены, что хотите удалить этот пост? Это действие необратимо.')) {
+                deletePostAjax(postId);
+            }
+        };
+
+        async function deletePostAjax(postId) {
+            let url;
+            if (communityPk !== 'null') {
+                url = `/community/${communityPk}/posts/${postId}/delete/ajax/`;
+            } else {
+                url = `/post/${postId}/delete/ajax/`; 
+            }
+
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({}) 
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Пост успешно удален!');
+                    if (communityPk !== 'null') {
+                        window.location.href = `/community/${communityPk}/`; 
+                    } else {
+                        window.location.href = `/`; 
+                    }
+                } else {
+                    alert('Ошибка при удалении поста: ' + (data.message || 'Неизвестная ошибка.'));
+                }
+            } catch (error) {
+                console.error('Ошибка AJAX при удалении поста:', error);
+                alert('Произошла ошибка при удалении поста.');
+            }
+        }
+
+        window.openModal = function(modalElement) {
+            modalElement.style.display = 'block';
+            document.body.classList.add('modal-open'); 
+        };
+
+        window.closeModal = function(modalElement) {
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open'); 
+        };
+
+        window.addEventListener('click', (event) => {
+            if (event.target === repostsModal) {
+                closeModal(repostsModal);
+            }
+        });
+    });
+</script>
+{% endblock %}

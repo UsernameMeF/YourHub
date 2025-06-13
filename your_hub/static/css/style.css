@@ -59,3 +59,14 @@
 /* Чаты */
 @import url('chat/_form_style.css');
 @import url('chat/_form_style_dark.css');
+
+
+/* Сообщества */
+@import url('community/_community_detail.css');
+@import url('community/_community_detail_dark.css');
+@import url('community/_community_form.css');
+@import url('community/_community_form_dark.css');
+@import url('community/_community_list.css');
+@import url('community/_community_list_dark.css');
+
+/* Может быть я когда-то нормально разберусь со стилями.

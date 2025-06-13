@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Создать пост в {{ community.name }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/community/_community_post_create.css' %}"> {# Обновлено #}
+    <link rel="stylesheet" href="{% static 'css/community/_community_post_create_dark.css' %}" media="(prefers-color-scheme: dark)"> {# Обновлено #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="main-container form-container">
+    <h1 class="form-title">Создать публикацию в "{{ community.name }}"</h1>
+    <form method="post" enctype="multipart/form-data"> 
+        {% csrf_token %}
+
+        <div class="form-field-wrapper">
+            <label for="{{ post_form.title.id_for_label }}" class="form-label">{{ post_form.title.label }}</label>
+            {{ post_form.title }}
+            {% if post_form.title.help_text %}
+                <div class="form-help-text">{{ post_form.title.help_text }}</div>
+            {% endif %}
+            {% for error in post_form.title.errors %}
+                <div class="form-error-message">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        
+        <div class="form-field-wrapper">
+            <label for="{{ post_form.content.id_for_label }}" class="form-label">{{ post_form.content.label }}</label>
+            {{ post_form.content }}
+            {% if post_form.content.help_text %}
+                <div class="form-help-text">{{ post_form.content.help_text }}</div>
+            {% endif %}
+            {% for error in post_form.content.errors %}
+                <div class="form-error-message">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="submit-button">Опубликовать</button>
+        <a href="{% url 'community:community_detail' pk=community.pk %}" class="cancel-button">Отмена</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('id_images');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const clearFilesButton = document.getElementById('clearFilesButton');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                let fileNames = [];
+                for (let i = 0; i < this.files.length; i++) {
+                    fileNames.push(this.files[i].name);
+                }
+                fileNameDisplay.textContent = fileNames.join(', ');
+                clearFilesButton.style.display = 'inline-block';
+            } else {
+                fileNameDisplay.textContent = 'Файлы не выбраны';
+                clearFilesButton.style.display = 'none';
+            }
+        });
+
+        clearFilesButton.addEventListener('click', function() {
+            fileInput.value = ''; 
+            fileNameDisplay.textContent = 'Файлы не выбраны';
+            clearFilesButton.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

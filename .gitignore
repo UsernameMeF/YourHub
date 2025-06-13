@@ -183,4 +183,5 @@ your_hub/media/profile_avatars/**
 your_hub/media/post_attachments/**
 your_hub/media/group_chats/**
 your_hub/media/chat_attachments/**
+your_hub/media/community_posts_attachments/**
 # -------------------

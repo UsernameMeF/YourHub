@@ -16,6 +16,9 @@
     <div class="chat_category-buttons">
         <button id="showPrivateChatsBtn" class="btn btn-primary active">Чаты</button>
         <button id="showGroupChatsBtn" class="btn btn-secondary">Группы</button>
+        <a href="{% url 'chat:create_group_chat' %}" class="btn btn-success create-group-btn">
+            <i class="fas fa-plus-circle"></i> Создать группу
+        </a>
     </div>
 
     {% if chat_rooms or group_chats %}

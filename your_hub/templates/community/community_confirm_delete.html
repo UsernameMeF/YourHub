@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Удалить сообщество: {{ community.name }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/community/_community_form.css' %}"> {# Можно использовать тот же стиль #}
+    <link rel="stylesheet" href="{% static 'css/community/_community_form_dark.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="main-container form-container delete-confirm-container">
+    <h1 class="form-title">Подтверждение удаления</h1>
+    <p class="delete-message">Вы уверены, что хотите удалить сообщество "{{ community.name }}"?</p>
+    <p class="delete-message warning">Это действие необратимо и приведет к удалению всех постов и данных, связанных с этим сообществом!</p>
+    
+    <form method="post" class="delete-form">
+        {% csrf_token %}
+        <button type="submit" class="submit-button delete-button">Удалить</button>
+        <a href="{% url 'community:community_detail' community.pk %}" class="cancel-button">Отмена</a>
+    </form>
+</div>
+{% endblock %}

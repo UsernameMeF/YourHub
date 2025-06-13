@@ -233,3 +233,34 @@
     margin-right: 5px; /* Отступ для иконки группы */
     color: #6c757d; /* Цвет для иконки группы */
 }
+
+.create-group-btn {
+    display: inline-flex; /* Используем flex для выравнивания иконки и текста */
+    align-items: center; /* Выравниваем содержимое по центру по вертикали */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #28a745; /* Зеленый цвет для кнопки успеха */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none; /* Убираем подчеркивание для ссылки */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    white-space: nowrap; /* Предотвращаем перенос текста на новую строку */
+}
+
+.create-group-btn:hover {
+    background-color: #218838; /* Темнее при наведении */
+    transform: translateY(-1px); /* Легкий эффект поднятия */
+}
+
+.create-group-btn:active {
+    background-color: #1e7e34; /* Еще темнее при нажатии */
+    transform: translateY(0); /* Возвращаем на место */
+}
+
+.create-group-btn i {
+    margin-right: 8px; /* Отступ справа для иконки */
+    font-size: 18px; /* Размер иконки */
+}

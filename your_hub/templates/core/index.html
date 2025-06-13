@@ -47,6 +47,8 @@
     const endOfFeedMessage = document.getElementById('end-of-feed-message');
     const noPostsMessage = document.getElementById('no-posts-message');
 
+    const getPostsAjaxUrl = "{% url 'core:get_posts_ajax' %}"; // Corrected URL
+
     // Элементы управления сортировкой
     const sortDropdownContainer = document.querySelector('.sort-dropdown-container');
     const sortDropdownButton = document.querySelector('.sort-dropdown-button');
@@ -65,15 +67,14 @@
     // ===========================================
     // Инициализация из localStorage
     // ===========================================
-    let currentSort = localStorage.getItem('yourhub_sort_preference') || 'new'; // Получаем из localStorage или 'new' по умолчанию
-    let currentView = localStorage.getItem('yourhub_view_preference') || 'card'; // Получаем из localStorage или 'card' по умолчанию
+    let currentSort = localStorage.getItem('yourhub_sort_preference') || 'new';
+    let currentView = localStorage.getItem('yourhub_view_preference') || 'card';
 
 
     // ===========================================
     // Вспомогательные функции
     // ===========================================
 
-    // Функция для обрезки текста
     function shortenText(text, maxLength) {
         if (text.length <= maxLength) {
             return text;
@@ -81,15 +82,12 @@
         return text.substring(0, maxLength) + '...';
     }
 
-
-
-    // Функция для рендеринга поста (будет создавать HTML из JSON-данных)
     function renderPost(postData, viewMode) {
         const postElement = document.createElement('div');
         postElement.classList.add('post-card');
         postElement.id = `post-${postData.id}`;
 
-        const titleLink = `{% url "core:post_detail" 0 %}`.replace('0', postData.id);
+        const detailUrl = postData.detail_url; 
 
         let attachmentsHtml = '';
         if (viewMode === 'card') {
@@ -114,45 +112,63 @@
             }
         }
 
-
+        let postHeaderContent = '';
+        if (postData.is_community_post) {
+            postHeaderContent = `
+                <div class="community-header">
+                    <a href="${postData.community_url}" class="community-link">
+                        <span class="community-name">${postData.community_name}</span>
+                    </a>
+                    <i class="fas fa-angle-right community-arrow"></i>
+                    <span class="post-date">${postData.created_at}</span>
+                    
+                </div>
+            `;
+        } else {
+            postHeaderContent = `
+                <div class="post-header">
+                    ${viewMode === 'card' ? `<img src="${postData.author_avatar_url}" alt="Аватар" class="post-author-avatar">` : ''}
+                    <div class="post-info">
+                        <a href="/users/${postData.author_id}" class="post-author-username">${postData.author_username}</a>
+                        <span class="post-date">${postData.created_at}</span>
+                        
+                    </div>
+                </div>
+            `;
+        }
 
         const postContent = viewMode === 'compact' ? shortenText(postData.content, 150) : postData.content;
 
         postElement.innerHTML = `
+            ${postHeaderContent}
             ${attachmentsHtml}
 
-            <div class="post-header">
-                ${viewMode === 'card' ? `<img src="${postData.author_avatar_url}" alt="Аватар" class="post-author-avatar">` : ''}
-                <div class="post-info">
-                    <a href="/users/${postData.author_id}" class="post-author-username">${postData.author_username}</a>
-                    <span class="post-date">${postData.created_at}</span>
-                    ${postData.updated_at ? `<span class="post-date">(обновлено: ${postData.updated_at})</span>` : ''}
-                </div>
-                ${postData.can_edit_delete ? `
-                    <div class="post-actions-dropdown">
-                        <button class="post-actions-button">...</button>
-                        <div class="dropdown-menu">
-                            <a href="#" onclick="event.preventDefault(); openEditPostModal(${postData.id}, '${postData.title.replace(/'/g, "\\'")}', '${postData.content.replace(/'/g, "\\'")}')">Редактировать</a>
-                            <a href="#" onclick="event.preventDefault(); openDeletePostModal(${postData.id})">Удалить</a>
-                        </div>
+            ${postData.can_edit_delete ? `
+                <div class="post-actions-dropdown">
+                    <button class="post-actions-button">...</button>
+                    <div class="dropdown-menu">
+                        <a href="#" onclick="event.preventDefault(); openEditPostModal(${postData.id}, '${postData.title.replace(/'/g, "\\'")}', '${postData.content.replace(/'/g, "\\'")}', ${postData.is_community_post})">Редактировать</a>
+                        <a href="#" onclick="event.preventDefault(); openDeletePostModal(${postData.id}, ${postData.is_community_post})">Удалить</a>
                     </div>
-                ` : ''}
-            </div>
+                </div>
+            ` : ''}
 
-            <h2 class="post-title"><a href="${titleLink}">${postData.title}</a></h2>
+            <h2 class="post-title"><a href="${detailUrl}">${postData.title}</a></h2>
             
+            <div class="post-content">${postContent}</div>
+
 
             <div class="post-actions">
-                <button class="action-button like-button ${postData.is_liked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'like')">
+                <button class="action-button like-button ${postData.is_liked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'like', ${postData.is_community_post})">
                     <i class="fas fa-thumbs-up"></i> <span class="likes-count">${postData.total_likes}</span>
                 </button>
-                <button class="action-button dislike-button ${postData.is_disliked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'dislike')">
+                <button class="action-button dislike-button ${postData.is_disliked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'dislike', ${postData.is_community_post})">
                     <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">${postData.total_dislikes}</span>
                 </button>
-                <button class="action-button repost-button ${postData.is_reposted ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'repost')">
+                <button class="action-button repost-button ${postData.is_reposted ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'repost', ${postData.is_community_post})">
                     <i class="fas fa-retweet"></i> <span class="reposts-count">${postData.total_reposts}</span>
                 </button>
-                <a href="${titleLink}" class="action-button">
+                <a href="${detailUrl}" class="action-button">
                     <i class="fas fa-comment"></i> <span class="comments-count total-comments-${postData.id}">${postData.total_comments}</span>
                 </a>
             </div>
@@ -172,12 +188,12 @@
         endOfFeedMessage.style.display = 'none';
 
         try {
-            const response = await fetch(`{% url "core:get_posts_ajax" %}?page=${currentPage}&sort=${currentSort}`);
+            const response = await fetch(`${getPostsAjaxUrl}?page=${currentPage}&sort=${currentSort}`); 
             const data = await response.json();
 
             if (!append) {
                 postsContainer.innerHTML = '';
-                loadedPostsData = {};
+                loadedPostsData = {}; // Очищаем данные при новой загрузке (сортировка/вид)
             }
 
             if (data.posts.length === 0 && currentPage === 1) {
@@ -214,69 +230,64 @@
     });
 
     // ===========================================
-    // Обработчики событий для элементов управления
+    // Обработчики событий для элементов управления - ЭТО НОВАЯ/ВОССТАНОВЛЕННАЯ ЧАСТЬ
     // ===========================================
 
-    // Сортировка: Открытие/закрытие выпадающего списка
-    sortDropdownButton.addEventListener('click', (event) => {
-        sortDropdownMenu.style.display = sortDropdownMenu.style.display === 'block' ? 'none' : 'block';
-        event.stopPropagation();
+    // Показ/скрытие выпадающего меню сортировки
+    sortDropdownButton.addEventListener('click', () => {
+        sortDropdownMenu.classList.toggle('show');
     });
 
-    // Сортировка: Обработка выбора опции
+    // Обработка выбора опции сортировки
     sortOptions.forEach(option => {
-        option.addEventListener('click', (event) => {
-            event.preventDefault();
-            const newSort = option.dataset.sort;
-
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newSort = e.target.dataset.sort;
             if (newSort !== currentSort) {
-                // Сохраняем новую сортировку в localStorage
-                localStorage.setItem('yourhub_sort_preference', newSort);
-
-                sortOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-
-                currentSortLabel.textContent = option.textContent;
-
                 currentSort = newSort;
-                currentPage = 1;
-                hasNextPage = true;
-                loadPosts(false); // Заменяем посты
+                localStorage.setItem('yourhub_sort_preference', currentSort);
+                currentSortLabel.textContent = e.target.textContent; // Обновляем текст кнопки
+                sortOptions.forEach(opt => opt.classList.remove('active')); // Убираем active со всех
+                e.target.classList.add('active'); // Добавляем active к выбранной
+                sortDropdownMenu.classList.remove('show'); // Скрываем меню
+                
+                currentPage = 1; // Сбрасываем страницу при смене сортировки
+                loadPosts(false); // Загружаем посты заново
             }
-            sortDropdownMenu.style.display = 'none';
         });
     });
 
-    // Сортировка: Закрытие выпадающего списка при клике вне его
-    document.addEventListener('click', (event) => {
-        if (!sortDropdownContainer.contains(event.target)) {
-            sortDropdownMenu.style.display = 'none';
+    // Скрытие выпадающего меню при клике вне его
+    document.addEventListener('click', (e) => {
+        if (!sortDropdownContainer.contains(e.target)) {
+            sortDropdownMenu.classList.remove('show');
         }
     });
 
-    // Переключение вида
+    // Обработка переключения вида
     viewToggleButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const newView = button.dataset.view;
-
+        button.addEventListener('click', (e) => {
+            const newView = e.currentTarget.dataset.view;
             if (newView !== currentView) {
-                // Сохраняем новый вид в localStorage
-                localStorage.setItem('yourhub_view_preference', newView);
-
-                viewToggleButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                postsContainer.classList.remove('card-view', 'compact-view');
-                postsContainer.classList.add(`${newView}-view`);
-
                 currentView = newView;
+                localStorage.setItem('yourhub_view_preference', currentView);
 
-                renderLoadedPosts(); // Перерендериваем уже загруженные посты
+                // Обновляем активные классы кнопок
+                viewToggleButtons.forEach(btn => btn.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+
+                // Обновляем класс на контейнере постов
+                postsContainer.classList.remove('card-view', 'compact-view');
+                postsContainer.classList.add(`${currentView}-view`);
+
+                renderLoadedPosts(); // Перерисовываем уже загруженные посты с новым видом
             }
         });
     });
 
+    // ===========================================
     // Функция для перерендеринга всех уже загруженных постов при смене вида
+    // ===========================================
     function renderLoadedPosts() {
         postsContainer.innerHTML = ''; // Очищаем контейнер
         
@@ -285,7 +296,6 @@
         postsToRender.forEach(postData => {
             const postElement = renderPost(postData, currentView);
             postsContainer.appendChild(postElement);
-            // Инициализация карусели только для карточного вида
         });
 
         if (Object.keys(loadedPostsData).length === 0) {
@@ -300,13 +310,12 @@
     // Инициализация при загрузке страницы
     // ===========================================
 
-    // Устанавливаем начальное состояние UI на основе загруженных настроек
     function initializeUIFromPreferences() {
         // Устанавливаем активную опцию сортировки
         sortOptions.forEach(option => {
             if (option.dataset.sort === currentSort) {
                 option.classList.add('active');
-                currentSortLabel.textContent = option.textContent;
+                currentSortLabel.textContent = option.textContent; // Устанавливаем текст кнопки
             } else {
                 option.classList.remove('active');
             }
@@ -328,6 +337,102 @@
     // Вызываем инициализацию UI перед первой загрузкой постов
     initializeUIFromPreferences();
     loadPosts(false); // Загружаем первую порцию постов с учетом сохраненной сортировки и вида.
+
+    // === ФУНКЦИИ handlePostAction, openEditPostModal, openDeletePostModal ===
+    // (Без изменений, они были в вашем предоставленном коде)
+
+    function handlePostAction(postId, actionType, isCommunityPost) {
+        const url = isCommunityPost 
+            ? `/community/posts/${postId}/${actionType}/` 
+            : `/posts/${postId}/${actionType}/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const postElement = document.getElementById(`post-${postId}`);
+                if (!postElement) return;
+
+                if (actionType === 'like') {
+                    const likeButton = postElement.querySelector('.like-button');
+                    const likesCount = postElement.querySelector('.likes-count');
+                    likesCount.textContent = data.likes_count;
+                    if (data.is_liked) {
+                        likeButton.classList.add('active');
+                    } else {
+                        likeButton.classList.remove('active');
+                    }
+                    if (data.is_liked && postElement.querySelector('.dislike-button').classList.contains('active')) {
+                        postElement.querySelector('.dislike-button').classList.remove('active');
+                        postElement.querySelector('.dislikes-count').textContent = parseInt(postElement.querySelector('.dislikes-count').textContent) - 1;
+                    }
+                } else if (actionType === 'dislike') {
+                    const dislikeButton = postElement.querySelector('.dislike-button');
+                    const dislikesCount = postElement.querySelector('.dislikes-count');
+                    dislikesCount.textContent = data.dislikes_count;
+                    if (data.is_disliked) {
+                        dislikeButton.classList.add('active');
+                    } else {
+                        dislikeButton.classList.remove('active');
+                    }
+                    if (data.is_disliked && postElement.querySelector('.like-button').classList.contains('active')) {
+                        postElement.querySelector('.like-button').classList.remove('active');
+                        postElement.querySelector('.likes-count').textContent = parseInt(postElement.querySelector('.likes-count').textContent) - 1;
+                    }
+                } else if (actionType === 'repost') {
+                    const repostButton = postElement.querySelector('.repost-button');
+                    const repostsCount = postElement.querySelector('.reposts-count');
+                    repostsCount.textContent = data.reposts_count;
+                    if (data.is_reposted) {
+                        repostButton.classList.add('active');
+                    } else {
+                        repostButton.classList.remove('active');
+                    }
+                }
+            } else if (data.status === 'error') {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Ошибка при выполнении действия:', error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function openEditPostModal(postId, title, content, isCommunityPost) {
+        const editUrl = isCommunityPost 
+            ? `/community/posts/${postId}/edit/` 
+            : `/posts/${postId}/edit/`;
+        window.location.href = editUrl; 
+    }
+
+    function openDeletePostModal(postId, isCommunityPost) {
+        const deleteUrl = isCommunityPost 
+            ? `/community/posts/${postId}/delete/` 
+            : `/posts/${postId}/delete/`;
+        if (confirm('Вы уверены, что хотите удалить этот пост?')) {
+            window.location.href = deleteUrl;
+        }
+    }
 
 </script>
 {% endblock %}

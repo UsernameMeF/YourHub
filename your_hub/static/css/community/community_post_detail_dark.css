@@ -1,0 +1,129 @@
+/* your_hub/static/css/community/_community_post_detail_dark.css */
+
+html.dark-theme .post-detail-container {
+    background-color: #2c2c2c;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .post-header {
+    border-bottom-color: #444;
+}
+
+html.dark-theme .post-title {
+    color: #f0f0f0;
+}
+
+html.dark-theme .post-meta {
+    color: #bbb;
+}
+
+html.dark-theme .post-content {
+    color: #e0e0e0;
+}
+
+html.dark-theme .post-attachments {
+    border-top-color: #444;
+}
+
+html.dark-theme .post-attachments h3 {
+    color: #ccc;
+}
+
+html.dark-theme .attachment-image {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .post-actions {
+    border-top-color: #444;
+}
+
+html.dark-theme .post-actions .action-button {
+    color: #bbb;
+}
+
+html.dark-theme .post-actions .action-button:hover {
+    color: #66b3ff;
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .post-actions .action-button i {
+    color: #ccc;
+}
+
+html.dark-theme .post-actions .action-button i.active {
+    color: #66b3ff; 
+}
+
+html.dark-theme .post-actions .action-item {
+    color: #bbb;
+}
+
+html.dark-theme .post-actions .action-item i {
+    color: #ccc;
+}
+
+
+html.dark-theme .post-comments-section {
+    border-top-color: #444;
+}
+
+html.dark-theme .post-comments-section h3 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .comment-form {
+    border-bottom-color: #444;
+}
+
+html.dark-theme textarea.community-comment-text-input {
+    background-color: #3a3a3a;
+    border-color: #555;
+    color: #f0f0f0;
+}
+
+html.dark-theme .login-prompt {
+    color: #bbb;
+}
+
+html.dark-theme .login-prompt a {
+    color: #66b3ff;
+}
+
+html.dark-theme .comment-item {
+    background-color: #333;
+    border-color: #444;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+}
+
+html.dark-theme .comment-author-info {
+    color: #e0e0e0;
+}
+
+html.dark-theme .comment-author-avatar {
+    border-color: #555;
+}
+
+html.dark-theme .comment-author-username {
+    color: #66b3ff;
+}
+
+html.dark-theme .comment-date {
+    color: #aaa;
+}
+
+html.dark-theme .comment-text {
+    color: #f0f0f0;
+}
+
+html.dark-theme .no-comments {
+    color: #aaa;
+    border-color: #555;
+}
+
+html.dark-theme .back-to-community-link {
+    color: #66b3ff;
+}
+
+html.dark-theme .back-to-community-link:hover {
+    color: #88ccff;
+}

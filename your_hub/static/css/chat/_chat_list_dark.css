@@ -108,3 +108,29 @@ html.dark-theme .chat_timestamp {
 html.dark-theme .group-chat-item .chat_name .fas {
     color: #a0a0a0;
 }
+
+/* Стили для кнопки "Создать группу" в тёмной теме */
+html.dark-theme .create-group-btn {
+    background-color: #2e8b57; /* Глубокий, но заметный зелёный */
+    color: #f0f0f0; /* Светлый текст */
+    border: 1px solid #1e6c3f; /* Немного темнее фона кнопки рамка */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Выраженная тень для глубины */
+}
+
+html.dark-theme .create-group-btn:hover {
+    background-color: #3cb371; /* Чуть светлее зелёный при наведении */
+    border-color: #258c54; /* Рамка тоже светлеет */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5); /* Тень становится более выраженной */
+    transform: translateY(-1px); /* Эффект поднятия */
+}
+
+html.dark-theme .create-group-btn:active {
+    background-color: #287a4a; /* Темнее при нажатии */
+    border-color: #1a5c37;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Тень уменьшается */
+    transform: translateY(1px); /* Небольшое смещение вниз */
+}
+
+html.dark-theme .create-group-btn i {
+    color: #f0f0f0; /* Убеждаемся, что иконка светлая */
+}

@@ -1,0 +1,278 @@
+/* community_detail.css */
+.main-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.community-header-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 25px 30px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.community-title {
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.community-description {
+    font-size: 1em;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.community-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    color: #888;
+    font-size: 0.9em;
+}
+
+.community-meta-item i {
+    margin-right: 5px;
+    color: #007bff; /* Акцентный цвет для иконок */
+}
+
+.community-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.community-action-buttons .btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.05em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none; /* Для ссылки-кнопки */
+    display: inline-block; /* Для ссылки-кнопки */
+    text-align: center;
+}
+
+.community-action-buttons .btn-join {
+    background-color: #007bff;
+    color: white;
+}
+
+.community-action-buttons .btn-join:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.community-action-buttons .btn-leave {
+    background-color: #dc3545; /* Красный для отписки */
+    color: white;
+}
+
+.community-action-buttons .btn-leave:hover {
+    background-color: #c82333;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+.community-action-buttons .btn-create-post {
+    background-color: #28a745; /* Зеленый для создания поста */
+    color: white;
+}
+
+.community-action-buttons .btn-create-post:hover {
+    background-color: #218838;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+
+.community-members-section,
+.community-posts-section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px 30px;
+    margin-bottom: 20px;
+}
+
+.community-members-section h3,
+.community-posts-section h3 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.members-avatars-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.member-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #eee;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.member-avatar:hover {
+    transform: translateY(-3px);
+    border-color: #007bff;
+}
+
+.view-all-members-link {
+    margin-left: 10px;
+    font-size: 0.9em;
+    color: #007bff;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+
+.view-all-members-link:hover {
+    text-decoration: underline;
+}
+
+.community-posts-section p {
+    color: #777;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* ... существующие стили ... */
+
+.btn-edit {
+    background-color: #007bff; /* Синий для редактирования */
+    color: #fff;
+}
+
+.btn-edit:hover {
+    background-color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+}
+
+.btn-delete {
+    background-color: #dc3545; /* Красный для удаления */
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+}
+
+/* ... остальные стили ... */
+
+/* ... (существующие стили) ... */
+
+.btn-create-post {
+    background-color: #28a745; /* Зеленый цвет для создания */
+    color: #fff;
+    margin-left: 10px; /* Отступ от других кнопок */
+    padding: 8px 15px; /* Увеличим отступы, чтобы выглядела как кнопка */
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Чтобы текст не переносился */
+}
+
+.btn-create-post:hover {
+    background-color: #218838;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+}
+
+.community-posts-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.community-posts-section h3 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.latest-community-post-preview {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.latest-community-post-preview .post-preview-link-wrapper {
+    text-decoration: none; 
+    color: inherit; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer; 
+}
+
+.latest-community-post-preview .post-preview-link-wrapper:hover {
+    opacity: 0.9; 
+}
+
+.latest-community-post-preview .post-preview-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 5px; 
+    flex-grow: 1; 
+}
+
+.latest-community-post-preview .post-preview-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin-top: 10px; 
+    object-fit: cover; 
+    max-height: 250px; 
+    display: block; 
+}
+
+.latest-community-post-preview .post-preview-meta {
+    font-size: 0.9em;
+    color: #777;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee; 
+}
+
+.latest-community-post-preview .post-preview-meta .meta-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px; 
+}
+
+.latest-community-post-preview .post-preview-meta .meta-item:last-child {
+    margin-right: 0;
+}
+
+.latest-community-post-preview .post-preview-meta .meta-item i {
+    margin-right: 5px;
+    color: #999;
+}

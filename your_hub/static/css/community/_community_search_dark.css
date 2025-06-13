@@ -1,0 +1,62 @@
+/* static/css/community/_community_search_dark.css */
+
+html.dark-theme .search-bar-container {
+    background-color: #252526;
+    border: 1px solid #3a3a3a;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-sizing: border-box; /* ГЛАВНОЕ ИЗМЕНЕНИЕ: Учитывать padding и border в общей ширине */
+}
+
+html.dark-theme .search-input {
+    background-color: #383838;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    box-sizing: border-box; /* Для надёжности */
+}
+
+html.dark-theme .search-input::placeholder {
+    color: #999;
+}
+
+html.dark-theme .search-input:focus {
+    border-color: #00e600;
+    box-shadow: 0 0 0 0.2rem rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .search-button.compact-button {
+    background-color: #00e600;
+    color: #fff;
+}
+
+html.dark-theme .search-button.compact-button:hover {
+    background-color: #00ff00;
+}
+
+html.dark-theme .search-button.compact-button:active {
+    background-color: #00b300;
+}
+
+html.dark-theme .reset-search-button {
+    background-color: #555;
+    color: #fff;
+}
+
+html.dark-theme .reset-search-button:hover {
+    background-color: #666;
+}
+
+html.dark-theme .reset-search-button:active {
+    background-color: #444;
+}
+
+html.dark-theme .community-list-item .chat_name .fas {
+    color: #00e600;
+}
+
+html.dark-theme .no-chats-message {
+    background-color: #252526;
+    border: 1px solid #3a3a3a;
+    color: #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-sizing: border-box; /* Для надёжности */
+}

@@ -5,11 +5,7 @@
 
 {% block extra_css %}
     {# Подключаем общий CSS-файл, если у вас есть #}
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    {# Подключаем новые стили для форм #}
-    <link rel="stylesheet" href="{% static 'css/forms/_form_style.css' %}">
-    {# Подключаем стили для темной темы, если она активна (это делается обычно JS-ом или серверным рендером) #}
-    <link rel="stylesheet" href="{% static 'css/forms/_form_style_dark.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% block content %}

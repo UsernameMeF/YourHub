@@ -1,0 +1,78 @@
+/* social_network/your_hub/static/css/community/_community_form_dark.css */
+
+html.dark-theme .form-container {
+    background-color: #1a1a1a; /* Темный фон карточки */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5); /* Более выраженная тень */
+}
+
+html.dark-theme .form-title {
+    color: #f0f0f0; /* Светлый заголовок */
+}
+
+html.dark-theme .form-label {
+    color: #ddd; /* Светлее метки */
+}
+
+html.dark-theme .form-field-wrapper input[type="text"],
+html.dark-theme .form-field-wrapper textarea,
+html.dark-theme .form-field-wrapper input[type="file"] {
+    background-color: #2c2c2c; /* Темный фон полей */
+    border-color: #444; /* Темная рамка */
+    color: #f0f0f0; /* Светлый текст */
+}
+
+html.dark-theme .form-field-wrapper input[type="text"]:focus,
+html.dark-theme .form-field-wrapper textarea:focus {
+    border-color: #00e600; /* Зеленый акцент при фокусе */
+    box-shadow: 0 0 0 3px rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .form-field-wrapper input[readonly] {
+    background-color: #3a3a3a; /* Темнее фон для readonly */
+    color: #b0b0b0; /* Чуть светлее текст */
+    cursor: default; /* Курсор по умолчанию */
+}
+
+html.dark-theme .form-help-text {
+    color: #aaa; /* Светлее подсказки */
+}
+
+html.dark-theme .form-error-message {
+    color: #ff8888; /* Более мягкий красный для темной темы */
+}
+
+html.dark-theme .submit-button {
+    background-color: #00e600; /* Зеленая кнопка */
+    color: #1a1a1a; /* Темный текст на зеленом */
+}
+
+html.dark-theme .submit-button:hover {
+    background-color: #00cc00; /* Темнее зеленый при наведении */
+    box-shadow: 0 4px 10px rgba(0, 230, 0, 0.3);
+}
+
+html.dark-theme .cancel-button {
+    background-color: #555; /* Темный серый */
+    color: #f0f0f0;
+}
+
+html.dark-theme .cancel-button:hover {
+    background-color: #666;
+    box-shadow: 0 4px 10px rgba(85, 85, 85, 0.3);
+}
+
+html.dark-theme .delete-message {
+    color: #bbb;
+}
+
+html.dark-theme .delete-message.warning {
+    color: #ffaaaa; /* Светло-красный для предупреждения */
+}
+
+html.dark-theme .delete-button {
+    background-color: #ff6b6b; /* Темно-красный для удаления */
+}
+
+html.dark-theme .delete-button:hover {
+    background-color: #cc5a5a;
+}

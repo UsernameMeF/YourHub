@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ community.name }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/community/_community_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/community/_community_detail_dark.css' %}" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="community-header-card">
+        <div class="community-header-content">
+            <div class="community-text-content">
+                <h1 class="community-title">{{ community.name }}</h1>
+                <p class="community-description">{{ community.description|default:"Без описания." }}</p>
+                
+                <div class="community-meta">
+                    <span class="community-meta-item">
+                        <i class="fas fa-users"></i> {{ community.members.count }} участников
+                    </span>
+                    <span class="community-meta-item">
+                        <i class="fas fa-calendar-alt"></i> Создано: {{ community.created_at|date:"d M Y" }}
+                    </span>
+                    <span class="community-meta-item">
+                        <i class="fas fa-user-tie"></i> Создатель: {{ community.creator.username }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="community-action-buttons">
+            {% if request.user.is_authenticated %}
+                {% if is_creator %}
+                    <a href="{% url 'community:community_edit' pk=community.pk %}" class="btn btn-edit">Редактировать</a>
+                    <a href="{% url 'community:community_delete' pk=community.pk %}" class="btn btn-delete">Удалить сообщество</a>
+                    <a href="{% url 'community:community_post_create' pk=community.pk %}" class="btn btn-create-post">Создать публикацию</a>
+                {% else %}
+                    <button 
+                        id="toggleMembershipBtn" 
+                        class="btn {% if is_member %}btn-leave{% else %}btn-join{% endif %}"
+                        data-community-id="{{ community.id }}"
+                        data-is-member="{{ is_member|lower }}"
+                    >
+                        {% if is_member %}Отписаться{% else %}Присоединиться{% endif %}
+                    </button>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'users:login' %}" class="btn btn-join">Войти, чтобы присоединиться</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="community-members-section">
+        <h3>Участники</h3>
+        <div class="members-avatars-list">
+            {% for member in first_members %}
+                <a href="{% url 'users:user_profile' member.id %}" title="{{ member.username }}">
+                    <img src="{% if member.profile.avatar %}{{ member.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="{{ member.username }}" class="member-avatar">
+                </a>
+            {% empty %}
+                <p>Пока нет участников.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="community-posts-section">
+        <h3>Публикации сообщества</h3>
+        {% if last_post %}
+            <div class="latest-community-post-preview">
+                {# Превью поста: его текст и статистика #}
+                <a href="{% url 'community:community_post_detail' pk=community.pk post_pk=last_post.pk %}" class="post-preview-link-wrapper">
+                    <p class="post-preview-text">
+                        {{ last_post.title|truncatechars:150 }} 
+                    </p>
+                </a>
+                <div class="post-preview-meta">
+                    <span class="meta-item">
+                        Опубликовано 
+                        {% if last_post.posted_by %} {# <-- ДОБАВЛЕНА ПРОВЕРКА #}
+                            {{ last_post.posted_by.username }}
+                        {% else %}
+                            [Удаленный пользователь]
+                        {% endif %}
+                        в {{ last_post.created_at|date:"d M Y" }}
+                    </span>
+                    <span class="meta-item"><i class="fas fa-thumbs-up"></i> {{ last_post.total_likes }}</span>
+                    <span class="meta-item"><i class="fas fa-thumbs-down"></i> {{ last_post.total_dislikes }}</span>
+                    <span class="meta-item"><i class="fas fa-share-alt"></i> {{ last_post.total_reposts }}</span>
+                    <span class="meta-item"><i class="fas fa-comment"></i> {{ last_post.total_comments }}</span>
+                </div>
+            </div>
+        {% else %}
+            <p>В этом сообществе пока нет публикаций.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleMembershipBtn = document.getElementById('toggleMembershipBtn');
+
+        if (toggleMembershipBtn) {
+            toggleMembershipBtn.addEventListener('click', function() {
+                const communityId = this.dataset.communityId;
+                const isMember = this.dataset.isMember === 'true'; 
+                const url = `/community/${communityId}/toggle_membership/`; 
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({}) 
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.textContent = data.action === 'joined' ? 'Отписаться' : 'Присоединиться';
+                        this.classList.toggle('btn-join', data.action === 'left');
+                        this.classList.toggle('btn-leave', data.action === 'joined');
+                        
+                        this.dataset.isMember = data.is_member;
+
+                        const membersCountSpan = document.querySelector('.community-meta-item i.fa-users').parentNode;
+                        if (membersCountSpan) {
+                            membersCountSpan.innerHTML = `<i class="fas fa-users"></i> ${data.members_count} участников`;
+                        }
+
+                        console.log(`Успешно ${data.action} сообщество! Новое количество участников: ${data.members_count}`);
+                    } else {
+                        console.error('Ошибка при смене статуса членства:', data.message);
+                        alert('Произошла ошибка: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Произошла ошибка сети или сервера:', error);
+                    alert('Произошла ошибка сети. Попробуйте ещё раз.');
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

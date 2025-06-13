@@ -10,10 +10,12 @@ from django.conf import settings
 from django.utils import timezone 
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
+from django.urls import reverse
 
 from .forms import PostForm, PostDeleteForm, CommentForm
 from .models import Post, PostAttachment, Comment 
 from users.models import Friendship, Follow
+from community.models import Community, CommunityPost
 
 User = get_user_model()
 
@@ -28,76 +30,173 @@ def index(request):
     return render(request, 'core/index.html', context) # Передаем контекст
 
 
-# НОВАЯ ФУНКЦИЯ ДЛЯ AJAX-ЗАПРОСОВ ПОСТОВ
+# НОВАЯ ФУНКЦИЯ ДЛЯ AJAX-ЗАПРОСОВ ПОСТОВ (ДОПОЛНЕНА ДЛЯ ВКЛЮЧЕНИЯ ПОСТОВ СООБЩЕСТВ)
 def get_posts_ajax(request):
     sort_by = request.GET.get('sort', 'new') 
-    page = int(request.GET.get('page', 1)) 
+    page_number = int(request.GET.get('page', 1)) 
     posts_per_page = 10
 
-    posts_queryset = Post.objects.select_related('author__profile').prefetch_related(
-        'attachments', 'likes', 'dislikes', 'reposts', 'comments'
-    ).annotate(
-        # Добавляем аннотации для всех счетчиков
-        likes_count_annotated=Count('likes', distinct=True),
-        dislikes_count_annotated=Count('dislikes', distinct=True),
-        reposts_count_annotated=Count('reposts', distinct=True),
-        comments_count_annotated=Count('comments', distinct=True)
+    # Получаем все обычные посты (Post из core)
+    # Используем select_related и prefetch_related для оптимизации запросов к БД
+    core_posts_queryset = Post.objects.select_related('author__profile').prefetch_related(
+        'attachments', # Если attachments это ManyToManyField к модели изображения
+        'likes', 'dislikes', 'reposts', 'comments'
     )
 
-    if sort_by == 'popular':
-        posts_queryset = posts_queryset.annotate(likes_count=Count('likes')).order_by('-likes_count', '-created_at')
-    else: 
-        posts_queryset = posts_queryset.order_by('-created_at')
+    # Получаем все посты сообществ (CommunityPost)
+    # Используем select_related для posted_by и community
+    community_posts_queryset = CommunityPost.objects.select_related(
+        'posted_by__profile', 'community'
+    ).prefetch_related(
+        'likes', 'dislikes', 'reposts', 'comments'
+    )
 
-    # Измененная логика пагинации: запрашиваем на 1 пост больше, чтобы определить has_next_page
-    start_index = (page - 1) * posts_per_page
-    end_index = start_index + posts_per_page
+    # Собираем все посты в один список
+    all_posts = []
 
-    # Запрашиваем на один элемент больше, чтобы понять, есть ли следующая страница
-    # Если мы получили N+1 элементов, значит, N-ый элемент - последний на текущей странице,
-    # а (N+1)-ый элемент означает, что есть следующая страница.
-    posts_with_next_check = posts_queryset[start_index : end_index + 1]
-    
-    has_next_page = len(posts_with_next_check) > posts_per_page
-    posts = posts_with_next_check[:posts_per_page] # Обрезаем до нужного количества постов для текущей страницы
-
-    posts_data = []
-    for post in posts:
-        is_liked = False
-        is_disliked = False
-        is_reposted = False
-        
-        if request.user.is_authenticated:
-            is_liked = post.likes.filter(id=request.user.id).exists()
-            is_disliked = post.dislikes.filter(id=request.user.id).exists()
-            is_reposted = post.reposts.filter(id=request.user.id).exists()
-
-        author_avatar_url = request.build_absolute_uri(settings.STATIC_URL + 'images/default-avatar.png')
-        if hasattr(post.author, 'profile') and post.author.profile.avatar:
+    # Добавляем обычные посты
+    for post in core_posts_queryset:
+        author_avatar_url = settings.STATIC_URL + 'images/default-avatar.png'
+        if hasattr(post.author, 'profile') and post.author.profile.avatar and post.author.profile.avatar.name:
             author_avatar_url = request.build_absolute_uri(post.author.profile.avatar.url)
+        
+        # Собираем вложения (если Post имеет ManyToManyField 'attachments' к другой модели с полем 'image')
+        # Если Post имеет одно поле image, то просто post.image.url
+        attachments_data = [{'url': request.build_absolute_uri(att.image.url)} for att in post.attachments.all() if att.image]
 
-        posts_data.append({
-            'id': post.id,
+        all_posts.append({
+            'id': post.pk,
+            'is_community_post': False, # Флаг для JS
             'author_username': post.author.username,
             'author_id': post.author.id,
             'author_avatar_url': author_avatar_url,
             'title': post.title,
             'content': post.content,
-            'created_at': post.created_at.strftime("%d %b %Y %H:%M"),
-            'updated_at': post.updated_at.strftime("%d %b %Y %H:%M") if post.updated_at and post.updated_at != post.created_at else None,
+            'created_at': post.created_at, # Дата/время как объекты, чтобы сортировать
+            'updated_at': post.updated_at,
+            'total_likes': post.total_likes, # Предполагается @property в модели Post
+            'total_dislikes': post.total_dislikes, # Предполагается @property
+            'total_reposts': post.total_reposts, # Предполагается @property
+            'total_comments': post.total_comments, # Предполагается @property
+            'attachments': attachments_data,
+            'detail_url': reverse('core:post_detail', args=[post.pk]), # URL для детальной страницы обычного поста
+            # Поля community будут отсутствовать или null для обычных постов
+            'community_id': None,
+            'community_name': None,
+            'community_url': None,
+        })
+
+    # Добавляем посты сообществ (CommunityPost)
+    for post in community_posts_queryset:
+        author_avatar_url = settings.STATIC_URL + 'images/default-avatar.png' 
+        if hasattr(post.posted_by, 'profile') and post.posted_by.profile.avatar and post.posted_by.profile.avatar.name:
+            author_avatar_url = request.build_absolute_uri(post.posted_by.profile.avatar.url)
+
+        community_avatar_url = settings.STATIC_URL + 'images/default_community_avatar.png' 
+        if hasattr(post.community, 'avatar') and post.community.avatar and post.community.avatar.name:
+            community_avatar_url = request.build_absolute_uri(post.community.avatar.url)
+
+
+        all_posts.append({
+            'id': post.pk,
+            'is_community_post': True, 
+            'author_username': post.posted_by.username if post.posted_by else '[Удаленный пользователь]',
+            'author_id': post.posted_by.id if post.posted_by else None,
+            'author_avatar_url': author_avatar_url,
+            'title': post.title, # <-- ИЗМЕНЕНО: теперь используем post.title напрямую
+            'content': post.content,
+            'created_at': post.created_at, 
+            'updated_at': post.updated_at if hasattr(post, 'updated_at') and post.updated_at else post.created_at, # Учитываем updated_at, если добавил
             'total_likes': post.total_likes, 
             'total_dislikes': post.total_dislikes, 
             'total_reposts': post.total_reposts, 
             'total_comments': post.total_comments, 
-            'attachments': [{'url': att.image.url} for att in post.attachments.all()],
-            'is_liked': is_liked,
-            'is_disliked': is_disliked,
-            'is_reposted': is_reposted,
-            'can_edit_delete': request.user.is_authenticated and request.user == post.author 
+            'detail_url': reverse('community:community_post_detail', args=[post.community.pk, post.pk]),
+            'community_id': post.community.pk,
+            'community_name': post.community.name,
+            'community_url': reverse('community:community_detail', args=[post.community.pk]),
+            'community_avatar_url': community_avatar_url, 
         })
 
+    # Сортировка объединенного списка
+    if sort_by == 'popular':
+        # Сортируем по общей сумме лайков, дизлайков, репостов и комментариев
+        all_posts.sort(key=lambda p: (p['total_likes'] + p['total_dislikes'] + p['total_reposts'] + p['total_comments']), reverse=True)
+    else: # 'new'
+        all_posts.sort(key=lambda p: p['created_at'], reverse=True)
+
+
+    # Ручная пагинация (бесконечный скролл)
+    start_index = (page_number - 1) * posts_per_page
+    end_index = start_index + posts_per_page
+    
+    posts_on_page = all_posts[start_index:end_index] # Получаем посты для текущей страницы
+    has_next_page = len(all_posts) > end_index # Проверяем, есть ли следующая страница
+
+    serialized_posts_data = []
+    current_user_id = request.user.id if request.user.is_authenticated else None
+
+    for post_data in posts_on_page:
+        # Теперь добавляем поля is_liked, is_disliked, is_reposted, can_edit_delete
+        # (они не были в исходных словарях, т.к. values() их не тянет)
+        # Это потребует дополнительного запроса к БД для каждой кнопки, 
+        # или предзагрузки всех состояний пользователя.
+        # Для эффективности, лучше предзагрузить лайки/дизлайки/репосты пользователя.
+        
+        # Оптимизация: Кэшируем ID лайков/дизлайков/репостов текущего пользователя
+        # (Добавляется в request.user, чтобы не повторять запрос для каждого поста)
+        if current_user_id:
+            if not hasattr(request.user, '_liked_posts_ids_cache'):
+                request.user._liked_posts_ids_cache = set(request.user.liked_posts.values_list('id', flat=True))
+                request.user._disliked_posts_ids_cache = set(request.user.disliked_posts.values_list('id', flat=True))
+                request.user._reposted_posts_ids_cache = set(request.user.reposted_posts.values_list('id', flat=True))
+                request.user._liked_community_posts_ids_cache = set(request.user.liked_community_posts.values_list('id', flat=True))
+                request.user._disliked_community_posts_ids_cache = set(request.user.disliked_community_posts.values_list('id', flat=True))
+                request.user._reposted_community_posts_ids_cache = set(request.user.reposted_community_posts.values_list('id', flat=True))
+
+            if post_data['is_community_post']:
+                post_data['is_liked'] = post_data['id'] in request.user._liked_community_posts_ids_cache
+                post_data['is_disliked'] = post_data['id'] in request.user._disliked_community_posts_ids_cache
+                post_data['is_reposted'] = post_data['id'] in request.user._reposted_community_posts_ids_cache
+                
+                # Проверка админства сообщества для удаления
+                is_community_admin = False
+                if request.user.is_authenticated and post_data['community_id']:
+                     is_community_admin = Community.objects.filter(
+                         pk=post_data['community_id'], 
+                         communitymembership__user=request.user, 
+                         communitymembership__is_admin=True
+                     ).exists()
+                
+                # can_edit_delete для CommunityPost: либо автор поста, либо админ сообщества
+                post_data['can_edit_delete'] = (request.user.is_authenticated and 
+                                                (current_user_id == post_data['author_id'] or is_community_admin))
+
+            else: # Обычный пост
+                post_data['is_liked'] = post_data['id'] in request.user._liked_posts_ids_cache
+                post_data['is_disliked'] = post_data['id'] in request.user._disliked_posts_ids_cache
+                post_data['is_reposted'] = post_data['id'] in request.user._reposted_posts_ids_cache
+                
+                # can_edit_delete для обычного поста: только автор поста
+                post_data['can_edit_delete'] = (request.user.is_authenticated and 
+                                                current_user_id == post_data['author_id'])
+        else: # Неавторизованный пользователь
+            post_data['is_liked'] = False
+            post_data['is_disliked'] = False
+            post_data['is_reposted'] = False
+            post_data['can_edit_delete'] = False
+
+        # Форматируем даты для JSON
+        post_data['created_at'] = post_data['created_at'].strftime("%d %b %Y, %H:%M")
+        if post_data['updated_at']:
+             post_data['updated_at'] = post_data['updated_at'].strftime("%d %b %Y, %H:%M")
+        else:
+             post_data['updated_at'] = None # Если updated_at не отличается от created_at, делаем его None
+
+        serialized_posts_data.append(post_data)
+
     return JsonResponse({
-        'posts': posts_data,
+        'posts': serialized_posts_data,
         'has_next_page': has_next_page
     })
 

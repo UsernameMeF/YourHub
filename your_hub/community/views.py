@@ -1,3 +1,454 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+from django.db import transaction
+from django.db.models import Count, Q
+from .forms import CommunityCreationForm 
+from .models import Community, CommunityMembership 
+from django.views.decorators.http import require_POST
+from django.urls import reverse
+import json
+from django.conf import settings
+from users.models import Profile, Friendship
 
-# Create your views here.
+from .forms import CommunityCreationForm, CommunityUpdateForm, CommunityPostForm, CommunityCommentForm
+from .models import Community, CommunityMembership, CommunityPost, CommunityComment 
+
+# Представление для создания нового сообщества
+@login_required
+def community_create_view(request):
+    if request.method == 'POST':
+        form = CommunityCreationForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                community = form.save(commit=False)
+                community.creator = request.user # Устанавливаем создателя
+                community.save()
+                
+                # Добавляем создателя как участника сообщества и администратора
+                CommunityMembership.objects.create(
+                    user=request.user,
+                    community=community,
+                    is_admin=True # Создатель сразу становится администратором
+                )
+            return redirect('community:community_detail', pk=community.id)
+        else:
+            # Форма невалидна, отобразим её снова с ошибками
+            pass
+    else:
+        form = CommunityCreationForm()
+    
+    return render(request, 'community/community_create.html', {'form': form})
+
+
+@login_required
+def community_detail_view(request, pk):
+    community = get_object_or_404(
+        Community.objects.prefetch_related('members').annotate(
+            members_count=Count('members', distinct=True) # Подсчитываем количество участников
+        ),
+        id=pk
+    )
+    
+    is_member = False
+    is_creator = False
+    if request.user.is_authenticated:
+        is_member = community.members.filter(id=request.user.id).exists()
+        is_creator = (request.user == community.creator)
+    
+
+    first_members = community.members.all().order_by('?')[:7] # Случайные 7 участников
+
+    last_post = CommunityPost.objects.filter(community=community).order_by('-created_at').first()
+
+    context = {
+        'community': community,
+        'is_member': is_member,
+        'is_creator': is_creator,
+        'first_members': first_members,
+        'last_post': last_post,
+    }
+
+    return render(request, 'community/community_detail.html', context)
+
+
+# Представление для присоединения/отписки от сообщества (AJAX)
+@login_required
+@transaction.atomic # Гарантируем атомарность операции
+def community_toggle_membership(request, pk): # community_id теперь из URL
+    community = get_object_or_404(Community, id=pk)
+    user = request.user
+    
+    # Получаем объект членства, если он существует
+    membership_exists = CommunityMembership.objects.filter(user=user, community=community).exists()
+    
+    if membership_exists:
+        # Если пользователь является создателем и пытается отписаться, запрещаем это
+        if user == community.creator:
+            return JsonResponse({'success': False, 'message': 'Создатель не может отписаться от своего сообщества.'}, status=403)
+        
+        # Если пользователь не создатель и уже участник, удаляем его из сообщества
+        CommunityMembership.objects.filter(user=user, community=community).delete()
+        action = 'left'
+        message = 'Вы успешно отписались от сообщества.'
+    else:
+        # Если пользователь не участник, добавляем его
+        CommunityMembership.objects.create(user=user, community=community)
+        action = 'joined'
+        message = 'Вы успешно присоединились к сообществу!'
+    
+    # Обновляем количество участников для ответа AJAX
+    updated_members_count = community.members.count()
+
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'members_count': updated_members_count,
+        'is_member': not membership_exists, # Обновленное состояние
+        'message': message # Сообщение для отображения на фронтенде
+    })
+
+
+
+@login_required
+def community_edit_view(request, pk):
+    community = get_object_or_404(Community, pk=pk)
+
+    if request.user != community.creator:
+        return redirect('community:community_detail', pk=community.pk)
+
+    if request.method == 'POST':
+        form = CommunityUpdateForm(request.POST, instance=community) # Используем CommunityUpdateForm
+        if form.is_valid():
+            form.save()
+            return redirect('community:community_detail', pk=community.pk)
+    else:
+        form = CommunityUpdateForm(instance=community) # Используем CommunityUpdateForm
+    
+    context = {
+        'form': form,
+        'community': community,
+    }
+    return render(request, 'community/community_edit.html', context)
+
+
+@login_required
+def community_delete_view(request, pk):
+    community = get_object_or_404(Community, pk=pk)
+
+    # Только создатель может удалить сообщество
+    if request.user != community.creator:
+        return redirect('community:community_detail', pk=community.pk) # Или 403
+
+    if request.method == 'POST':
+        community.delete()
+        # После удаления перенаправляем на страницу со списком всех сообществ пользователя или на главную
+        return redirect('community:user_communities') # Или 'home'
+    
+    context = {
+        'community': community,
+    }
+    return render(request, 'community/community_confirm_delete.html', context)
+
+# Представление для отображения всех сообществ, в которых состоит пользователь
+@login_required
+def user_communities_view(request):
+    # Получаем сообщества, в которых состоит текущий пользователь
+    # И аннотируем их количеством участников для удобства отображения
+    user_communities = Community.objects.filter(
+        members=request.user
+    ).annotate(
+        members_count=Count('members', distinct=True)
+    ).order_by('-created_at') # Сортируем по дате создания
+
+    return render(request, 'community/user_communities.html', {
+        'user_communities': user_communities
+    })
+
+# ПОСТЫ ОТ СООБЩЕСТВ
+
+
+@login_required
+@transaction.atomic 
+def community_post_create_view(request, pk): # pk - ID сообщества
+    community = get_object_or_404(Community, pk=pk)
+
+    # Проверка: только создатель может создавать посты
+    if request.user != community.creator:
+        return HttpResponseForbidden("Только создатель сообщества может создавать публикации.")
+
+    if request.method == 'POST':
+        post_form = CommunityPostForm(request.POST)
+
+        if post_form.is_valid():
+            post = post_form.save(commit=False)
+            post.community = community
+            post.posted_by = request.user
+            post.save() 
+
+            
+            return redirect('community:community_detail', pk=community.pk)
+        else:
+            print(post_form.errors) 
+            # Если форма невалидна, мы все равно рендерим страницу с ошибками, передавая ее в контекст
+    else:
+        post_form = CommunityPostForm()
+    
+    context = {
+        'community': community,
+        'post_form': post_form,
+    }
+    return render(request, 'community/community_post_create.html', context)
+
+
+# Детальная страница поста сообщества (доступна без авторизации)
+def community_post_detail_view(request, pk, post_pk): # pk - ID сообщества, post_pk - ID поста
+    community = get_object_or_404(Community, pk=pk)
+    post = get_object_or_404(
+        CommunityPost.objects.select_related('posted_by'), 
+        pk=post_pk, 
+        community=community
+    )
+
+    # Увеличиваем счетчик просмотров
+    post.views_count += 1
+    post.save(update_fields=['views_count']) 
+
+    # Форма для комментариев
+    comment_form = CommunityCommentForm()
+    comments = post.comments.select_related('author__profile').order_by('created_at') # Получаем комментарии с авторами
+
+    # Проверяем, лайкнул ли, дизлайкнул ли, репостнул ли пользователь
+    is_liked_by_user = False
+    is_disliked_by_user = False
+    is_reposted_by_user = False
+    if request.user.is_authenticated:
+        is_liked_by_user = post.likes.filter(id=request.user.id).exists()
+        is_disliked_by_user = post.dislikes.filter(id=request.user.id).exists()
+        is_reposted_by_user = post.reposts.filter(id=request.user.id).exists()
+
+
+    context = {
+        'community': community,
+        'post': post,
+        'comment_form': comment_form,
+        'comments': comments,
+        'is_liked': is_liked_by_user,
+        'is_disliked': is_disliked_by_user,
+        'is_reposted': is_reposted_by_user,
+    }
+    return render(request, 'community/community_post_detail.html', context)
+
+
+@login_required
+@require_POST
+def community_post_like(request, pk, post_pk):
+    post = get_object_or_404(CommunityPost, pk=post_pk, community__pk=pk)
+    user = request.user
+    
+    action = 'liked'
+    if user in post.likes.all():
+        post.likes.remove(user)
+        action = 'unliked'
+    else:
+        post.likes.add(user)
+        if user in post.dislikes.all():
+            post.dislikes.remove(user)
+    
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'likes_count': post.total_likes,
+        'dislikes_count': post.total_dislikes
+    })
+
+@login_required
+@require_POST
+def community_post_dislike(request, pk, post_pk):
+    post = get_object_or_404(CommunityPost, pk=post_pk, community__pk=pk)
+    user = request.user
+    
+    action = 'disliked'
+    if user in post.dislikes.all():
+        post.dislikes.remove(user)
+        action = 'undisliked'
+    else:
+        post.dislikes.add(user)
+        if user in post.likes.all():
+            post.likes.remove(user)
+
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'likes_count': post.total_likes,
+        'dislikes_count': post.total_dislikes
+    })
+
+@login_required
+@require_POST
+def community_post_repost(request, pk, post_pk):
+    post = get_object_or_404(CommunityPost, pk=post_pk, community__pk=pk)
+    user = request.user
+    
+    action = 'reposted'
+    if user in post.reposts.all():
+        post.reposts.remove(user)
+        action = 'unreposted'
+    else:
+        post.reposts.add(user)
+
+    return JsonResponse({
+        'success': True,
+        'action': action,
+        'reposts_count': post.total_reposts
+    })
+
+# ИЗМЕНЕННАЯ ФУНКЦИЯ: AJAX-представление для получения списка репостов с фильтрацией
+@login_required
+def community_post_reposts_ajax(request, pk, post_pk):
+    community = get_object_or_404(Community, pk=pk)
+    post = get_object_or_404(CommunityPost, pk=post_pk, community=community)
+    current_user = request.user
+    
+    all_repost_users = post.reposts.all()
+    repost_users_data = []
+
+    # Получаем друзей
+    friends = set()
+    accepted_friendships = Friendship.objects.filter(
+        Q(from_user=current_user) | Q(to_user=current_user),
+        status='accepted'
+    ).select_related('from_user', 'to_user')
+
+    for fs in accepted_friendships:
+        if fs.from_user == current_user:
+            friends.add(fs.to_user)
+        else:
+            friends.add(fs.from_user)
+
+    # Получаем ID пользователей, на которых подписан текущий пользователь
+    # Если 'following' - это related_name для подписок, то так:
+    following_ids = set(current_user.following.all().values_list('following__id', flat=True))
+    # ^^^ Предполагается, что у тебя есть модель подписок, где `following` это related_name
+    # к полю, которое указывает на того, на кого подписан пользователь.
+    # Если у тебя другая структура подписок, например, ManyToManyField напрямую, 
+    # то это будет current_user.subscriptions.values_list('id', flat=True) или что-то похожее.
+    # Проверь свою модель подписок, если 'following' не работает.
+    
+    for user in all_repost_users:
+        # Убедимся, что user.profile существует, чтобы избежать AttributeError
+        avatar_url = user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else settings.STATIC_URL + 'images/default_avatar.png'
+        
+        # Добавляем самого пользователя всегда
+        if user == current_user:
+            repost_users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'avatar_url': avatar_url,
+                'relationship': 'Вы', 
+            })
+        # Если пользователь - друг
+        elif user in friends:
+            repost_users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'avatar_url': avatar_url,
+                'relationship': 'Друг',
+            })
+        # Если пользователь, на которого подписан текущий пользователь
+        elif user.id in following_ids:
+            repost_users_data.append({
+                'id': user.id,
+                'username': user.username,
+                'avatar_url': avatar_url,
+                'relationship': 'Подписка',
+            })
+        # Остальных не включаем
+
+    # Отсортируем, чтобы текущий пользователь, друзья и подписки были в начале
+    # (Опционально: можно сделать сортировку на JS или добавить поле сортировки в данные и сортировать по нему)
+    # Здесь просто добавлю, чтобы текущий пользователь был первым в списке
+    repost_users_data.sort(key=lambda x: (x['relationship'] != 'Вы', x['relationship'] != 'Друг', x['relationship'] != 'Подписка', x['username']))
+
+    return JsonResponse({
+        'success': True,
+        'reposts': repost_users_data,
+        'reposts_count': post.total_reposts, # Общее количество репостов (не отфильтрованное)
+        'filtered_count': len(repost_users_data) # Количество отфильтрованных для отображения
+    })
+
+@login_required
+@require_POST
+def community_add_comment(request, pk, post_pk):
+    community = get_object_or_404(Community, pk=pk)
+    post = get_object_or_404(CommunityPost, pk=post_pk, community=community)
+    
+    form = CommunityCommentForm(request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+
+        author_avatar_url = comment.author.profile.avatar.url if hasattr(comment.author, 'profile') and comment.author.profile.avatar else settings.STATIC_URL + 'images/default_avatar.png'
+        
+        return JsonResponse({
+            'success': True,
+            'comment': {
+                'author_id': comment.author.id,
+                'author_username': comment.author.username,
+                'author_avatar_url': author_avatar_url,
+                'text': comment.text,
+                'created_at': comment.created_at.strftime("%d %b %Y, %H:%M"), 
+                'total_comments': post.total_comments, 
+            }
+        })
+    else:
+        # Улучшенное сообщение об ошибке валидации
+        errors = form.errors.as_json()
+        return JsonResponse({
+            'success': False,
+            'message': 'Ошибка валидации комментария. Возможно, текст слишком короткий или длинный.',
+            'errors': json.loads(errors) # Парсим JSON ошибки для удобства
+        }, status=400) 
+
+
+@login_required
+@require_POST
+def community_post_delete_ajax(request, pk, post_pk):
+    community = get_object_or_404(Community, pk=pk)
+    post = get_object_or_404(CommunityPost, pk=post_pk, community=community)
+
+    is_community_admin = CommunityMembership.objects.filter(
+        user=request.user, community=community, is_admin=True
+    ).exists()
+
+    if request.user == post.posted_by or is_community_admin:
+        post.delete()
+        return JsonResponse({'success': True, 'message': 'Пост успешно удален.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'У вас нет прав для удаления этого поста.'}, status=403) 
+
+
+def community_search_view(request):
+    query = request.GET.get('q') # Получаем поисковый запрос
+    communities = Community.objects.all() # Изначально все сообщества
+
+    if query:
+        # Фильтруем сообщества по названию, без учета регистра
+        # Дополнительно аннотируем количество участников
+        communities = communities.filter(Q(name__icontains=query)).annotate(
+            members_count=Count('members', distinct=True)
+        ).order_by('name') # Сортируем по названию для найденных
+    else:
+        # Если запрос пустой, показываем все сообщества, также аннотируя количество участников
+        communities = communities.annotate(
+            members_count=Count('members', distinct=True)
+        ).order_by('-created_at') # Или по дате создания, если нет запроса
+
+    context = {
+        'communities': communities,
+        'query': query if query else '', # Передаем запрос обратно в шаблон
+        'title': 'Поиск сообществ',
+    }
+    return render(request, 'community/community_search.html', context)
