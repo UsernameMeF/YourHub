@@ -1,0 +1,236 @@
+/* SOCIAL_NETWORK/your_hub/static/css/notifications/notification_list.css */
+
+/*
+   Важное примечание: эти стили разработаны для работы внутри
+   структуры: <div class="container"><main class="content">...</div>
+   Если масштабирование все еще не работает, это почти наверняка
+   проблема в стилях .container или .content в global/_base.css,
+   которые, к сожалению, мы не можем изменять.
+*/
+
+/* --- Стили для основного контейнера страницы уведомлений --- */
+/*
+   Масштабирование:
+   - max-width: 800px; ограничивает максимальную ширину.
+   - width: 100%; заставляет контейнер занимать всю доступную ширину родителя.
+     Если родитель (content) сужается, этот контейнер сужается вместе с ним,
+     но не выходит за 800px.
+   - margin: 30px auto; центрирует блочный элемент по горизонтали,
+     если у него есть заданная ширина или max-width.
+*/
+.notification-list-container {
+    max-width: 800px;
+    width: 100%; /* Занимает 100% ширины .content */
+    margin: 30px auto; /* Центрируем по горизонтали, 30px сверху/снизу */
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* Важно для корректного расчета размеров с padding */
+    color: #333; /* Базовый цвет текста */
+    position: relative; /* Для правильного позиционирования внутренних элементов (кнопки "прочитано") */
+    /* outline: 2px solid red; /* ДЛЯ ОТЛАДКИ: Временно покажет границы контейнера */ 
+}
+
+/* --- Заголовок страницы --- */
+.notification-notification-title { /* Новый класс */
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+}
+
+/* --- Стили для списка уведомлений --- */
+.notification-list {
+    list-style: none; /* Убираем маркеры списка */
+    padding: 0;
+    margin: 0;
+}
+
+/* --- Стили для каждого элемента уведомления --- */
+.notification-item {
+    display: flex; /* Flexbox для содержимого уведомления */
+    align-items: center; /* Выравнивание элементов по центру по вертикали */
+    background-color: #fcfcfc;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Для кнопки "прочитано" */
+}
+
+/* Стили для непрочитанных уведомлений */
+.notification-item.unread {
+    background-color: #e6f7ff;
+    border-color: #aaddff;
+    font-weight: bold;
+}
+
+/* Эффект при наведении на уведомление */
+.notification-item:hover {
+    background-color: #f0f8ff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Стили для ссылки, оборачивающей содержимое уведомления */
+.notification-link {
+    display: flex;
+    flex-grow: 1; /* Занимает все доступное пространство */
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    padding-right: 40px; /* Отступ справа для кнопки "прочитано" */
+}
+
+/* Стили для иконки уведомления */
+.notification-icon {
+    font-size: 1.5em;
+    color: #23e2dd; /* Акцентный цвет (бирюзовый) */
+    margin-right: 15px;
+    flex-shrink: 0; /* Предотвращаем сжатие иконки */
+    width: 40px; /* Фиксированная ширина */
+    height: 40px; /* Фиксированная высота */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Круглая форма */
+    background-color: rgba(35, 226, 221, 0.1); /* Легкий фон */
+}
+
+/* Стили для текстового содержимого уведомления */
+.notification-content {
+    flex-grow: 1; /* Занимает все оставшееся пространство */
+}
+
+.notification-text {
+    margin: 0;
+    line-height: 1.4;
+    color: #444;
+    word-wrap: break-word; /* Перенос длинных слов */
+    overflow-wrap: break-word;
+}
+
+.notification-item.unread .notification-text {
+    color: #222;
+}
+
+/* Имя отправителя */
+.notification-sender {
+    font-weight: bold;
+    color: #23e2dd; /* Акцентный цвет */
+    margin-right: 5px;
+}
+
+/* Временная метка уведомления */
+.notification-timestamp {
+    display: block;
+    font-size: 0.85em;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* --- Сообщение об отсутствии уведомлений --- */
+.notification-no-notifications-message { /* Новый класс */
+    background-color: #ffffff;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #555;
+    margin-top: 20px;
+}
+
+/* --- Индикатор загрузки и кнопка "Загрузить еще" --- */
+.notification-loading-spinner { /* Новый класс */
+    text-align: center;
+    padding: 20px;
+    color: #555;
+    font-size: 1.1em;
+}
+
+.notification-loading-spinner .fas {
+    color: #23e2dd; /* Акцентный цвет */
+    margin-right: 10px;
+}
+
+.notification-load-more-button { /* Новый класс */
+    background-color: #23e2dd; /* Акцентный цвет (бирюзовый) */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    display: block; /* Важно: делает кнопку блочным элементом для margin: auto */
+    margin: 25px auto; /* Центрируем кнопку по горизонтали */
+    outline: none;
+    width: fit-content; /* Занимает ширину по содержимому */
+    min-width: 150px; /* Минимальная ширина для кнопки */
+    text-align: center; /* Центрируем текст внутри кнопки */
+    box-sizing: border-box;
+    /* outline: 2px solid purple; /* ДЛЯ ОТЛАДКИ: Временно покажет границы кнопки */ 
+}
+
+.notification-load-more-button:hover {
+    background-color: #1ed1cb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.notification-load-more-button:focus {
+    box-shadow: 0 0 0 3px rgba(35, 226, 221, 0.5);
+}
+
+
+/* --- Адаптивность для мобильных устройств --- */
+@media (max-width: 768px) {
+    /* На мобильных, контейнер должен занять почти всю ширину с небольшими отступами */
+    .notification-list-container {
+        margin: 15px auto; /* Меньшие отступы по бокам, но все еще центрируем */
+        padding: 15px;
+        width: calc(100% - 30px); /* Убедимся, что ширина учитывает маргины 15px * 2 */
+    }
+    .notification-list-container h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    .notification-item {
+        flex-wrap: wrap; /* Разрешаем элементам переноситься на новую строку */
+        padding: 10px 15px;
+        align-items: flex-start; /* Выравнивание элементов вверху */
+    }
+    .notification-link {
+        flex-basis: 100%; /* Занимает всю ширину */
+        padding-right: 0;
+        margin-top: 0; /* Сброс верхнего отступа */
+    }
+    .notification-icon {
+        margin-right: 10px;
+        width: 35px;
+        height: 35px;
+    }
+    .notification-content {
+        flex-basis: 100%; /* Контент занимает всю ширину */
+        order: 2; /* Порядок отображения после иконки */
+    }
+    .notification-timestamp {
+        order: 3;
+        flex-basis: 100%;
+        text-align: right;
+        margin-top: 8px;
+        font-size: 0.8em;
+    }
+    .notification-mark-as-read-btn { /* Новый класс */
+        position: static; /* Отключаем абсолютное позиционирование */
+        margin-left: auto; /* Выравнивает кнопку справа в flex-контейнере (для flex-wrap) */
+        order: 1; /* Кнопка будет первой (справа вверху) */
+        width: 25px;
+        height: 25px;
+        font-size: 1em;
+        margin-bottom: 5px;
+    }
+}

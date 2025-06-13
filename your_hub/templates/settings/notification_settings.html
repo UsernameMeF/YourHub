@@ -1,0 +1,133 @@
+{# notifications/templates/notifications/notification_settings.html #}
+{% extends 'settings/settings_base.html' %}
+{% load static %}
+
+{% block title %}Настройки уведомлений{% endblock %}
+
+{% block settings_extra_head %}
+    <link rel="stylesheet" href="{% static 'css/notifications/_notification_settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications/_notification_settings_dark.css' %}" media="(prefers-color-scheme: dark)">
+{% endblock %}
+
+{% block settings_content %}
+{# Устанавливаем активную вкладку для settings_base.html #}
+{% with active_tab='notifications' %}
+    {{ block.super }}
+{% endwith %}
+
+<div class="notification-settings-form-wrapper">
+    <h2>Настройки уведомлений</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-section">
+            <h3>Звук уведомлений</h3>
+            <div class="form-group">
+                {{ form.notification_sound.label_tag }}
+                {{ form.notification_sound }}
+            </div>
+            <div class="form-group">
+                {{ form.volume.label_tag }}
+                <div class="volume-slider-wrapper">
+                    {{ form.volume }}
+                    <span id="volume-value">{{ form.volume.value }}</span>
+                </div>
+                <button type="button" id="play-sound-btn" class="play-sound-btn"><i class="fas fa-volume-up"></i> Прослушать</button>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Получать уведомления о:</h3>
+            <div class="form-grid">
+                <div class="form-group form-check-group">
+                    {{ form.receive_messages_notifications }}
+                    {{ form.receive_messages_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_group_messages_notifications }}
+                    {{ form.receive_group_messages_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_friend_requests_notifications }}
+                    {{ form.receive_friend_requests_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_approved_friend_requests_notifications }}
+                    {{ form.receive_approved_friend_requests_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_comments_notifications }}
+                    {{ form.receive_comments_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_likes_notifications }}
+                    {{ form.receive_likes_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_reposts_notifications }}
+                    {{ form.receive_reposts_notifications.label_tag }}
+                </div>
+                <div class="form-group form-check-group">
+                    {{ form.receive_follows_notifications }}
+                    {{ form.receive_follows_notifications.label_tag }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Режим</h3>
+            <div class="form-group form-check-group">
+                {{ form.do_not_disturb }}
+                {{ form.do_not_disturb.label_tag }}
+            </div>
+        </div>
+
+        {% if form.errors %}
+            <div class="error-messages">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>{{ field.label }}: {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="submit-btn">Сохранить настройки</button>
+    </form>
+</div>
+
+<audio id="notification-preview-sound-player" src="" preload="auto"></audio>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const soundSelect = document.getElementById('id_notification_sound');
+        const volumeSlider = document.getElementById('id_volume');
+        const volumeValueSpan = document.getElementById('volume-value');
+        const playSoundBtn = document.getElementById('play-sound-btn');
+        const previewSoundPlayer = document.getElementById('notification-preview-sound-player');
+
+        const staticUrl = "{% static 'sounds/' %}";
+
+        function updateAndPlaySound() {
+            if (soundSelect.value) {
+                previewSoundPlayer.src = staticUrl + soundSelect.value;
+                previewSoundPlayer.volume = parseFloat(volumeSlider.value);
+                previewSoundPlayer.play().catch(e => console.error("Error playing sound:", e));
+            }
+        }
+
+        function updateVolumeDisplay() {
+            volumeValueSpan.textContent = (parseFloat(volumeSlider.value) * 100).toFixed(0) + '%';
+        }
+
+        updateVolumeDisplay();
+
+        volumeSlider.addEventListener('input', updateVolumeDisplay);
+        volumeSlider.addEventListener('change', updateAndPlaySound); // Play sound on release
+        playSoundBtn.addEventListener('click', updateAndPlaySound);
+        soundSelect.addEventListener('change', updateAndPlaySound);
+    });
+</script>
+{% endblock %}

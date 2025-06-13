@@ -1,0 +1,29 @@
+/* static/css/settings/settings_base_dark.css */
+
+html.dark-theme .settings-main-container {
+    background-color: #252526;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .settings-main-container h1 {
+    color: #f0f0f0;
+    border-bottom-color: #3a3a3a;
+}
+
+html.dark-theme .settings-nav {
+    border-bottom-color: #4a4a4a;
+}
+
+html.dark-theme .settings-nav-item {
+    color: #bbb;
+}
+
+html.dark-theme .settings-nav-item:hover {
+    color: #00e600;
+    border-bottom-color: #00ff00;
+}
+
+html.dark-theme .settings-nav-item.active {
+    color: #00e600;
+    border-bottom-color: #00e600;
+}

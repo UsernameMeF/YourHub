@@ -1,12 +1,12 @@
-# users/apps.py
+# notifications/apps.py
 from django.apps import AppConfig
 
 
-class UsersConfig(AppConfig):
+class NotificationsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'users'
-    verbose_name = 'Пользователи'
+    name = 'notifications'
+    verbose_name = 'Уведомления'
 
     def ready(self):
         # Импортируем сигналы здесь, когда Django полностью загружен
-        import users.signals
+        import notifications.signals

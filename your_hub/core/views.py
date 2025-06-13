@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
+from notifications.utils import send_notification_to_user
 
 from .forms import PostForm, PostDeleteForm, CommentForm
 from .models import Post, PostAttachment, Comment 
@@ -382,6 +383,25 @@ def post_like(request, pk):
         post.likes.remove(user)
         action = 'unliked'
     else:
+        # НОВОЕ: Отправляем уведомление, только если пользователь лайкнул пост
+        # и это не его собственный пост
+        if post.author != user:
+            recipient = post.author
+            sender_user = user
+            notification_type = 'like'
+            content = f"{sender_user.username} оценил(а) ваш пост: \"{post.title}\"" # Или часть content
+            related_object = post # Связанный объект - сам пост
+            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+
+            send_notification_to_user(
+                recipient=recipient,
+                sender=sender_user,
+                notification_type=notification_type,
+                content=content,
+                related_object=related_object,
+                custom_url=custom_url
+            )
+            print(f"DEBUG: Notification 'like' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
         post.likes.add(user)
         # Если пользователь лайкнул, убираем дизлайк, если он был
         if user in post.dislikes.all():
@@ -428,6 +448,25 @@ def post_repost(request, pk):
         post.reposts.remove(user)
         action = 'unreposted'
     else:
+        # НОВОЕ: Отправляем уведомление, только если пользователь репостнул пост
+        # и это не его собственный пост
+        if post.author != user:
+            recipient = post.author
+            sender_user = user
+            notification_type = 'repost'
+            content = f"{sender_user.username} репостнул(а) ваш пост: \"{post.title}\"" # Или часть content
+            related_object = post # Связанный объект - сам пост
+            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+
+            send_notification_to_user(
+                recipient=recipient,
+                sender=sender_user,
+                notification_type=notification_type,
+                content=content,
+                related_object=related_object,
+                custom_url=custom_url
+            )
+            print(f"DEBUG: Notification 'repost' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
         post.reposts.add(user)
 
     return JsonResponse({
@@ -447,6 +486,31 @@ def add_comment(request, pk):
         comment.post = post
         comment.author = request.user
         comment.save()
+
+        # НОВОЕ: Отправка уведомления о новом комментарии
+        # Уведомляем автора поста, если комментарий не от него самого
+        if post.author != request.user:
+            recipient = post.author
+            sender_user = request.user
+            notification_type = 'comment'
+            # Обрезаем комментарий для уведомления, если он слишком длинный
+            display_content = comment.text
+            if len(display_content) > 50:
+                display_content = display_content[:47] + '...'
+            
+            content = f"{sender_user.username} прокомментировал(а) ваш пост: \"{display_content}\""
+            related_object = comment # Связанный объект - сам комментарий
+            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+
+            send_notification_to_user(
+                recipient=recipient,
+                sender=sender_user,
+                notification_type=notification_type,
+                content=content,
+                related_object=related_object,
+                custom_url=custom_url
+            )
+            print(f"DEBUG: Notification 'comment' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
 
         # Возвращаем информацию о новом комментарии
         return JsonResponse({

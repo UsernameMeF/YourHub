@@ -7,6 +7,10 @@ from django.db import transaction # Для атомарности операци
 from .models import ChatRoom, ChatMessage, ChatAttachment, GroupChat, GroupChatMessage, GroupChatAttachment
 from django.contrib.auth import get_user_model
 
+# Импортируем утилиту для отправки уведомлений
+from notifications.utils import send_notification_to_user
+from django.urls import reverse
+
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -86,31 +90,50 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message_content = data.get('message', '').strip()
             attachments_data = data.get('attachments', []) # Для сообщений, отправленных через AJAX views.py
 
-            if message_content or attachments_data: # Сообщение не может быть пустым и без вложений
-                chat_message = await self.save_message(self.user, self.chat_instance, self.MessageModel, message_content, attachments_data)
+            if message_content or attachments_data:
+                try:
+                    # Вызываем новый асинхронный метод для сохранения и отправки уведомлений
+                    chat_message = await self._save_message_and_send_notifications(
+                        self.user,
+                        self.chat_instance,
+                        self.MessageModel,
+                        message_content,
+                        attachments_data, 
+                        self.room_type,
+                        self.room_id
+                    )
 
-                # Добавляем отправителя в список прочитавших
-                await self.add_reader_to_message(chat_message, self.user)
+                    sender_id = self.user.id
+                    sender_avatar_url = await self.get_user_avatar_url(self.user)
+                    read_count = await self.get_message_read_count(chat_message)
 
-                sender_id = self.user.id
-                sender_avatar_url = await self.get_user_avatar_url(self.user)
-                read_count = await self.get_message_read_count(chat_message)
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': message_content,
+                            'sender_username': self.user.username,
+                            'sender_id': sender_id,
+                            'sender_avatar_url': sender_avatar_url,
+                            'timestamp': chat_message.timestamp.strftime('%d.%m.%Y %H:%M'),
+                            'message_id': str(chat_message.id),
+                            'attachments': attachments_data,
+                            'read_count': read_count,
+                            'is_edited': False,
+                        }
+                    )
+                    print(f"DEBUG (ChatConsumer): Message sent to chat group: {self.room_group_name}")
 
-                await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'message': message_content,
-                        'sender_username': self.user.username,
-                        'sender_id': sender_id,
-                        'sender_avatar_url': sender_avatar_url,
-                        'timestamp': chat_message.timestamp.strftime('%d.%m.%Y %H:%M'),
-                        'message_id': str(chat_message.id),
-                        'attachments': attachments_data, # Передаем полученные вложения
-                        'read_count': read_count,
-                        'is_edited': False,
-                    }
-                )
+                except Exception as e:
+                    print(f"ERROR (ChatConsumer): Failed to save message or send notifications: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Здесь можно отправить ошибку обратно клиенту, если нужно
+                    await self.send(text_data=json.dumps({
+                        'type': 'error',
+                        'message': 'Ошибка при отправке сообщения: ' + str(e)
+                    }))
+
         elif message_type == 'typing_status':
             is_typing = data.get('is_typing', False)
             await self.channel_layer.group_send(
@@ -187,6 +210,75 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def is_user_in_chat(self, user, chat_instance):
         return chat_instance.participants.filter(id=user.id).exists()
+
+    # НОВЫЙ ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ СОХРАНЕНИЯ СООБЩЕНИЙ И ОТПРАВКИ УВЕДОМЛЕНИЙ
+    @database_sync_to_async
+    def _save_message_and_send_notifications(self, sender, chat_instance, MessageModel, content, attachments_data, room_type, room_id):
+        """
+        Сохраняет сообщение в БД, добавляет отправителя как прочитавшего,
+        и вызывает send_notification_to_user для других участников чата.
+        """
+        with transaction.atomic():
+            if isinstance(chat_instance, ChatRoom):
+                chat_message = MessageModel.objects.create(
+                    chat_room=chat_instance,
+                    sender=sender,
+                    content=content,
+                    is_edited=False
+                )
+            elif isinstance(chat_instance, GroupChat):
+                chat_message = MessageModel.objects.create(
+                    group_chat=chat_instance,
+                    sender=sender,
+                    content=content,
+                    is_edited=False
+                )
+            else:
+                raise ValueError("Неизвестный тип чата для сохранения сообщения.")
+
+
+            recipients = []
+            if room_type == 'private':
+                recipients = list(chat_instance.participants.exclude(id=sender.id))
+            elif room_type == 'group':
+                recipients = list(chat_instance.participants.exclude(id=sender.id))
+            
+            # Обрезаем контент сообщения для уведомления
+            display_content = content
+            if len(display_content) > 50:
+                display_content = display_content[:47] + '...'
+            elif not display_content and attachments_data: # Если только вложения
+                display_content = "Новые вложения"
+            elif not display_content:
+                display_content = "Пустое сообщение"
+
+            # Формируем URL для уведомления
+            notification_url = '#'
+            if room_type == 'private':
+                notification_url = reverse('chat:chat_room', args=[chat_instance.id])
+            elif room_type == 'group':
+                notification_url = reverse('chat:group_chat_room', args=[chat_instance.id])
+
+            # Отправляем уведомления каждому получателю
+            for recipient in recipients:
+                notification_type_str = 'message' if room_type == 'private' else 'group_message'
+                notification_content_text = f"{sender.username} написал вам: \"{display_content}\""
+                if room_type == 'group':
+                    notification_content_text = f"{sender.username} в группе \"{chat_instance.name}\": \"{display_content}\""
+                
+                print(f"DEBUG (Consumer - Notification Call): Sending notification. Recipient: {recipient.username}, Sender: {sender.username}, Type: {notification_type_str}, Content: {notification_content_text}, URL: {notification_url}")
+                send_notification_to_user(
+                    recipient=recipient,
+                    sender=sender,
+                    notification_type=notification_type_str,
+                    content=notification_content_text,
+                    related_object=chat_message, # Передаем объект ChatMessage
+                    custom_url=notification_url
+                )
+                print(f"DEBUG (Consumer - Notification Call): Notification request sent for {recipient.username}.")
+
+            # Теперь возвращаем объект сообщения, чтобы его можно было использовать для group_send в receive
+            return chat_message
 
     @database_sync_to_async
     def save_message(self, sender, chat_instance, MessageModel, content, attachments_data):

@@ -15,6 +15,8 @@ from django.utils import timezone
 from django.http import JsonResponse # Для AJAX
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string# HTML сниппеты
+from django.urls import reverse
+from notifications.utils import send_notification_to_user
 
 ONLINE_THRESHOLD_MINUTES = 5 # "Порог" времени для определения статуса онлайн
 
@@ -324,6 +326,8 @@ def send_friend_request(request, to_user_id):
             Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user)
         ).first()
 
+        is_new_request = False
+
         if existing_friendship:
             # Логика для обработки уже существующего отношения
             if existing_friendship.status == 'accepted':
@@ -352,6 +356,26 @@ def send_friend_request(request, to_user_id):
             friendship = Friendship.objects.create(from_user=request.user, to_user=to_user, status='pending')
             friendship_status = 'pending_sent'
             sent_request = friendship
+
+        # НОВОЕ: Отправка уведомления, если запрос был отправлен или обновлен
+        if is_new_request:
+            recipient = to_user # Тот, кому отправили запрос
+            sender_user = request.user
+            notification_type = 'friend_request'
+            content = f"{sender_user.username} отправил(-а) вам запрос на дружбу."
+            related_object = sent_request # Объект Friendship
+            custom_url = reverse('users:profile', args=[sender_user.id]) # Ссылка на профиль отправителя
+
+            send_notification_to_user(
+                recipient=recipient,
+                sender=sender_user,
+                notification_type=notification_type,
+                content=content,
+                related_object=related_object,
+                custom_url=custom_url
+            )
+            print(f"DEBUG: Notification 'friend_request' sent to {recipient.username} from {sender_user.username}")
+
 
         # Обновляем статус подписки (не связан с дружбой напрямую, но нужен для рендеринга кнопок)
         follow_status = Follow.objects.filter(follower=request.user, following=to_user).exists()
@@ -436,6 +460,24 @@ def accept_friend_request(request, friendship_id):
     # Проверяем, что текущий пользователь является получателем запроса и статус 'pending'
     if request.user == friendship_request.to_user and friendship_request.status == 'pending':
         friendship_request.accept() # Метод accept должен изменить статус на 'accepted'
+
+        # НОВОЕ: Отправка уведомления о принятии дружбы
+        recipient = friendship_request.from_user # Тот, кто отправил запрос и теперь стал другом
+        sender_user = request.user # Тот, кто принял запрос
+        notification_type = 'friend_accept'
+        content = f"{sender_user.username} принял(-а) ваш запрос на дружбу."
+        related_object = friendship_request # Сам объект Friendship (теперь в статусе accepted)
+        custom_url = reverse('users:profile', args=[sender_user.id]) # Ссылка на профиль того, кто принял
+
+        send_notification_to_user(
+            recipient=recipient,
+            sender=sender_user,
+            notification_type=notification_type,
+            content=content,
+            related_object=related_object,
+            custom_url=custom_url
+        )
+        print(f"DEBUG: Notification 'friend_accept' sent to {recipient.username} from {sender_user.username}")
         
         viewed_user_on_profile = friendship_request.from_user
 
@@ -609,6 +651,25 @@ def follow_user(request, user_id):
         status_response = 'success'
         message_response = ''
         follow_status = True
+
+        # НОВОЕ: Отправка уведомления о новой подписке
+        recipient = following_user # Тот, на кого подписались
+        sender_user = request.user # Тот, кто подписался
+        notification_type = 'follow'
+        content = f"{sender_user.username} подписался(-ась) на вас."
+        related_object = follow_instance # Объект Follow
+        custom_url = reverse('users:profile', args=[sender_user.id]) # Ссылка на профиль того, кто подписался
+
+        send_notification_to_user(
+            recipient=recipient,
+            sender=sender_user,
+            notification_type=notification_type,
+            content=content,
+            related_object=related_object,
+            custom_url=custom_url
+        )
+        print(f"DEBUG: Notification 'follow' sent to {recipient.username} from {sender_user.username}")
+
     else:
         status_response = 'info'
         message_response = ''

@@ -1,0 +1,39 @@
+{# notifications/templates/notifications/_single_notification.html #}
+{% load static %}
+{% load humanize %}
+
+<li class="notification-item {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+    <a href="{{ notification.get_absolute_url|default:'#' }}" class="notification-link">
+        <div class="notification-icon">
+            {# Иконки для разных типов уведомлений #}
+            {% if notification.notification_type == 'message' %}
+                <i class="fas fa-envelope"></i>
+            {% elif notification.notification_type == 'group_message' %}
+                <i class="fas fa-comments"></i>
+            {% elif notification.notification_type == 'friend_request' %}
+                <i class="fas fa-user-plus"></i>
+            {% elif notification.notification_type == 'approved_friend_request' %}
+                <i class="fas fa-user-check"></i>
+            {% elif notification.notification_type == 'comment' %}
+                <i class="fas fa-comment"></i>
+            {% elif notification.notification_type == 'like' %}
+                <i class="fas fa-heart"></i>
+            {% elif notification.notification_type == 'repost' %}
+                <i class="fas fa-retweet"></i>
+            {% elif notification.notification_type == 'follow' %}
+                <i class="fas fa-user-friends"></i>
+            {% else %}
+                <i class="fas fa-bell"></i>
+            {% endif %}
+        </div>
+        <div class="notification-content">
+            <p class="notification-text">
+                {% if notification.sender %}
+                    <span class="notification-sender">{{ notification.sender.username }}</span>:
+                {% endif %}
+                {{ notification.content }}
+            </p>
+            <span class="notification-timestamp">{{ notification.timestamp|naturaltime }}</span>
+        </div>
+    </a>
+</li>

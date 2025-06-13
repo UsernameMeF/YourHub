@@ -1,0 +1,29 @@
+{# templates/settings/settings_base.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Настройки{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/settings/_settings_base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/settings/_settings_base_dark.css' %}" media="(prefers-color-scheme: dark)">
+    {% block settings_extra_head %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="main-container settings-main-container">
+    <h1>Настройки</h1>
+
+    <div class="settings-nav">
+        <a href="#" class="settings-nav-item {% if active_tab == 'chats' %}active{% endif %}">Чаты</a>
+        <a href="#" class="settings-nav-item {% if active_tab == 'posts' %}active{% endif %}">Публикации</a>
+        <a href="#" class="settings-nav-item {% if active_tab == 'communities' %}active{% endif %}">Сообщества</a>
+        <a href="{% url 'notifications:settings' %}" class="settings-nav-item {% if active_tab == 'notifications' %}active{% endif %}">Уведомления</a>
+    </div>
+
+    <div class="settings-content">
+        {% block settings_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

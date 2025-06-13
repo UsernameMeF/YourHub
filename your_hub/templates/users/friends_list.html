@@ -58,12 +58,12 @@
                         </a>
                         <div class="request-actions"> {# Контейнер для кнопок действий с запросом #}
                             {# Форма для принятия запроса - с классом для AJAX #}
-                            <form method="post" action="{% url 'accept_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
+                            <form method="post" action="{% url 'users:accept_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-success">Принять</button>
                             </form>
                             {# Форма для отклонения запроса - с классом для AJAX #}
-                            <form method="post" action="{% url 'decline_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
+                            <form method="post" action="{% url 'users:decline_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Отклонить</button>
                             </form>

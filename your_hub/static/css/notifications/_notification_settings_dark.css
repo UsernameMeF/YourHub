@@ -1,0 +1,94 @@
+/* static/css/notifications/notification_settings_dark.css */
+
+html.dark-theme .notification-settings-form-wrapper h2 {
+    color: #f0f0f0;
+}
+html.dark-theme .notification-settings-form-wrapper h3 {
+    color: #ccc;
+    border-bottom-color: #4a4a4a;
+}
+
+html.dark-theme .form-group label {
+    color: #ddd;
+}
+
+html.dark-theme .form-select {
+    background-color: #383838;
+    border-color: #555;
+    color: #e0e0e0;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23e0e0e0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
+
+html.dark-theme .form-select:focus {
+    border-color: #00e600;
+    box-shadow: 0 0 0 0.2rem rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .form-range-slider {
+    background: #555;
+}
+
+html.dark-theme .form-range-slider::-webkit-slider-thumb {
+    background: #00e600;
+    border: 2px solid #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .form-range-slider::-moz-range-thumb {
+    background: #00e600;
+    border: 2px solid #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+html.dark-theme #volume-value {
+    color: #00e600;
+}
+
+html.dark-theme .play-sound-btn {
+    background-color: #555;
+    color: white;
+}
+
+html.dark-theme .play-sound-btn:hover {
+    background-color: #666;
+}
+
+html.dark-theme .form-check-group label {
+    color: #ddd;
+}
+
+html.dark-theme .form-check-input {
+    border-color: #555;
+    background-color: #383838;
+}
+
+html.dark-theme .form-check-input:checked {
+    background-color: #00e600;
+    border-color: #00e600;
+}
+
+html.dark-theme .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .submit-btn {
+    background-color: #00e600;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .submit-btn:hover {
+    background-color: #00ff00;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .submit-btn:active {
+    background-color: #00b300;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .error-messages {
+    color: #ffb3b3;
+    border-color: #b30000;
+    background-color: #660000;
+}
