@@ -106,3 +106,77 @@ html.dark-theme .page-title {
     color: #00ff00; /* Темная тема: ярко-зеленый цвет, как в ваших примерах */
     text-shadow: 1px 1px 3px rgba(0,255,0,0.3); /* Более выраженная тень */
 }
+
+
+/* --- Dark theme for tag-search-bar Styles (Modernized) --- */
+html.dark-theme .tag-search-bar-container {
+    background-color: #252526; /* Темный фон */
+    border: 1px solid #3a3a3a;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Более заметная тень в темной теме */
+}
+
+html.dark-theme .tag-search-bar-input {
+    background-color: #383838;
+    border: 1px solid #555555;
+    color: #e0e0e0;
+}
+
+html.dark-theme .tag-search-bar-input::placeholder {
+    color: #999999;
+}
+
+html.dark-theme .tag-search-bar-input:focus {
+    border-color: #00e600; /* Зеленый акцент для тёмной темы */
+    box-shadow: 0 0 0 3px rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .tag-search-bar-button {
+    background-color: #00e600; /* Зеленая кнопка */
+    color: #fff;
+}
+
+html.dark-theme .tag-search-bar-button:hover {
+    background-color: #00ff00;
+}
+
+html.dark-theme .tag-search-bar-button:active {
+    background-color: #00b300;
+}
+
+html.dark-theme .tag-search-bar-clear-button {
+    background-color: #555555; /* Темно-серый для кнопки очистки */
+    color: #ffffff;
+}
+
+html.dark-theme .tag-search-bar-clear-button:hover {
+    background-color: #666666;
+}
+
+html.dark-theme .tag-search-bar-clear-button:active {
+    background-color: #444444;
+}
+
+/* Переменные для темной темы (если не определены глобально) */
+html.dark-theme {
+    --primary-color: #00e600;
+    --primary-hover-color: #00ff00;
+    --primary-active-color: #00b300;
+    --button-text-color: #ffffff;
+
+    --secondary-button-bg: #555555;
+    --secondary-button-text: #ffffff;
+    --secondary-button-hover-bg: #666666;
+    --secondary-button-active-bg: #444444;
+
+    --card-bg-color: #252526;
+    --border-color: #3a3a3a;
+    --input-bg-color: #383838;
+    --input-border-color: #555555;
+    --text-color: #e0e0e0;
+    --text-muted-color: #999999;
+
+    --shadow-small: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-button-hover: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+

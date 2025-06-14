@@ -17,7 +17,6 @@
         <h1 class="post-title">{{ post.title }}</h1>
         <p class="post-content">{{ post.content|linebreaksbr }}</p>
 
-        {# --- ИЗМЕНЕНИЯ ЗДЕСЬ: Интеграция галереи вложений --- #}
         {% if post.attachments.all %} {# Используем post.attachments.all для единообразия #}
             <div class="post-attachments-gallery" id="post-gallery-{{ post.id }}">
                 <div class="gallery-images-container">
@@ -43,6 +42,20 @@
                     </div>
                 {% endif %}
             </div>
+        {% endif %}
+
+        {# НОВОЕ: Отображение тегов #}
+        {% if post.tags.all %}
+        <div class="post-tags">
+            <i class="fas fa-tags"></i>
+            {% for tag in post.tags.all %}
+                {% if tag.name|first == '@' %} {# Если тег начинается с @, это тег автора, не делаем его кликабельным #}
+                    <span class="post-tag author-tag">#{{ tag.name }}</span>
+                {% else %} {# Обычные теги делаем кликабельными #}
+                    <a href="{% url 'core:index' %}?tag={{ tag.slug }}" class="post-tag">#{{ tag.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
         {% endif %}
 
         <div class="post-actions">
@@ -72,6 +85,7 @@
                 </button>
             {% endif %}
             {% if user.is_authenticated and user == post.author %}
+                <a href="{% url 'core:edit_post_page' post.pk %}" class="action-button edit-post-button">Редактировать</a>
                 <button class="action-button delete-post-button" onclick="openDeletePostModal('{{ post.id }}')">
                     <i class="fas fa-trash"></i> Удалить
                 </button>

@@ -15,7 +15,10 @@
             <div class="post-actions-dropdown">
                 <button class="post-actions-button">...</button>
                 <div class="dropdown-menu">
-                    <a href="#" onclick="event.preventDefault(); openEditPostModal({{ post.id }}, '{{ post.title|escapejs }}', '{{ post.content|escapejs }}');">Редактировать</a>
+                    {# Кнопка "Редактировать" теперь ведет на отдельную страницу #}
+                    <a href="{% url 'core:edit_post_page' post.pk %}">Редактировать</a>
+                    
+                    {# Кнопка "Удалить" остается с модальным окном #}
                     <a href="#" onclick="event.preventDefault(); openDeletePostModal({{ post.id }});">Удалить</a>
                 </div>
             </div>

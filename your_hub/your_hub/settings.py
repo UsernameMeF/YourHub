@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'chat',
     'community',
     'notifications',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

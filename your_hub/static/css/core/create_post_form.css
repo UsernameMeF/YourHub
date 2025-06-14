@@ -1,0 +1,219 @@
+/* Общие стили для контейнера формы */
+.post-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+.post-form-container h1,
+.post-form-container h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 2em;
+    font-weight: 700;
+}
+
+/* Стили для обертки полей формы */
+.form-field-wrapper {
+    margin-bottom: 20px;
+}
+
+.form-field-wrapper label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* Стили для полей ввода (input, textarea) */
+.form-input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box; /* Учитываем padding в общей ширине */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input-field:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Стили для сообщений об ошибках */
+.errorlist, .error-message {
+    color: #dc3545;
+    font-size: 0.85em;
+    margin-top: 5px;
+    padding-left: 5px; /* Небольшой отступ */
+    list-style-type: none; /* Убрать маркеры для ul.errorlist */
+}
+
+/* Стили для текста помощи */
+.help-text {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-top: 5px;
+    padding-left: 5px;
+}
+
+/* --- Стили для секции загрузки изображений --- */
+.image-upload-section {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.image-upload-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #495057;
+    font-size: 1.5em;
+}
+
+.image-previews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 120px для более крупных превью */
+    gap: 15px; /* Увеличим расстояние */
+    margin-bottom: 20px; /* Отступ от кнопки добавления */
+    padding: 10px 0;
+}
+
+.image-preview-item {
+    position: relative;
+    width: 120px; /* Фиксированный размер для предпросмотра */
+    height: 120px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #eee;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.image-preview-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Чтобы изображение полностью заполняло контейнер, обрезая лишнее */
+    display: block;
+}
+
+.remove-image-button {
+    position: absolute;
+    top: -5px; /* Немного выйти за пределы для удобства */
+    right: -5px; /* Немного выйти за пределы для удобства */
+    background-color: #dc3545;
+    color: white;
+    border: 2px solid #fff; /* Белая обводка */
+    border-radius: 50%;
+    width: 28px; /* Чуть больше размер */
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em; /* Больше крестик */
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.remove-image-button:hover {
+    background-color: #c82333;
+    transform: scale(1.1);
+}
+
+/* Стили для кнопки "Добавить изображение" */
+.add-image-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745; /* Зеленый цвет для добавления */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    min-width: 180px; /* Добавим минимальную ширину */
+    text-align: center;
+}
+
+.add-image-button:hover {
+    background-color: #218838;
+}
+
+.add-image-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Стили для скрытого инпута type="file", который используется JS */
+.hidden-input-file {
+    display: none;
+}
+
+/* --- Стили для кнопок действия формы --- */
+.form-actions {
+    margin-top: 30px;
+    text-align: right; /* Выравнивание кнопок по правому краю */
+    display: flex;
+    justify-content: flex-end; /* Растянуть для использования gap */
+    gap: 15px; /* Промежуток между кнопками */
+}
+
+.form-button {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.form-button.primary {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.form-button.primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.form-button.cancel {
+    background-color: #6c757d; /* Серый цвет для отмены */
+    color: white;
+    border-color: #6c757d;
+}
+
+.form-button.cancel:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+/* Стиль для ошибок загрузки изображений (будет выводиться JS) */
+.image-upload-section .error-message {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 10px;
+    text-align: center;
+}

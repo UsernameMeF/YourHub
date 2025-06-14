@@ -14,11 +14,68 @@ from django.urls import reverse
 from notifications.utils import send_notification_to_user
 
 from .forms import PostForm, PostDeleteForm, CommentForm
-from .models import Post, PostAttachment, Comment 
+from .models import Post, PostAttachment, Comment, Tag
 from users.models import Friendship, Follow
-from community.models import Community, CommunityPost
+from community.models import Community, CommunityPost 
+
 
 User = get_user_model()
+
+# ==============================================================
+# Вспомогательные функции для работы с тегами
+# ==============================================================
+def process_and_assign_tags(post, tags_input_string):
+    """
+    Обрабатывает строку тегов (без #, так как форма уже их удалила),
+    создает новые Tag объекты при необходимости и привязывает их к посту.
+    Также добавляет автоматический тег @{username}.
+    """
+    # Очищаем все существующие теги поста, чтобы начать с чистого листа
+    # Это позволяет корректно обновлять теги при редактировании
+    post.tags.clear() 
+
+    # 1. Добавляем автоматический тег #@{имя_пользователя}
+    # Имя тега для модели Tag: @имя_пользователя (без #)
+    author_tag_name_clean = f"@{post.author.username}".lower()
+    
+    # Используем get_or_create для создания или получения тега
+    # Валидация Tag.name будет применена здесь
+    try:
+        author_tag, created = Tag.objects.get_or_create(name=author_tag_name_clean) 
+        post.tags.add(author_tag)
+    except Exception as e:
+        # Если имя пользователя содержит недопустимые символы для тега,
+        # это будет отловлено здесь. В нормальной ситуации username должен быть валиден.
+        print(f"Ошибка при создании/добавлении тега автора '{author_tag_name_clean}': {e}")
+
+
+    # 2. Обрабатываем пользовательские теги
+    if tags_input_string:
+        # Разбиваем строку на отдельные теги (они уже без # из forms.py)
+        # Используем set для уникальности и strip для удаления лишних пробелов по краям.
+        user_tags_clean = set(tag.strip().lower() for tag in tags_input_string.split() if tag.strip())
+        
+        # Счетчик для пользовательских тегов, чтобы контролировать лимит
+        current_user_tags_count = 0 
+        
+        for clean_tag_name in user_tags_clean:
+            # Игнорируем тег автора, если пользователь его случайно ввел
+            if clean_tag_name == author_tag_name_clean:
+                continue
+            
+            # Проверяем общий лимит тегов (10, включая авторский)
+            if post.tags.count() >= 11: # Если уже есть 10 тегов + авторский, то не добавляем больше
+                break
+
+            try:
+                # Создаем или получаем объект Tag. Валидатор Tag.name будет работать здесь.
+                tag_obj, created = Tag.objects.get_or_create(name=clean_tag_name)
+                post.tags.add(tag_obj)
+                current_user_tags_count += 1
+            except Exception as e:
+                # Отлов ошибок валидации для конкретных пользовательских тегов
+                print(f"Не удалось добавить тег '{clean_tag_name}': {e}")
+
 
 # Главная страница (лента постов)
 def index(request):
@@ -26,31 +83,60 @@ def index(request):
 
     context = {
         'post_form': post_form,
-        # Если у вас есть другие переменные контекста для главной страницы, добавьте их здесь
+        # Добавляем сюда сортировку, тип отображения и текущий тег для инициализации на фронте
+        'current_sort': request.GET.get('sort', 'new'),
+        'current_view_type': request.GET.get('view', 'cards'),
+        'current_tag_slug': request.GET.get('tag', ''), # Передаем slug, если он есть
+        'current_tag_name': '', # Будет установлено, если tag_slug найден
     }
-    return render(request, 'core/index.html', context) # Передаем контекст
+
+    # Если есть фильтр по тегу, попробуем найти его имя для отображения
+    tag_slug = request.GET.get('tag')
+    if tag_slug:
+        try:
+            tag_obj = Tag.objects.get(slug=tag_slug)
+            context['current_tag_name'] = tag_obj.name
+        except Tag.DoesNotExist:
+            context['current_tag_name'] = '' # Тег не найден
+
+    return render(request, 'core/index.html', context)
 
 
-# НОВАЯ ФУНКЦИЯ ДЛЯ AJAX-ЗАПРОСОВ ПОСТОВ (ДОПОЛНЕНА ДЛЯ ВКЛЮЧЕНИЯ ПОСТОВ СООБЩЕСТВ)
+# НОВАЯ ФУНКЦИЯ ДЛЯ AJAX-ЗАПРОСОВ ПОСТОВ (ДОПОЛНЕНА ДЛЯ ВКЛЮЧЕНИЯ ПОСТОВ СООБЩЕСТВ И ТЕГОВ)
 def get_posts_ajax(request):
     sort_by = request.GET.get('sort', 'new') 
     page_number = int(request.GET.get('page', 1)) 
     posts_per_page = 10
+    
+    # =============================================================
+    # НОВАЯ ЛОГИКА: ФИЛЬТРАЦИЯ ПО ТЕГАМ (только для обычных постов)
+    # =============================================================
+    tag_filter_slug = request.GET.get('tag') # Получаем slug тега из GET-параметра URL
+    
+    core_posts_queryset = Post.objects.all()
+    community_posts_queryset = CommunityPost.objects.all() 
 
-    # Получаем все обычные посты (Post из core)
-    # Используем select_related и prefetch_related для оптимизации запросов к БД
-    core_posts_queryset = Post.objects.select_related('author__profile').prefetch_related(
-        'attachments', # Если attachments это ManyToManyField к модели изображения
-        'likes', 'dislikes', 'reposts', 'comments'
+    # Применяем фильтр по тегу, если он есть
+    if tag_filter_slug:
+        # Фильтруем ТОЛЬКО обычные посты по slug тега
+        core_posts_queryset = core_posts_queryset.filter(tags__slug=tag_filter_slug).distinct()
+        # CommunityPost не фильтруем по тегам
+        community_posts_queryset = community_posts_queryset.none() # Можно и так, если вы хотите полностью исключить community посты при поиске по тегу
+
+
+    # Добавляем prefetch_related и select_related после фильтрации
+    core_posts_queryset = core_posts_queryset.select_related('author__profile').prefetch_related(
+        'attachments', 
+        'likes', 'dislikes', 'reposts', 'comments', 'tags' # Добавляем 'tags'
     )
 
-    # Получаем все посты сообществ (CommunityPost)
-    # Используем select_related для posted_by и community
-    community_posts_queryset = CommunityPost.objects.select_related(
+    # Для community_posts_queryset удаляем prefetch_related('tags')
+    community_posts_queryset = community_posts_queryset.select_related(
         'posted_by__profile', 'community'
     ).prefetch_related(
-        'likes', 'dislikes', 'reposts', 'comments'
+        'likes', 'dislikes', 'reposts', 'comments' 
     )
+    # =============================================================
 
     # Собираем все посты в один список
     all_posts = []
@@ -61,9 +147,21 @@ def get_posts_ajax(request):
         if hasattr(post.author, 'profile') and post.author.profile.avatar and post.author.profile.avatar.name:
             author_avatar_url = request.build_absolute_uri(post.author.profile.avatar.url)
         
-        # Собираем вложения (если Post имеет ManyToManyField 'attachments' к другой модели с полем 'image')
-        # Если Post имеет одно поле image, то просто post.image.url
         attachments_data = [{'url': request.build_absolute_uri(att.image.url)} for att in post.attachments.all() if att.image]
+        
+        # Собираем теги для поста, добавляя '#' к имени тега для отображения
+        tags_data = []
+        for tag in post.tags.all():
+            is_author_tag = tag.name.startswith('@') 
+            
+            tag_url = None
+            if not is_author_tag: # Если это не авторский тег, делаем его кликабельным
+                tag_url = reverse('core:index') + f'?tag={tag.slug}' 
+            
+            tags_data.append({
+                'name': '#' + tag.name, # Добавляем # для отображения на фронте
+                'url': tag_url 
+            })
 
         all_posts.append({
             'id': post.pk,
@@ -73,15 +171,15 @@ def get_posts_ajax(request):
             'author_avatar_url': author_avatar_url,
             'title': post.title,
             'content': post.content,
-            'created_at': post.created_at, # Дата/время как объекты, чтобы сортировать
+            'created_at': post.created_at, 
             'updated_at': post.updated_at,
-            'total_likes': post.total_likes, # Предполагается @property в модели Post
-            'total_dislikes': post.total_dislikes, # Предполагается @property
-            'total_reposts': post.total_reposts, # Предполагается @property
-            'total_comments': post.total_comments, # Предполагается @property
+            'total_likes': post.total_likes, 
+            'total_dislikes': post.total_dislikes, 
+            'total_reposts': post.total_reposts, 
+            'total_comments': post.total_comments, 
             'attachments': attachments_data,
-            'detail_url': reverse('core:post_detail', args=[post.pk]), # URL для детальной страницы обычного поста
-            # Поля community будут отсутствовать или null для обычных постов
+            'tags': tags_data, # ДОБАВЛЕНО: Теги для обычных постов
+            'detail_url': reverse('core:post_detail', args=[post.pk]),
             'community_id': None,
             'community_name': None,
             'community_url': None,
@@ -97,21 +195,22 @@ def get_posts_ajax(request):
         if hasattr(post.community, 'avatar') and post.community.avatar and post.community.avatar.name:
             community_avatar_url = request.build_absolute_uri(post.community.avatar.url)
 
-
         all_posts.append({
             'id': post.pk,
             'is_community_post': True, 
             'author_username': post.posted_by.username if post.posted_by else '[Удаленный пользователь]',
             'author_id': post.posted_by.id if post.posted_by else None,
             'author_avatar_url': author_avatar_url,
-            'title': post.title, # <-- ИЗМЕНЕНО: теперь используем post.title напрямую
+            'title': post.title, 
             'content': post.content,
             'created_at': post.created_at, 
-            'updated_at': post.updated_at if hasattr(post, 'updated_at') and post.updated_at else post.created_at, # Учитываем updated_at, если добавил
+            'updated_at': post.updated_at if hasattr(post, 'updated_at') and post.updated_at else post.created_at, 
             'total_likes': post.total_likes, 
             'total_dislikes': post.total_dislikes, 
             'total_reposts': post.total_reposts, 
             'total_comments': post.total_comments, 
+            'attachments': [], # Community posts не имеют PostAttachment, если у них нет своей модели для этого
+            'tags': [], # УДАЛЕНО: Теги для постов сообществ не нужны
             'detail_url': reverse('community:community_post_detail', args=[post.community.pk, post.pk]),
             'community_id': post.community.pk,
             'community_name': post.community.name,
@@ -121,7 +220,6 @@ def get_posts_ajax(request):
 
     # Сортировка объединенного списка
     if sort_by == 'popular':
-        # Сортируем по общей сумме лайков, дизлайков, репостов и комментариев
         all_posts.sort(key=lambda p: (p['total_likes'] + p['total_dislikes'] + p['total_reposts'] + p['total_comments']), reverse=True)
     else: # 'new'
         all_posts.sort(key=lambda p: p['created_at'], reverse=True)
@@ -138,19 +236,14 @@ def get_posts_ajax(request):
     current_user_id = request.user.id if request.user.is_authenticated else None
 
     for post_data in posts_on_page:
-        # Теперь добавляем поля is_liked, is_disliked, is_reposted, can_edit_delete
-        # (они не были в исходных словарях, т.к. values() их не тянет)
-        # Это потребует дополнительного запроса к БД для каждой кнопки, 
-        # или предзагрузки всех состояний пользователя.
-        # Для эффективности, лучше предзагрузить лайки/дизлайки/репосты пользователя.
-        
-        # Оптимизация: Кэшируем ID лайков/дизлайков/репостов текущего пользователя
-        # (Добавляется в request.user, чтобы не повторять запрос для каждого поста)
         if current_user_id:
             if not hasattr(request.user, '_liked_posts_ids_cache'):
+                # Оптимизация: кэшируем ID постов, которые лайкнул/дизлайкнул/репостнул пользователь
+                # для обычных постов
                 request.user._liked_posts_ids_cache = set(request.user.liked_posts.values_list('id', flat=True))
                 request.user._disliked_posts_ids_cache = set(request.user.disliked_posts.values_list('id', flat=True))
                 request.user._reposted_posts_ids_cache = set(request.user.reposted_posts.values_list('id', flat=True))
+                # Кэшируем для community_posts
                 request.user._liked_community_posts_ids_cache = set(request.user.liked_community_posts.values_list('id', flat=True))
                 request.user._disliked_community_posts_ids_cache = set(request.user.disliked_community_posts.values_list('id', flat=True))
                 request.user._reposted_community_posts_ids_cache = set(request.user.reposted_community_posts.values_list('id', flat=True))
@@ -160,27 +253,24 @@ def get_posts_ajax(request):
                 post_data['is_disliked'] = post_data['id'] in request.user._disliked_community_posts_ids_cache
                 post_data['is_reposted'] = post_data['id'] in request.user._reposted_community_posts_ids_cache
                 
-                # Проверка админства сообщества для удаления
                 is_community_admin = False
                 if request.user.is_authenticated and post_data['community_id']:
-                     is_community_admin = Community.objects.filter(
-                         pk=post_data['community_id'], 
-                         communitymembership__user=request.user, 
-                         communitymembership__is_admin=True
-                     ).exists()
+                    is_community_admin = Community.objects.filter(
+                        pk=post_data['community_id'], 
+                        communitymembership__user=request.user, 
+                        communitymembership__is_admin=True
+                    ).exists()
                 
-                # can_edit_delete для CommunityPost: либо автор поста, либо админ сообщества
                 post_data['can_edit_delete'] = (request.user.is_authenticated and 
-                                                (current_user_id == post_data['author_id'] or is_community_admin))
+                                                 (current_user_id == post_data['author_id'] or is_community_admin))
 
             else: # Обычный пост
                 post_data['is_liked'] = post_data['id'] in request.user._liked_posts_ids_cache
                 post_data['is_disliked'] = post_data['id'] in request.user._disliked_posts_ids_cache
                 post_data['is_reposted'] = post_data['id'] in request.user._reposted_posts_ids_cache
                 
-                # can_edit_delete для обычного поста: только автор поста
                 post_data['can_edit_delete'] = (request.user.is_authenticated and 
-                                                current_user_id == post_data['author_id'])
+                                                 current_user_id == post_data['author_id'])
         else: # Неавторизованный пользователь
             post_data['is_liked'] = False
             post_data['is_disliked'] = False
@@ -189,16 +279,56 @@ def get_posts_ajax(request):
 
         # Форматируем даты для JSON
         post_data['created_at'] = post_data['created_at'].strftime("%d %b %Y, %H:%M")
-        if post_data['updated_at']:
-             post_data['updated_at'] = post_data['updated_at'].strftime("%d %b %Y, %H:%M")
+        # Проверяем updated_at перед форматированием, т.к. оно может быть None для CommunityPost
+        if 'updated_at' in post_data and post_data['updated_at']:
+                post_data['updated_at'] = post_data['updated_at'].strftime("%d %b %Y, %H:%M")
         else:
-             post_data['updated_at'] = None # Если updated_at не отличается от created_at, делаем его None
+            # Для постов сообществ, если нет updated_at, используем created_at (уже установлено выше)
+            post_data['updated_at'] = None 
 
         serialized_posts_data.append(post_data)
 
     return JsonResponse({
         'posts': serialized_posts_data,
         'has_next_page': has_next_page
+    })
+
+# Новая view для страницы создания поста
+@login_required
+def create_post_page(request):
+    form = PostForm()
+    return render(request, 'core/create_post.html', {'form': form})
+
+
+# Новая view для страницы редактирования поста
+@login_required
+def edit_post_page(request, pk):
+    post = get_object_or_404(Post, pk=pk, author=request.user)
+    
+    # Подготавливаем начальные теги для формы редактирования
+    # Извлекаем только пользовательские теги, исключая авторский (@username)
+    # Они должны быть в формате "#название" для отображения в поле ввода формы.
+    initial_tags_for_form = []
+    for tag in post.tags.all():
+        if not tag.name.startswith('@'): # Пропускаем авторский тег
+            initial_tags_for_form.append(f'#{tag.name}') # Добавляем # для отображения в поле
+    initial_tags_string = " ".join(initial_tags_for_form)
+
+    # Получаем текущие изображения поста
+    post_images = []
+    for attachment in post.attachments.all().order_by('id'):
+        if attachment.image:
+            post_images.append({
+                'id': attachment.id,
+                'url': attachment.image.url 
+            })
+    
+    form = PostForm(instance=post, initial={'tags_input': initial_tags_string})
+    
+    return render(request, 'core/edit_post.html', {
+        'form': form, 
+        'post': post, 
+        'post_images_json': json.dumps(post_images, cls=DjangoJSONEncoder) # Передаем изображения как JSON
     })
 
 
@@ -215,7 +345,7 @@ def get_post_reposts_list(request, post_id):
     accepted_friendships = Friendship.objects.filter(
         Q(from_user=current_user) | Q(to_user=current_user),
         status='accepted'
-    ).select_related('from_user', 'to_user') # Оптимизация: избегаем лишних запросов к БД
+    ).select_related('from_user', 'to_user') 
 
     for fs in accepted_friendships:
         if fs.from_user == current_user:
@@ -227,7 +357,6 @@ def get_post_reposts_list(request, post_id):
     following_ids = set(current_user.following.values_list('following__id', flat=True))
 
     for user in all_repost_users:
-        # Убедимся, что user.profile существует, чтобы избежать AttributeError
         avatar_url = user.profile.avatar.url if hasattr(user, 'profile') and user.profile.avatar else '/media/images/default-avatar.png'
         
         if user == current_user:
@@ -235,7 +364,7 @@ def get_post_reposts_list(request, post_id):
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Вы (репостнули)', # Оставляем для полноты данных, хоть и не используем в HTML
+                'relationship': 'Вы (репостнули)', 
             })
         elif user in friends:
             repost_users_data.append({
@@ -244,22 +373,18 @@ def get_post_reposts_list(request, post_id):
                 'avatar_url': avatar_url,
                 'relationship': 'Друг',
             })
-        elif user.id in following_ids: # Сравниваем по ID, так как following_ids это set из ID
+        elif user.id in following_ids: 
             repost_users_data.append({
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
                 'relationship': 'Подписка',
             })
-        # Остальные пользователи не включаются в список, как было оговорено
 
-    # Добавляем количество отфильтрованных репостов в ответ
     return JsonResponse({
         'reposts': repost_users_data,
         'filtered_count': len(repost_users_data)
     })
-
-
 
 
 @login_required 
@@ -267,50 +392,97 @@ def get_post_reposts_list(request, post_id):
 def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST) 
-        
         images_files = request.FILES.getlist('images') 
 
         if form.is_valid():
-            with transaction.atomic(): # Используем транзакцию для сохранения поста и вложений
+            with transaction.atomic(): 
                 post = form.save(commit=False)
                 post.author = request.user
                 post.save() 
+                
+                tags_input_string = form.cleaned_data.get('tags_input') # Получаем очищенные теги из формы
+                process_and_assign_tags(post, tags_input_string)
 
                 for img_file in images_files:
                     PostAttachment.objects.create(post=post, image=img_file)
             
-            return JsonResponse({'success': True, 'message': 'Пост успешно создан!', 'post_id': post.id})
+            # Вместо JsonResponse для модалки, теперь редирект
+            # return JsonResponse({'success': True, 'message': 'Пост успешно создан!', 'post_id': post.id, 'redirect_url': reverse('core:post_detail', args=[post.id])})
+            return redirect(reverse('core:post_detail', args=[post.id]))
         else:
-            errors = json.dumps(form.errors.as_data())
-            return JsonResponse({'success': False, 'message': 'Ошибка при создании поста.', 'errors': errors}, status=400)
-    return JsonResponse({'success': False, 'message': 'Недопустимый метод запроса.'}, status=405)
+            # Для ошибок, если форма невалидна, возвращаем форму с ошибками
+            # В данном случае, так как это страница, мы перерендериваем её с ошибками
+            # return JsonResponse({'success': False, 'message': 'Ошибка при создании поста.', 'errors': errors}, status=400)
+            return render(request, 'core/create_post.html', {'form': form})
+    # return JsonResponse({'success': False, 'message': 'Недопустимый метод запроса.'}, status=405)
+    return redirect('core:index') # Или другая страница при GET запросе на post_create
 
 
 @login_required
-@require_POST
+@require_http_methods(["POST", "GET"]) # Разрешаем GET для отображения страницы
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk, author=request.user)
+    
     if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
+        # Подготавливаем начальные теги для формы редактирования (для случая, если форма невалидна)
+        initial_tags_for_form = []
+        for tag in post.tags.all():
+            if not tag.name.startswith('@'):
+                initial_tags_for_form.append(f'#{tag.name}')
+        initial_tags_string = " ".join(initial_tags_for_form)
+
+        form = PostForm(request.POST, instance=post, initial={'tags_input': initial_tags_string})
+        
         images_files = request.FILES.getlist('images') 
         
         if form.is_valid():
-            with transaction.atomic(): # Используем транзакцию для сохранения поста и вложений
+            with transaction.atomic(): 
                 form.save()
 
-                # Добавление новых изображений
-                for img_file in images_files:
-                    PostAttachment.objects.create(post=post, image=img_file)
+                tags_input_string = form.cleaned_data.get('tags_input') 
+                process_and_assign_tags(post, tags_input_string)
 
-                # TODO: Если нужно удалять существующие изображения, нужна отдельная логика.
-                # Например, можно передавать список ID изображений, которые нужно сохранить,
-                # и удалять те, которых нет в списке.
+                existing_image_ids_json = request.POST.get('existing_image_ids')
+                if existing_image_ids_json:
+                    try:
+                        existing_image_ids = json.loads(existing_image_ids_json)
+                        post.attachments.exclude(id__in=existing_image_ids).delete()
+                    except json.JSONDecodeError:
+                        print("Ошибка декодирования JSON для existing_image_ids при редактировании поста.")
+                        # Оставляем старые изображения, если JSON некорректен
+                else:
+                    # Если existing_image_ids не передан, удаляем все старые изображения.
+                    # Это значит, что фронтенд должен всегда отправлять этот параметр,
+                    # даже если он пустой массив, чтобы указать, что все удалено.
+                    post.attachments.all().delete() 
+
+                for img_file in images_files:
+                    if img_file:
+                        PostAttachment.objects.create(post=post, image=img_file)
             
-            return JsonResponse({'success': True, 'message': 'Пост успешно обновлен!'})
+            # Редирект после успешного обновления
+            return redirect(reverse('core:post_detail', args=[post.id]))
         else:
-            errors = json.dumps(form.errors.as_data())
-            return JsonResponse({'success': False, 'message': 'Ошибка при обновлении поста.', 'errors': errors}, status=400)
-    return JsonResponse({'success': False, 'message': 'Недопустимый метод запроса.'}, status=405)
+            # Если форма невалидна, рендерим страницу редактирования с ошибками
+            post_images = [] # Заново получаем изображения для рендеринга формы
+            for attachment in post.attachments.all().order_by('id'):
+                if attachment.image:
+                    post_images.append({
+                        'id': attachment.id,
+                        'url': attachment.image.url 
+                    })
+            return render(request, 'core/edit_post.html', {
+                'form': form, 
+                'post': post, 
+                'post_images_json': json.dumps(post_images, cls=DjangoJSONEncoder)
+            })
+    else: # GET запрос на post_edit, должен отображать форму редактирования
+        # Эта ветка будет вызываться, если пользователь напрямую перейдет на /post/<pk>/edit/
+        # Мы уже сделали отдельную функцию edit_post_page для этого,
+        # так что эта ветка здесь не нужна, но если бы она была, то выглядела бы так:
+        # return edit_post_page(request, pk) # Вызываем функцию, которая рендерит форму
+        # Т.к. мы уже переносим логику отображения в edit_post_page, эту ветку можно удалить
+        raise Http404("Страница редактирования доступна через отдельный URL.")
 
 
 @login_required
@@ -319,27 +491,23 @@ def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk, author=request.user)
     if request.method == 'POST':
         post_id = post.id
-        with transaction.atomic(): # Используем транзакцию для удаления поста
+        with transaction.atomic(): 
             post.delete()
-        return JsonResponse({'success': True, 'message': 'Пост успешно удален.', 'deleted_post_id': post_id})
+        # После удаления редирект на главную страницу или другую подходящую страницу
+        return JsonResponse({'success': True, 'message': 'Пост успешно удален.', 'deleted_post_id': post_id, 'redirect_url': reverse('core:index')})
     return JsonResponse({'success': False, 'message': 'Недопустимый метод запроса.'}, status=405)
+
 
 
 # Представление для детального просмотра поста
 def post_detail(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+    post = get_object_or_404(Post.objects.select_related('author__profile').prefetch_related('tags', 'comments__author__profile', 'attachments'), pk=pk) 
     
-    # Увеличиваем счетчик просмотров
-    # Для более надежного подсчета просмотров, особенно если у вас много трафика,
-    # можно использовать кэширование, сессии или Celery для асинхронного обновления.
-    # А пока такой простой вариант, он работает.
     post.views_count += 1
     post.save(update_fields=['views_count']) 
 
-    # Форма для добавления комментария
     comment_form = CommentForm()
 
-    # Для отображения лайкнул ли пользователь на детальной странице
     is_liked_by_user = False
     is_disliked_by_user = False
     is_reposted_by_user = False
@@ -349,16 +517,28 @@ def post_detail(request, pk):
         is_reposted_by_user = post.reposts.filter(id=request.user.id).exists()
 
     post_images = []
-    # post.attachments.all() предполагает, что у Post есть related_name 'attachments'
-    # если это не так, вам нужно будет обратиться к PostAttachment.objects.filter(post=post)
     for attachment in post.attachments.all().order_by('id'):
         if attachment.image:
             post_images.append({
                 'id': attachment.id,
-                'url': request.build_absolute_uri(attachment.image.url) # Используем absolute_uri для полной URL
+                'url': request.build_absolute_uri(attachment.image.url) 
             })
 
-    # Сериализуем список словарей в JSON-строку
+    post_tags = []
+    for tag in post.tags.all(): 
+        # Проверяем, является ли тег авторским (начинается с '@')
+        is_author_tag = tag.name.startswith('@') 
+        
+        tag_url = None
+        if not is_author_tag: # Если это не авторский тег, делаем его кликабельным
+            tag_url = reverse('core:index') + f'?tag={tag.slug}' # Используем slug для URL
+        
+        post_tags.append({
+            'name': '#' + tag.name, # Добавляем # для отображения
+            'url': tag_url 
+        })
+    
+
     post_images_json = json.dumps(post_images, cls=DjangoJSONEncoder)
 
     return render(request, 'core/post_detail.html', {
@@ -368,10 +548,11 @@ def post_detail(request, pk):
         'is_disliked': is_disliked_by_user,
         'is_reposted': is_reposted_by_user,
         'post_images_json': post_images_json,
+        'post_tags': post_tags, 
     })
 
 
-# Представления для лайков/дизлайков/репостов и комментариев
+# Представления для лайков/дизлайков/reposts и комментариев (без изменений)
 @login_required
 @require_POST
 def post_like(request, pk):
@@ -383,15 +564,13 @@ def post_like(request, pk):
         post.likes.remove(user)
         action = 'unliked'
     else:
-        # НОВОЕ: Отправляем уведомление, только если пользователь лайкнул пост
-        # и это не его собственный пост
         if post.author != user:
             recipient = post.author
             sender_user = user
             notification_type = 'like'
-            content = f"{sender_user.username} оценил(а) ваш пост: \"{post.title}\"" # Или часть content
-            related_object = post # Связанный объект - сам пост
-            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+            content = f"{sender_user.username} оценил(а) ваш пост: \"{post.title}\"" 
+            related_object = post 
+            custom_url = reverse('core:post_detail', args=[post.id]) 
 
             send_notification_to_user(
                 recipient=recipient,
@@ -403,7 +582,6 @@ def post_like(request, pk):
             )
             print(f"DEBUG: Notification 'like' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
         post.likes.add(user)
-        # Если пользователь лайкнул, убираем дизлайк, если он был
         if user in post.dislikes.all():
             post.dislikes.remove(user)
     
@@ -426,7 +604,6 @@ def post_dislike(request, pk):
         action = 'undisliked'
     else:
         post.dislikes.add(user)
-        # Если пользователь дизлайкнул, убираем лайк, если он был
         if user in post.likes.all():
             post.likes.remove(user)
 
@@ -448,15 +625,13 @@ def post_repost(request, pk):
         post.reposts.remove(user)
         action = 'unreposted'
     else:
-        # НОВОЕ: Отправляем уведомление, только если пользователь репостнул пост
-        # и это не его собственный пост
         if post.author != user:
             recipient = post.author
             sender_user = user
             notification_type = 'repost'
-            content = f"{sender_user.username} репостнул(а) ваш пост: \"{post.title}\"" # Или часть content
-            related_object = post # Связанный объект - сам пост
-            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+            content = f"{sender_user.username} репостнул(а) ваш пост: \"{post.title}\"" 
+            related_object = post 
+            custom_url = reverse('core:post_detail', args=[post.id]) 
 
             send_notification_to_user(
                 recipient=recipient,
@@ -487,20 +662,17 @@ def add_comment(request, pk):
         comment.author = request.user
         comment.save()
 
-        # НОВОЕ: Отправка уведомления о новом комментарии
-        # Уведомляем автора поста, если комментарий не от него самого
         if post.author != request.user:
             recipient = post.author
             sender_user = request.user
             notification_type = 'comment'
-            # Обрезаем комментарий для уведомления, если он слишком длинный
             display_content = comment.text
             if len(display_content) > 50:
                 display_content = display_content[:47] + '...'
             
             content = f"{sender_user.username} прокомментировал(а) ваш пост: \"{display_content}\""
-            related_object = comment # Связанный объект - сам комментарий
-            custom_url = reverse('core:post_detail', args=[post.id]) # Ссылка на пост
+            related_object = comment 
+            custom_url = reverse('core:post_detail', args=[post.id]) 
 
             send_notification_to_user(
                 recipient=recipient,
@@ -512,7 +684,6 @@ def add_comment(request, pk):
             )
             print(f"DEBUG: Notification 'comment' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
 
-        # Возвращаем информацию о новом комментарии
         return JsonResponse({
             'success': True, 
             'message': 'Комментарий успешно добавлен!',
@@ -525,5 +696,5 @@ def add_comment(request, pk):
             }
         })
     else:
-        errors = json.dumps(form.errors.as_data())
+        errors = {field: form.errors[field] for field in form.errors} 
         return JsonResponse({'success': False, 'message': 'Ошибка при добавлении комментария.', 'errors': errors}, status=400)

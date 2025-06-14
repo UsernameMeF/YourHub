@@ -3,8 +3,25 @@
 
 {% block title %}Главная страница - YourHub{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/core/_index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core/_index_dark.css' %}">
+{% endblock %}
+
 {% block content %}
     <h1 class="page-title">Лента постов</h1>
+
+    <div class="tag-search-bar-container">
+        <form class="tag-search-bar-form" onsubmit="event.preventDefault(); document.getElementById('tag-search-button').click();">
+            <div class="tag-search-input-and-button-row">
+                <input type="text" id="tag-search-input" class="tag-search-bar-input" placeholder="Искать по тегам #tag">
+                <button type="button" id="tag-search-button" class="tag-search-bar-button">Поиск</button>
+            </div>
+            <div class="tag-search-bar-clear-button-row">
+                <button type="button" id="clear-tag-search-button" class="tag-search-bar-clear-button" style="display: none;">Очистить</button>
+            </div>
+        </form>
+    </div>
 
     <div class="feed-controls">
         <div class="sort-dropdown-container">
@@ -47,7 +64,7 @@
     const endOfFeedMessage = document.getElementById('end-of-feed-message');
     const noPostsMessage = document.getElementById('no-posts-message');
 
-    const getPostsAjaxUrl = "{% url 'core:get_posts_ajax' %}"; // Corrected URL
+    const getPostsAjaxUrl = "{% url 'core:get_posts_ajax' %}";
 
     // Элементы управления сортировкой
     const sortDropdownContainer = document.querySelector('.sort-dropdown-container');
@@ -59,17 +76,20 @@
     // Элементы управления видом
     const viewToggleButtons = document.querySelectorAll('.view-toggle-button');
 
+    // Новые элементы для поиска по тегам
+    const tagSearchInput = document.getElementById('tag-search-input');
+    const tagSearchButton = document.getElementById('tag-search-button');
+    const clearTagSearchButton = document.getElementById('clear-tag-search-button');
+
     let currentPage = 1;
     let isLoading = false;
     let hasNextPage = true;
     let loadedPostsData = {};
 
-    // ===========================================
     // Инициализация из localStorage
-    // ===========================================
     let currentSort = localStorage.getItem('yourhub_sort_preference') || 'new';
     let currentView = localStorage.getItem('yourhub_view_preference') || 'card';
-
+    let currentTag = localStorage.getItem('yourhub_tag_filter') || '';
 
     // ===========================================
     // Вспомогательные функции
@@ -87,7 +107,7 @@
         postElement.classList.add('post-card');
         postElement.id = `post-${postData.id}`;
 
-        const detailUrl = postData.detail_url; 
+        const detailUrl = postData.detail_url;
 
         let attachmentsHtml = '';
         if (viewMode === 'card') {
@@ -121,7 +141,6 @@
                     </a>
                     <i class="fas fa-angle-right community-arrow"></i>
                     <span class="post-date">${postData.created_at}</span>
-                    
                 </div>
             `;
         } else {
@@ -131,12 +150,11 @@
                     <div class="post-info">
                         <a href="/users/${postData.author_id}" class="post-author-username">${postData.author_username}</a>
                         <span class="post-date">${postData.created_at}</span>
-                        
                     </div>
                 </div>
             `;
         }
-
+        
         const postContent = viewMode === 'compact' ? shortenText(postData.content, 150) : postData.content;
 
         postElement.innerHTML = `
@@ -156,7 +174,6 @@
             <h2 class="post-title"><a href="${detailUrl}">${postData.title}</a></h2>
             
             <div class="post-content">${postContent}</div>
-
 
             <div class="post-actions">
                 <button class="action-button like-button ${postData.is_liked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'like', ${postData.is_community_post})">
@@ -188,12 +205,16 @@
         endOfFeedMessage.style.display = 'none';
 
         try {
-            const response = await fetch(`${getPostsAjaxUrl}?page=${currentPage}&sort=${currentSort}`); 
+            let url = `${getPostsAjaxUrl}?page=${currentPage}&sort=${currentSort}`;
+            if (currentTag) { // Добавляем параметр тега, если он установлен
+                url += `&tag=${encodeURIComponent(currentTag)}`; // encodeURIComponent нужен для корректной передачи русских символов в URL
+            }
+            const response = await fetch(url);
             const data = await response.json();
 
             if (!append) {
                 postsContainer.innerHTML = '';
-                loadedPostsData = {}; // Очищаем данные при новой загрузке (сортировка/вид)
+                loadedPostsData = {}; // Очищаем данные при новой загрузке (сортировка/вид/тег)
             }
 
             if (data.posts.length === 0 && currentPage === 1) {
@@ -230,7 +251,7 @@
     });
 
     // ===========================================
-    // Обработчики событий для элементов управления - ЭТО НОВАЯ/ВОССТАНОВЛЕННАЯ ЧАСТЬ
+    // Обработчики событий для элементов управления
     // ===========================================
 
     // Показ/скрытие выпадающего меню сортировки
@@ -246,13 +267,13 @@
             if (newSort !== currentSort) {
                 currentSort = newSort;
                 localStorage.setItem('yourhub_sort_preference', currentSort);
-                currentSortLabel.textContent = e.target.textContent; // Обновляем текст кнопки
-                sortOptions.forEach(opt => opt.classList.remove('active')); // Убираем active со всех
-                e.target.classList.add('active'); // Добавляем active к выбранной
-                sortDropdownMenu.classList.remove('show'); // Скрываем меню
-                
-                currentPage = 1; // Сбрасываем страницу при смене сортировки
-                loadPosts(false); // Загружаем посты заново
+                currentSortLabel.textContent = e.target.textContent;
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                e.target.classList.add('active');
+                sortDropdownMenu.classList.remove('show');
+
+                currentPage = 1;
+                loadPosts(false);
             }
         });
     });
@@ -272,24 +293,65 @@
                 currentView = newView;
                 localStorage.setItem('yourhub_view_preference', currentView);
 
-                // Обновляем активные классы кнопок
                 viewToggleButtons.forEach(btn => btn.classList.remove('active'));
                 e.currentTarget.classList.add('active');
 
-                // Обновляем класс на контейнере постов
                 postsContainer.classList.remove('card-view', 'compact-view');
                 postsContainer.classList.add(`${currentView}-view`);
 
-                renderLoadedPosts(); // Перерисовываем уже загруженные посты с новым видом
+                renderLoadedPosts();
             }
         });
+    });
+
+    // Обработчик кнопки поиска по тегам
+    tagSearchButton.addEventListener('click', () => {
+        let tagValue = tagSearchInput.value.trim();
+        if (tagValue.startsWith('#')) {
+            tagValue = tagValue.substring(1); // Удаляем '#' если он есть
+        }
+        
+        // *** ИЗМЕНЕНО: Не преобразуем в slug, просто используем введенное значение ***
+        const newTag = tagValue; 
+
+        if (newTag !== currentTag) {
+            currentTag = newTag;
+            localStorage.setItem('yourhub_tag_filter', currentTag);
+            currentPage = 1; // Сбрасываем страницу
+            loadPosts(false); // Загружаем посты с новым тегом
+
+            if (currentTag) {
+                clearTagSearchButton.style.display = 'inline-block';
+            } else {
+                clearTagSearchButton.style.display = 'none';
+            }
+        }
+    });
+
+    // Обработчик очистки поиска по тегам
+    clearTagSearchButton.addEventListener('click', () => {
+        tagSearchInput.value = '';
+        if (currentTag !== '') {
+            currentTag = '';
+            localStorage.removeItem('yourhub_tag_filter');
+            currentPage = 1; // Сбрасываем страницу
+            loadPosts(false); // Загружаем все посты
+            clearTagSearchButton.style.display = 'none';
+        }
+    });
+
+    // Позволяем нажимать Enter в поле поиска для активации поиска
+    tagSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            tagSearchButton.click();
+        }
     });
 
     // ===========================================
     // Функция для перерендеринга всех уже загруженных постов при смене вида
     // ===========================================
     function renderLoadedPosts() {
-        postsContainer.innerHTML = ''; // Очищаем контейнер
+        postsContainer.innerHTML = '';
         
         const postsToRender = Object.values(loadedPostsData);
 
@@ -315,7 +377,7 @@
         sortOptions.forEach(option => {
             if (option.dataset.sort === currentSort) {
                 option.classList.add('active');
-                currentSortLabel.textContent = option.textContent; // Устанавливаем текст кнопки
+                currentSortLabel.textContent = option.textContent;
             } else {
                 option.classList.remove('active');
             }
@@ -332,14 +394,24 @@
 
         // Применяем класс вида к контейнеру постов
         postsContainer.classList.add(`${currentView}-view`);
+
+        // Инициализируем поле поиска тегов и кнопку очистки
+        if (currentTag) {
+            tagSearchInput.value = `#${currentTag}`; // Отображаем тег с #
+            clearTagSearchButton.style.display = 'inline-block';
+        } else {
+            tagSearchInput.value = '';
+            clearTagSearchButton.style.display = 'none';
+        }
     }
 
     // Вызываем инициализацию UI перед первой загрузкой постов
     initializeUIFromPreferences();
-    loadPosts(false); // Загружаем первую порцию постов с учетом сохраненной сортировки и вида.
+    loadPosts(false); // Загружаем первую порцию постов с учетом сохраненной сортировки, вида и тега.
+
 
     // === ФУНКЦИИ handlePostAction, openEditPostModal, openDeletePostModal ===
-    // (Без изменений, они были в вашем предоставленном коде)
+    // (Без изменений)
 
     function handlePostAction(postId, actionType, isCommunityPost) {
         const url = isCommunityPost 
@@ -433,6 +505,5 @@
             window.location.href = deleteUrl;
         }
     }
-
 </script>
 {% endblock %}

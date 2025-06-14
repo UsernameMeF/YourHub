@@ -903,3 +903,51 @@
         font-size: 1em;
     }
 }
+
+
+.post-tags {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Расстояние между тегами */
+    align-items: center;
+}
+
+.post-tags i.fa-tags {
+    color: #6c757d; /* Цвет иконки тегов */
+    margin-right: 5px;
+    font-size: 1.1em;
+}
+
+.post-tag {
+    background-color: #e9ecef; /* Светлый фон для тега */
+    color: #007bff; /* Синий цвет текста для кликабельных тегов */
+    padding: 5px 10px;
+    border-radius: 20px; /* Скругленные края */
+    text-decoration: none; /* Убрать подчеркивание */
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap; /* Теги не переносятся на новую строку */
+    border: 1px solid transparent; /* Добавим прозрачную границу для консистентности */
+}
+
+.post-tag:hover {
+    background-color: #007bff; /* Изменение фона при наведении */
+    color: #fff; /* Изменение цвета текста при наведении */
+    border-color: #007bff; /* Изменение цвета границы */
+}
+
+.post-tag.author-tag {
+    background-color: #f8f9fa; /* Отличающийся фон для тега автора */
+    color: #6c757d; /* Более приглушенный цвет текста */
+    cursor: default; /* Не показывать курсор-указатель */
+    border: 1px solid #dee2e6; /* Легкая граница для тега автора */
+}
+
+.post-tag.author-tag:hover {
+    background-color: #f8f9fa; /* Не меняется при наведении */
+    color: #6c757d; /* Не меняется при наведении */
+    border-color: #dee2e6; /* Не меняется при наведении */
+}

@@ -292,3 +292,169 @@
     color: #2c3e50;      /* Цвет текста (темный, но не чисто черный) */
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Легкая тень для объема */
 }
+
+/* --- tag-search-bar Styles (Modernized) --- */
+.tag-search-bar-container {
+    margin: 25px auto;
+    padding: 20px; /* Увеличим отступы для более современного вида */
+    background-color: var(--card-bg-color); /* Используем переменную для фона, чтобы соответствовать карточкам */
+    border: 1px solid var(--border-color);
+    border-radius: 12px; /* Более мягкие углы */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Увеличим промежуток */
+    box-shadow: var(--shadow-small); /* Легкая тень */
+    max-width: 750px;
+    width: 95%;
+    box-sizing: border-box;
+}
+
+.tag-search-bar-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.tag-search-input-and-button-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.tag-search-bar-input {
+    flex-grow: 1;
+    padding: 12px 18px; /* Увеличим padding */
+    border: 1px solid var(--input-border-color); /* Отдельная переменная для границы инпута */
+    border-radius: 8px; /* Меньше, чем у контейнера */
+    font-size: 1rem;
+    outline: none;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 150px;
+    box-sizing: border-box;
+}
+
+.tag-search-bar-input::placeholder {
+    color: var(--text-muted-color);
+}
+
+.tag-search-bar-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); /* Эффект свечения */
+}
+
+.tag-search-bar-button {
+    padding: 12px 25px; /* Увеличим padding */
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Немного больше отступ для иконки/текста */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    color: var(--button-text-color); /* Белый текст на кнопке */
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 40px;
+    height: 44px; /* Фиксированная высота для согласованности */
+    background-color: var(--primary-color);
+    box-shadow: var(--shadow-button); /* Легкая тень для кнопки */
+}
+
+.tag-search-bar-button:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-2px); /* Легкий подъем */
+    box-shadow: var(--shadow-button-hover); /* Усилим тень при наведении */
+}
+
+.tag-search-bar-button:active {
+    background-color: var(--primary-active-color);
+    transform: translateY(0);
+    box-shadow: none; /* Убираем тень при клике */
+}
+
+.tag-search-bar-clear-button-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: -5px; /* Сдвинем чуть выше, чтобы уменьшить общий зазор, если он большой */
+}
+
+.tag-search-bar-clear-button {
+    background-color: var(--secondary-button-bg); /* Более нейтральный фон */
+    color: var(--secondary-button-text); /* Цвет текста */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem; /* Чуть меньше шрифт */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-button);
+}
+
+.tag-search-bar-clear-button:hover {
+    background-color: var(--secondary-button-hover-bg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+.tag-search-bar-clear-button:active {
+    background-color: var(--secondary-button-active-bg);
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Responsive adjustments for tag search bar */
+@media (max-width: 600px) {
+    .tag-search-input-and-button-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px; /* Увеличим отступ между инпутом и кнопкой на мобильных */
+    }
+
+    .tag-search-bar-input,
+    .tag-search-bar-button {
+        width: 100%;
+        margin-bottom: 0; /* Убрали старый margin-bottom */
+    }
+
+    .tag-search-bar-clear-button-row {
+        justify-content: center;
+    }
+}
+
+/* Общие переменные, если их нет (обычно в base.css или отдельном файле variables.css) */
+:root {
+    --primary-color: #23e2dd; /* Бирюзовый акцент */
+    --primary-hover-color: #1bcabc;
+    --primary-active-color: #1a9e9a;
+    --button-text-color: #ffffff;
+
+    --secondary-button-bg: #e0e0e0; /* Светло-серый */
+    --secondary-button-text: #555555;
+    --secondary-button-hover-bg: #d0d0d0;
+    --secondary-button-active-bg: #c0c0c0;
+
+    --card-bg-color: #ffffff;
+    --border-color: #e0e0e0;
+    --input-bg-color: #f8f8f8;
+    --input-border-color: #e0e0e0;
+    --text-color: #333333;
+    --text-muted-color: #888888;
+
+    --shadow-small: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-button-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
+}

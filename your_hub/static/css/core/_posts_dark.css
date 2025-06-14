@@ -302,3 +302,32 @@ html.dark-theme .image-preview-wrapper.deleted .delete-image-button {
 html.dark-theme .image-preview-wrapper.deleted .delete-image-button:hover {
     background-color: #00ff00;
 }
+
+
+html.dark-theme .post-tags i.fa-tags {
+    color: #b0b0b0; /* Светлее иконка тегов в темной теме */
+}
+
+html.dark-theme .post-tag {
+    background-color: #383838; /* Темный фон для тега */
+    color: #00e600; /* Используем акцентный зеленый для текста тега */
+    border: 1px solid #00e600; /* Зеленая граница */
+}
+
+html.dark-theme .post-tag:hover {
+    background-color: #00e600; /* Акцентный зеленый фон при наведении */
+    color: #1a1a1a; /* Темный текст на зеленом фоне */
+    border-color: #00e600; /* Зеленая граница */
+}
+
+html.dark-theme .post-tag.author-tag {
+    background-color: #2b2b2b; /* Более темный фон для тега автора в темной теме */
+    color: #888; /* Более приглушенный светлый цвет текста */
+    border: 1px solid #4a4a4a; /* Более темная граница */
+}
+
+html.dark-theme .post-tag.author-tag:hover {
+    background-color: #2b2b2b; /* Не меняется при наведении */
+    color: #888; /* Не меняется при наведении */
+    border-color: #4a4a4a; /* Не меняется при наведении */
+}

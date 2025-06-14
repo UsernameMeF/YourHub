@@ -10,11 +10,16 @@ urlpatterns = [
     path('api/posts/', views.get_posts_ajax, name='get_posts_ajax'),
     # НОВЫЙ URL для получения деталей конкретного поста (для JS-загрузки в модалку)
 
-    # URL для создания, редактирования, удаления постов
-    path('post/create/', views.post_create, name='post_create'),
-    path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
+    # Новые URL-пути для отдельных страниц создания/редактирования постов
+    path('create/', views.create_post_page, name='create_post_page'), # URL для страницы создания
+    path('edit/<int:pk>/', views.edit_post_page, name='edit_post_page'), # URL для страницы редактирования
+
+    path('post/create_submit/', views.post_create, name='post_create_submit'), # Переименовал, чтобы не путать
+    path('post/<int:pk>/edit_submit/', views.post_edit, name='post_edit_submit'), # Переименовал
+    # URL для удаления поста (остался AJAX)
     path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
-    
+
+
     # URL для действий с постами
     path('post/<int:pk>/like/', views.post_like, name='post_like'), # Убедитесь, что эти views существуют
     path('post/<int:pk>/dislike/', views.post_dislike, name='post_dislike'),

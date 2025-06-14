@@ -34,7 +34,7 @@
         </a>
 
         <div class="search-bar">
-            <input type="text" placeholder="Поиск по YourHub...">
+            <input type="text" placeholder="Тут могла быть ваша реклама">
         </div>
 
         <div class="auth-buttons">
@@ -51,9 +51,10 @@
                 </a>
 
                 {# Кнопка "Создать пост" - добавим ID для JS и уберем href="#" #}
-                <button type="button" class="header-button-create" id="create-post-button" title="Создать пост">
+                {# Кнопка "Создать пост" - теперь ведет на страницу создания #}
+                <a href="{% url 'core:create_post_page' %}" class="header-button-create" id="create-post-link" title="Создать пост">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                </button>
+                </a>
 
                 <div class="user-profile-menu">
                     <button class="profile-avatar-button" id="profile-avatar-button">
@@ -98,7 +99,7 @@
         <div class="modal-content">
             <span class="close-button" id="close-post-modal">&times;</span>
             <h2 id="post-modal-title">Создать новый пост</h2>
-            <form id="post-form" method="post" enctype="multipart/form-data" action="{% url 'core:post_create' %}">
+            <form id="post-form" method="post" enctype="multipart/form-data" action="{% url 'core:create_post_page' %}">
                 {% csrf_token %}
                 {{ post_form.title }}
                 {{ post_form.content }}
@@ -349,11 +350,11 @@
         }
 
 
-        // Открытие модалки создания поста
+        {% comment %} // Открытие модалки создания поста
         if (createPostButton) {
             createPostButton.addEventListener('click', () => {
                 postModalTitle.textContent = 'Создать новый пост';
-                postForm.action = '{% url "core:post_create" %}'; // Устанавливаем URL для создания
+                postForm.action = '{% url "core:post_create" %}';
                 postFormTitle.value = '';
                 postFormContent.value = '';
                 
@@ -366,7 +367,7 @@
                 existingImagesContainer.style.display = 'none'; // Скрываем контейнер существующих изображений
                 openModal(postModal);
             });
-        }
+        } {% endcomment %}
 
         // Закрытие модалки по крестику
         if (closePostModalButton) {
