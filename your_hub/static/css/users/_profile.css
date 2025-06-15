@@ -294,3 +294,59 @@
     margin: 0; /* Убрать внешние отступы форм, которые могут ломать gap */
     /* display: block; */ /* Убедиться, что форма не ломает flexbox */
 }
+
+
+/* Стили для карточки последнего поста */
+.latest-post-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s ease-in-out;
+}
+
+.latest-post-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.latest-post-card h4 {
+    color: #007bff; /* Примерный синий цвет */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.latest-post-card p {
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.latest-post-card .post-date {
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: #999;
+}
+
+.latest-post-link {
+    text-decoration: none; /* Убираем подчеркивание у ссылки */
+    color: inherit; /* Наследуем цвет текста от родителя */
+    display: block; /* Делаем ссылку блочным элементом, чтобы она занимала всю карточку */
+}
+
+/* Стили для сообщения об отсутствии публикаций */
+.no-posts-message {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 15px;
+}

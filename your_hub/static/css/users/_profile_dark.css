@@ -73,3 +73,36 @@ html.dark-theme .profile-section ul li a:hover {
     color: #00ff00;
 }
 
+
+html.dark-theme .latest-post-card {
+    background-color: #333333; /* Темный фон для карточки поста */
+    border-color: #4a4a4a; /* Темная граница */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Тень */
+}
+
+html.dark-theme .latest-post-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Усиленная тень при наведении */
+    transform: translateY(-2px);
+}
+
+html.dark-theme .latest-post-card h4 {
+    color: #00e600; /* Яркий зеленый цвет заголовка поста */
+}
+
+html.dark-theme .latest-post-card p {
+    color: #cccccc; /* Светлый текст содержимого */
+}
+
+html.dark-theme .latest-post-card .post-date {
+    color: #aaaaaa; /* Светлый, приглушенный цвет для даты */
+}
+
+html.dark-theme .latest-post-link {
+    color: inherit; /* Наследуем цвет в темной теме */
+}
+
+html.dark-theme .no-posts-message {
+    color: #aaaaaa; /* Светлый текст сообщения об отсутствии постов */
+    border-color: #4a4a4a; /* Темная пунктирная граница */
+    background-color: #333333; /* Темный фон сообщения */
+}

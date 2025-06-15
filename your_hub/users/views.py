@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib import messages
+
+from core.models import Post
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile, Friendship, Follow
 from django.conf import settings
@@ -30,7 +32,7 @@ def register_view(request):
             user = form.save()
             Profile.objects.create(user=user)
             # messages.success(request, f'Аккаунт создан для {user.username}! Теперь вы можете войти.') # Убираем это сообщение
-            return redirect('login')
+            return redirect('users:login')
         else:
             # Ошибки формы будут отображены в шаблоне
             pass
@@ -155,8 +157,10 @@ def profile_view(request, user_id):
         if Follow.objects.filter(follower=request.user, following=viewed_user).exists():
             follow_status = True
 
-
+    latest_post = Post.objects.filter(author=viewed_user).order_by('-created_at').first()
+    
     user_posts = [] 
+
     user_friends = User.objects.filter(
         Q(sent_friend_requests__to_user=viewed_user, sent_friend_requests__status='accepted') |
         Q(received_friend_requests__from_user=viewed_user, received_friend_requests__status='accepted')
@@ -179,6 +183,7 @@ def profile_view(request, user_id):
         'sent_request': sent_request,
         'received_request': received_request,
         'actual_status': calculated_actual_status, # Передаем вычисленный статус в контекст
+        'latest_post': latest_post,
     }
     return render(request, 'users/profile.html', context)
 
@@ -213,14 +218,6 @@ def edit_profile_view(request):
     return render(request, 'users/edit_profile.html', context)
 
 
-# users/views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse 
-from django.views.decorators.http import require_POST
-from .models import Profile # Убедитесь, что Profile импортирован правильно
-from django.utils import timezone # Добавьте импорт timezone
 
 @require_POST
 @login_required
@@ -625,7 +622,7 @@ def remove_friend(request, user_id):
             'received_request': None,
         }, request=request)
 
-        return JsonResponse({'status': 'success', 'message': message_text, 'new_button_html': new_button_html})
+        return JsonResponse({'status': 'success', 'message': '', 'new_button_html': new_button_html})
     else:
         return JsonResponse({'status': 'error', 'message': ''}, status=400)
 
@@ -637,7 +634,7 @@ def follow_user(request, user_id):
     following_user = get_object_or_404(User, pk=user_id)
 
     if request.user == following_user:
-        return JsonResponse({'status': 'error', 'message': ""}, status=400)
+        return JsonResponse({'status': 'error', 'message': ''}, status=400)
 
     # Важно: здесь мы не управляем friendship_status, только follow_status.
     # Если вы хотите, чтобы подписка/отписка влияла на кнопки дружбы,

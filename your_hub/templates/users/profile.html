@@ -68,20 +68,6 @@
 
         <div class="profile-sections">
             <div class="profile-section">
-                <h3>Публикации</h3>
-                {% if user_posts %}
-                    {# TODO: Отображение публикаций #}
-                    <ul>
-                        {% for post in user_posts %}
-                            <li>{{ post.title }} - {{ post.date_posted|date:"d.m.Y" }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>У пользователя пока нет публикаций.</p>
-                {% endif %}
-            </div>
-
-            <div class="profile-section">
                 <h3>Друзья ({{ user_friends.count }})</h3>
                 {% if user_friends %}
                     <ul>
@@ -95,6 +81,21 @@
             </div>
 
             <div class="profile-section">
+                <h3>Последняя публикация</h3>
+                {% if latest_post %}
+                    <a href="{{ latest_post.get_absolute_url }}" class="latest-post-link">
+                        <div class="latest-post-card">
+                            <h4>{{ latest_post.title }}</h4>
+                            <p>{{ latest_post.content|truncatechars:200 }}</p> {# Отображаем часть контента #}
+                            <span class="post-date">Опубликовано: {{ latest_post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </a>
+                {% else %}
+                    <p class="no-posts-message">У пользователя пока нет публикаций.</p>
+                {% endif %}
+            </div>
+
+            {% comment %} <div class="profile-section">
                 <h3>Активность</h3>
                 {% if user_activity %}
                     {# TODO: Отображение активности #}
@@ -106,7 +107,7 @@
                 {% else %}
                     <p>Последней активности нет.</p>
                 {% endif %}
-            </div>
+            </div> {% endcomment %}
         </div>
     </div>
 {% endblock %}
