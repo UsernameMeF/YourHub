@@ -1,0 +1,134 @@
+/* your_hub/static/css/community/_community_form.css */
+.form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.form-title {
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+    transition: color 0.5s ease;
+}
+
+.form-field-wrapper {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: bold;
+    transition: color 0.5s ease;
+}
+
+.form-field-wrapper input[type="text"],
+.form-field-wrapper textarea,
+.form-field-wrapper input[type="file"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1em;
+    color: #333;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.form-field-wrapper input[type="text"]:focus,
+.form-field-wrapper textarea:focus {
+    border-color: #23e2dd;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(35, 226, 221, 0.2);
+}
+
+.form-field-wrapper input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.form-help-text {
+    font-size: 0.85em;
+    color: #888;
+    margin-top: 5px;
+}
+
+.form-error-message {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.submit-button {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #23e2dd;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-right: 15px;
+}
+
+.submit-button:hover {
+    background-color: #1bcabc;
+    box-shadow: 0 4px 10px rgba(35, 226, 221, 0.3);
+}
+
+.cancel-button {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+}
+
+.delete-confirm-container {
+    text-align: center;
+}
+
+.delete-message {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.delete-message.warning {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.delete-form {
+    margin-top: 30px;
+}
+
+.delete-button {
+    background-color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}

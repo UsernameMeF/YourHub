@@ -1,0 +1,79 @@
+/* your_hub/static/css/community/_community_post_create_dark.css */
+
+html.dark-theme .form-container {
+    background-color: #2c2c2c;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .form-title {
+    color: #f0f0f0;
+}
+
+html.dark-theme .form-label {
+    color: #bbb;
+}
+
+html.dark-theme textarea.community-post-content-input {
+    background-color: #3a3a3a;
+    border-color: #555;
+    color: #f0f0f0;
+}
+
+html.dark-theme textarea.community-post-content-input:focus {
+    border-color: #66b3ff;
+    box-shadow: 0 0 0 3px rgba(102, 179, 255, 0.25);
+}
+
+html.dark-theme .form-help-text {
+    color: #aaa;
+}
+
+html.dark-theme .form-error-message {
+    color: #ff6b6b;
+}
+
+html.dark-theme .file-upload-wrapper {
+    border-color: #555;
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .file-upload-wrapper:hover {
+    border-color: #66b3ff;
+    background-color: #4a4a4a;
+}
+
+html.dark-theme .file-upload-wrapper label {
+    color: #66b3ff;
+}
+
+html.dark-theme .file-input-display {
+    background-color: #4a4a4a;
+    border-color: #666;
+    color: #f0f0f0;
+}
+
+html.dark-theme .clear-files-button {
+    color: #ff6b6b;
+}
+
+html.dark-theme .clear-files-button:hover {
+    color: #ff4d4d;
+}
+
+html.dark-theme .submit-button {
+    background-color: #0056b3;
+}
+
+html.dark-theme .submit-button:hover {
+    background-color: #003d80;
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
+}
+
+html.dark-theme .cancel-button {
+    background-color: #5a6268;
+}
+
+html.dark-theme .cancel-button:hover {
+    background-color: #4a4a4a;
+    box-shadow: 0 4px 10px rgba(90, 98, 104, 0.3);
+}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мої спільноти{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/community/_community_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/community/_community_list_dark.css' %}" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="main-container community-list-container">
+    <h1 class="community-list-title">Мої спільноти</h1>
+
+    {# --- КОНТЕЙНЕР ДЛЯ НОВИХ КНОПОК ВГОРІ ПРАВОРУЧ --- #}
+    <div class="top-right-actions">
+        <a href="{% url 'community:community_create' %}" class="btn create-community-btn">
+            <i class="fas fa-plus"></i> Створити спільноту
+        </a>
+        <a href="{% url 'community:community_search' %}" class="btn find-community-btn">
+            <i class="fas fa-search"></i> Знайти спільноту
+        </a>
+    </div>
+
+    <ul class="community-list">
+        {% for community in user_communities %}
+            <li class="community-list-item">
+                <a href="{% url 'community:community_detail' community.pk %}">
+                    <div class="community-info">
+                        <span class="community-name">{{ community.name }}</span>
+                        <span class="community-member-count">
+                            <i class="fas fa-users"></i> {{ community.members_count }} учасників
+                        </span>
+                    </div>
+                </a>
+            </li>
+        {% empty %}
+            <p class="no-communities-message">Ви поки що не є членом жодної спільноти.</p>
+            <p class="no-communities-message">
+                <a href="{% url 'community:community_create' %}" class="create-community-link">Створіть нову спільноту</a> або знайдіть існуючі.
+            </p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

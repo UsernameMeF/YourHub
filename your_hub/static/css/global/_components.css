@@ -1,0 +1,173 @@
+/* SOCIAL_NETWORK/your_hub/static/css/global/_components.css */
+
+.search-bar input {
+    grid-column: 2;
+    justify-self: center;
+    min-width: 0;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #fff;
+    color: #333;
+}
+
+.search-bar input::placeholder {
+    color: #666;
+}
+
+.search-bar input:focus {
+    border-color: #23e2dd;
+    box-shadow: 0 0 5px rgba(35, 226, 221, 0.5);
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    grid-column: 3;
+    justify-self: end;
+}
+
+.auth-buttons a {
+    margin-left: 10px;
+    text-decoration: none;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.auth-buttons a:hover {
+    background-color: #eee;
+}
+
+.auth-buttons .btn-primary {
+    border-color: #23e2dd;
+    color: #23e2dd;
+}
+.auth-buttons .btn-primary:hover {
+    background-color: #e9fcfb;
+}
+
+.auth-buttons .btn-secondary {
+    background-color: #23e2dd;
+    color: #fff;
+    border-color: #23e2dd;
+}
+.auth-buttons .btn-secondary:hover {
+    background-color: #1bcabc;
+}
+
+.header-icon-button, .header-button-create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    margin-left: 8px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    color: #666;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.header-icon-button svg {
+    width: 22px;
+    height: 22px;
+}
+
+.header-button-create {
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+.header-button-create svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+}
+
+.header-icon-button:hover, .header-button-create:hover {
+    background-color: #eee;
+    color: #333;
+}
+
+.user-profile-menu {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.profile-avatar-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.profile-avatar-button:hover .profile-avatar-img,
+.profile-avatar-button:focus .profile-avatar-img {
+    border-color: #23e2dd;
+}
+
+.profile-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    margin-top: 5px;
+}
+
+.theme-switch-button-dropdown {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.theme-switch-button-dropdown:hover {
+    background-color: #f1f1f1;
+}
+.theme-switch-button-dropdown .sun-icon,
+.theme-switch-button-dropdown .moon-icon {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}

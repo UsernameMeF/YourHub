@@ -1,0 +1,211 @@
+/* community_list.css */
+.main-container.community-list-container {
+    position: relative;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.community-list-title {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.community-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.community-list-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.community-list-item:last-child {
+    border-bottom: none;
+}
+
+.community-list-item:hover {
+    background-color: #f5f5f5;
+}
+
+.community-list-item a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.community-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.community-name {
+    font-weight: 600;
+    font-size: 1.05em;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.community-member-count {
+    font-size: 0.9em;
+    color: #888;
+}
+
+.community-member-count i {
+    margin-right: 5px;
+    color: #007bff;
+}
+
+.no-communities-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+}
+
+.no-communities-message .create-community-link {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.top-right-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    color: white;
+}
+
+.btn i {
+    margin-right: 8px;
+    font-size: 18px;
+    color: inherit;
+}
+
+.create-community-btn {
+    background-color: #23e2dd;
+    border-color: #23e2dd;
+}
+
+.create-community-btn:hover {
+    background-color: #1bcabc;
+    border-color: #1bcabc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.create-community-btn:active {
+    background-color: #1a9e9a;
+    border-color: #1a9e9a;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.find-community-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #23e2dd;
+    border-radius: 8px;
+    background-color: #23e2dd;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.find-community-btn.absolute-top-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.find-community-btn:hover {
+    background-color: #1bcabc;
+    border-color: #1bcabc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.find-community-btn:active {
+    background-color: #1a9e9a;
+    border-color: #1a9e9a;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.find-community-btn i {
+    margin-right: 8px;
+    font-size: 18px;
+    color: inherit;
+}
+
+@media (max-width: 600px) {
+    .main-container.community-list-container {
+        padding-top: 70px;
+    }
+    .top-right-actions {
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: stretch;
+        order: -1;
+        padding: 0 20px;
+        box-sizing: border-box;
+        top: auto;
+        right: auto;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .community-list-title {
+        text-align: center;
+    }
+}

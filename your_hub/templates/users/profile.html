@@ -1,0 +1,300 @@
+{# users/templates/users/profile.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Профіль {{ viewed_user.username }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/users/_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/users/_profile_dark.css' %}">
+    {# Переконайтеся, що Font Awesome підключено в base.html або тут #}
+    {# Приклад підключення Font Awesome (якщо ще немає в base.html): #}
+    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> #}
+{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <div class="profile-header-top">
+            <h2>Профіль</h2>
+            <div class="profile-actions-top">
+                {% if is_my_profile %}
+                    <a href="{% url 'users:edit_profile' %}" class="btn-primary">Редагувати профіль</a>
+                {% else %}
+                    {# Перевіряємо статус дружби для відображення кнопок #}
+                    {% include 'profile_actions_snippet.html' %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-header">
+            {# Контейнер для аватара та статусу #}
+            <div class="profile-avatar-wrapper">
+                <img src="{{ user_profile.avatar.url }}" alt="Аватар {{ viewed_user.username }}" class="profile-avatar-large">
+                
+                {# Іконка статусу #}
+                <div class="status-indicator status-{{ actual_status }}" 
+                     data-current-status="{{ user_profile.status }}" 
+                     {% if is_my_profile %}id="my-status-indicator"{% endif %}>
+                     <i class="status-icon"></i> 
+                </div>
+
+                {# Випадаюче меню статусів (видиме тільки для свого профілю) #}
+                {% if is_my_profile %}
+                <div class="status-dropdown" id="status-dropdown">
+                    <div class="status-option" data-status="online">
+                        <i class="status-dot fas fa-circle status-online"></i> В мережі
+                    </div>
+                    <div class="status-option" data-status="away">
+                        <i class="status-dot fas fa-moon status-away"></i> Неактивний
+                    </div>
+                    <div class="status-option" data-status="dnd">
+                        <i class="status-dot fas fa-minus-circle status-dnd"></i> Не турбувати
+                    </div>
+                    <div class="status-option" data-status="invisible">
+                        <i class="status-dot fas fa-circle status-invisible"></i> Невидимий
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-info">
+                <h3>@{{ viewed_user.username }}</h3>
+                <p>Дата реєстрації: {{ viewed_user.date_joined|date:"d.m.Y" }}</p>
+                {% if user_profile.bio %}
+                    <p>Про себе: {{ user_profile.bio }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-sections">
+            <div class="profile-section">
+                <h3>Друзі ({{ user_friends.count }})</h3>
+                {% if user_friends %}
+                    <ul>
+                        {% for friend in user_friends %}
+                            <li><a href="{% url 'users:user_profile' friend.id %}">{{ friend.username }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{{ viewed_user.username }} поки не має друзів.</p>
+                {% endif %}
+            </div>
+
+            <div class="profile-section">
+                <h3>Остання публікація</h3>
+                {% if latest_post %}
+                    <a href="{{ latest_post.get_absolute_url }}" class="latest-post-link">
+                        <div class="latest-post-card">
+                            <h4>{{ latest_post.title }}</h4>
+                            <p>{{ latest_post.content|truncatechars:200 }}</p> {# Відображаємо частину контенту #}
+                            <span class="post-date">Опубліковано: {{ latest_post.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </a>
+                {% else %}
+                    <p class="no-posts-message">У користувача поки немає публікацій.</p>
+                {% endif %}
+            </div>
+
+            {% comment %} <div class="profile-section">
+                <h3>Активність</h3>
+                {% if user_activity %}
+                    {# TODO: Відображення активності #}
+                    <ul>
+                        {% for activity in user_activity %}
+                            <li>{{ activity.description }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Останньої активності немає.</p>
+                {% endif %}
+            </div> {% endcomment %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- ПОЧАТОК: JavaScript для оновлення СТАТУСУ користувача (ваш існуючий код) ---
+    const statusIndicator = document.querySelector('.profile-avatar-wrapper .status-indicator');
+    const statusIcon = statusIndicator ? statusIndicator.querySelector('.status-icon') : null;
+    
+    function updateStatusIcon(displayStatus) { 
+        if (!statusIcon) return;
+        statusIcon.className = 'status-icon fas'; 
+        if (!statusIndicator) return; // Додана перевірка для statusIndicator
+        statusIndicator.className = 'status-indicator status-' + displayStatus;
+        if (displayStatus === 'online') {
+            statusIcon.classList.add('fa-circle');
+        } else if (displayStatus === 'away') {
+            statusIcon.classList.add('fa-moon');
+        } else if (displayStatus === 'dnd') {
+            statusIcon.classList.add('fa-minus-circle');
+        } else if (displayStatus === 'invisible' || displayStatus === 'offline') {
+            statusIcon.classList.add('fa-circle');
+        }
+    }
+
+    if (statusIndicator) { // Перевіряємо, що statusIndicator існує
+        const initialDisplayStatusClass = Array.from(statusIndicator.classList).find(cls => cls.startsWith('status-') && cls !== 'status-indicator');
+        const initialDisplayStatus = initialDisplayStatusClass ? initialDisplayStatusClass.replace('status-', '') : '{{ actual_status }}';
+        updateStatusIcon(initialDisplayStatus); 
+    }
+
+    {% if is_my_profile %}
+    const statusDropdown = document.getElementById('status-dropdown');
+    const statusOptions = statusDropdown ? statusDropdown.querySelectorAll('.status-option') : null;
+    // CSRF токен для AJAX-запитів статусу (переконайтеся, що він коректно передається, якщо не використовується FormData)
+    const csrfTokenForStatus = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
+
+
+    if (statusIndicator && statusDropdown && statusOptions) {
+        statusIndicator.addEventListener('click', function(event) {
+            event.stopPropagation();
+            statusDropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (statusDropdown && !statusDropdown.contains(event.target) && !statusIndicator.contains(event.target)) {
+                statusDropdown.classList.remove('active');
+            }
+        });
+
+        statusOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const newChosenStatus = this.dataset.status;
+                fetch('{% url "users:set_user_status" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfTokenForStatus
+                    },
+                    body: `status_type=${newChosenStatus}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text || 'Помилка відповіді сервера при оновленні статусу') });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateStatusIcon(data.new_status);
+                        if(statusIndicator) statusIndicator.dataset.currentStatus = data.chosen_status;
+                        if(statusDropdown) statusDropdown.classList.remove('active');
+                        console.log('Статус успішно оновлено до:', data.chosen_status, 'Відображуваний статус:', data.new_status);
+                    } else {
+                        console.error('Помилка при оновленні статусу:', data.message);
+                        displayMessage(data.message || 'Не вдалося оновити статус.', 'error'); // Відображення помилки користувачу
+                    }
+                })
+                .catch(error => {
+                    console.error('Помилка AJAX запиту для статусу:', error);
+                    displayMessage(error.message || 'Мережева помилка при оновленні статусу.', 'error');
+                });
+            });
+        });
+    }
+    {% endif %} 
+    // --- КІНЕЦЬ: JavaScript для оновлення СТАТУСУ користувача ---
+
+
+    // --- ПОЧАТОК: JavaScript для AJAX-обробки ДІЙ В ПРОФІЛІ (зі "старої версії", адаптований) ---
+    const profileActionsDiv = document.querySelector('.profile-actions-top'); // Оновлений селектор
+    const ajaxMessagesDiv = document.getElementById('ajax-messages');     // Для відображення повідомлень
+
+    // Функція для відображення повідомлень (зі "старої версії" з невеликими покращеннями)
+    function displayMessage(message, type) {
+        if (!ajaxMessagesDiv) {
+            console.warn("Елемент #ajax-messages не знайдено. Повідомлення не буде відображено:", message);
+            return;
+        }
+        if (!message || message.trim() === '') {
+            ajaxMessagesDiv.innerHTML = ''; // Очищаємо, якщо повідомлення порожнє
+            return; 
+        }
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('ajax-message'); // Базовий клас для стилізації
+        if (type) { // type це 'success', 'error', 'info' тощо
+            messageElement.classList.add(`ajax-message-${type}`);
+        } else {
+            messageElement.classList.add('ajax-message-info'); // За замовчуванням info, якщо тип не вказано
+        }
+        messageElement.textContent = message;
+        
+        ajaxMessagesDiv.innerHTML = ''; // Замінюємо попереднє повідомлення новим
+        ajaxMessagesDiv.appendChild(messageElement);
+
+        setTimeout(() => {
+            if (ajaxMessagesDiv.contains(messageElement)) {
+                messageElement.remove();
+            }
+        }, 5000); // Повідомлення видно 5 секунд
+    }
+    
+    function handleProfileFormSubmit(event) {
+        event.preventDefault(); // Запобігаємо стандартній відправці форми
+        const form = event.target;
+        const actionUrl = form.action;
+        const method = form.method;
+        const formData = new FormData(form); // FormData автоматично включає CSRF-токен з форми
+
+        fetch(actionUrl, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Для Django, щоб ідентифікувати AJAX-запит
+            }
+        })
+        .then(response => {
+            // Намагаємося отримати JSON у будь-якому випадку, щоб обробити повідомлення про помилки від сервера
+            return response.json().then(data => ({
+                ok: response.ok,       // boolean: true якщо статус 200-299
+                data: data             // розпарсений JSON
+            }));
+        })
+        .then(result => {
+            const data = result.data; // JSON-відповідь від сервера {status, message, new_button_html}
+            
+            if (!result.ok) { // Якщо HTTP статус НЕ успішний (наприклад, 400, 403, 500)
+                // Намагаємося використовувати повідомлення з JSON, якщо воно є, інакше стандартне
+                throw new Error(data.message || `Помилка сервера: ${result.status_code}. Спробуйте пізніше.`);
+            }
+
+            // HTTP статус успішний (2xx)
+            if (data.new_button_html && profileActionsDiv) {
+                profileActionsDiv.innerHTML = data.new_button_html;
+                attachSubmitListenersToNewForms(); // Перепризначаємо обробники на нові форми
+            }
+            // Відображаємо повідомлення від сервера (якщо воно є)
+            // data.status це поле з JSON ('success', 'error', 'info')
+            displayMessage(data.message, data.status); 
+        })
+        .catch(error => {
+            console.error('Помилка AJAX запиту для дій профілю:', error);
+            displayMessage(error.message || 'Сталася помилка. Будь ласка, спробуйте ще раз.', 'error');
+        });
+    }
+
+    function attachSubmitListenersToNewForms() {
+        if (profileActionsDiv) { // Переконаємося, що контейнер кнопок існує
+            const newForms = profileActionsDiv.querySelectorAll('.ajax-profile-action-form');
+            newForms.forEach(newForm => {
+                // Видаляємо попередній обробник (якщо був) перед додаванням нового,
+                // щоб уникнути багаторазового спрацьовування на одній формі.
+                newForm.removeEventListener('submit', handleProfileFormSubmit);
+                newForm.addEventListener('submit', handleProfileFormSubmit);
+            });
+        }
+    }
+
+    // Початкове призначення обробників при завантаженні сторінки
+    // Ця перевірка важлива, якщо .profile-actions-top може бути відсутнім або порожнім
+    if (profileActionsDiv && profileActionsDiv.querySelector('.ajax-profile-action-form')) {
+         attachSubmitListenersToNewForms();
+    }
+    // --- КІНЕЦЬ: JavaScript для AJAX-обробки ДІЙ В ПРОФІЛІ ---
+
+});
+</script>
+{% endblock %}

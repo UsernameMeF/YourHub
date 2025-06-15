@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list_dark.css' %}">
+    <link rel="stylesheet" href="{% static 'css/community/_community_search.css' %}">
+    <link rel="stylesheet" href="{% static 'css/community/_community_search_dark.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="chat_list-container">
+    <h1>{{ title }}</h1>
+
+    <div class="search-bar-container">
+        <form action="{% url 'community:community_search' %}" method="GET" class="community-search-form">
+            <div class="search-input-and-button-row"> {# Новий контейнер для поля введення та кнопки Пошук #}
+                <input type="text" name="q" placeholder="Знайти спільноту за назвою..." value="{{ query }}" class="search-input">
+                <button type="submit" class="search-button compact-button"> {# Додаємо клас compact-button #}
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            {% if query %}
+                <div class="reset-button-row"> {# Контейнер для кнопки Скинути #}
+                    <a href="{% url 'community:community_search' %}" class="reset-search-button">
+                        <i class="fas fa-times"></i> Скинути
+                    </a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if communities %}
+        <ul class="chat_list">
+            {% for community in communities %}
+                <li class="chat_list-item community-list-item">
+                    <a href="{% url 'community:community_detail' pk=community.pk %}">
+                        <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар спільноти" class="chat_avatar">
+                        <div class="chat_info">
+                            <span class="chat_name">
+                                <i class="fas fa-users"></i> {{ community.name }}
+                            </span>
+                            <span class="chat_last-message">
+                                {% if community.description %}
+                                    {{ community.description|truncatechars:70 }}
+                                {% else %}
+                                    Немає опису.
+                                {% endif %}
+                            </span>
+                        </div>
+                        <span class="chat_timestamp">
+                            <i class="fas fa-users"></i> {{ community.members_count }} учасн.
+                        </span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <li class="no-chats-message">
+            {% if query %}
+                <p>Спільнот за запитом "{{ query }}" не знайдено.</p>
+                <p><a href="{% url 'community:community_search' %}">Показати всі спільноти</a> або спробуйте інший запит.</p>
+            {% else %}
+                <p>Спільнот поки немає. Ви можете <a href="{% url 'community:community_create' %}">створити першу</a>!</p>
+            {% endif %}
+        </li>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

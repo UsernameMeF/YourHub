@@ -1,0 +1,60 @@
+{# templates/core/_post_card.html #}
+{% load static %}
+
+<div class="post-card" id="post-{{ post.id }}">
+    <div class="post-header">
+        <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="post-author-avatar">
+        <div class="post-info">
+            <a href="{% url 'users:user_profile' post.author.id %}" class="post-author-username">{{ post.author.username }}</a>
+            <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
+            {% if post.updated_at and post.created_at != post.updated_at %}
+                <span class="post-date">(оновлено: {{ post.updated_at|date:"d M Y H:i" }})</span>
+            {% endif %}
+        </div>
+        {% if user.is_authenticated and user == post.author %}
+            <div class="post-actions-dropdown">
+                <button class="post-actions-button">...</button>
+                <div class="dropdown-menu">
+                    {# Кнопка "Редагувати" тепер веде на окрему сторінку #}
+                    <a href="{% url 'core:edit_post_page' post.pk %}">Редагувати</a>
+                    
+                    {# Кнопка "Видалити" залишається з модальним вікном #}
+                    <a href="#" onclick="event.preventDefault(); openDeletePostModal({{ post.id }});">Видалити</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2 class="post-title"><a href="{% url 'core:post_detail' post.id %}">{{ post.title }}</a></h2>
+    
+    {# --- ЗМІНИ ТУТ: Текст допису без обрізання --- #}
+    <div class="post-content-wrapper"> {# Залишаємо обгортку для консистентності стилів, якщо це потрібно #}
+        <p class="post-content">{{ post.content|safe }}</p> {# Повний текст, без |truncatechars_html #}
+    </div>
+    {# --- КІНЕЦЬ ЗМІН --- #}
+
+    {% if post.attachments.first %} {# Перевіряємо, чи є хоча б одне вкладення #}
+        <div class="post-images-grid">
+            <img src="{{ post.attachments.first.image.url }}" alt="Вкладення до допису" class="post-grid-image">
+        </div>
+    {% endif %}
+
+    <div class="post-actions">
+        <button class="action-button like-button {% if is_liked %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'like')">
+            <i class="fas fa-thumbs-up"></i> <span class="likes-count">{{ post.total_likes }}</span>
+        </button>
+        <button class="action-button dislike-button {% if is_disliked %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'dislike')">
+            <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">{{ post.total_dislikes }}</span>
+        </button>
+        <button class="action-button repost-button {% if is_reposted %}active{% endif %}" onclick="handlePostAction({{ post.id }}, 'repost')">
+            <i class="fas fa-retweet"></i> <span class="reposts-count">{{ post.total_reposts }}</span>
+        </button>
+        <a href="{% url 'core:post_detail' post.id %}" class="action-button">
+            <i class="fas fa-comment"></i> <span class="comments-count total-comments-{{ post.id }}">{{ post.total_comments }}</span>
+        </a>
+    </div>
+
+    {% if show_full_comments %}
+        {# Коментарі будуть відображатися тільки на сторінці детального перегляду #}
+    {% endif %}
+</div>

@@ -1,0 +1,163 @@
+/* SOCIAL_NETWORK/your_hub/static/css/global/_base.css */
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    color: #333;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.header, .navbar, .dropdown-menu,
+.search-bar input, .auth-buttons a, .user-menu-button,
+.dropdown-menu a, form, form label,
+form input[type="text"], form input[type="password"], form input[type="email"],
+form button[type="submit"], form textarea {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #23e2dd;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    grid-column: 1;
+    justify-self: start;
+}
+
+.site-title:hover {
+    color: #1bcabc;
+}
+
+.site-title .hub-icon {
+    margin-right: 8px;
+    color: #1bcabc;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    color: #666;
+}
+.user-menu-button:hover {
+    background-color: #eee;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+    margin-top: 5px;
+}
+
+.dropdown-menu a {
+    color: #333;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease;
+    font-size: 0.9em;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.navbar {
+    width: 220px;
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+}
+
+.navbar a {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #555;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar a:hover {
+    background-color: #e9fcfb;
+    color: #23e2dd;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.theme-switch-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.theme-switch-button:hover {
+    background-color: #eee;
+}
+
+.theme-switch-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+.sun-icon { display: block; }
+.moon-icon { display: none; }

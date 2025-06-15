@@ -1,0 +1,108 @@
+/* community_detail_dark.css */
+html.dark-theme .community-header-card,
+html.dark-theme .community-members-section,
+html.dark-theme .community-posts-section {
+    background-color: #2a2a2a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .community-title {
+    color: #f0f0f0;
+}
+
+html.dark-theme .community-description,
+html.dark-theme .community-meta {
+    color: #b0b0b0;
+}
+
+html.dark-theme .community-meta-item i {
+    color: #00e600;
+}
+
+html.dark-theme .community-action-buttons .btn-join {
+    background-color: #00e600;
+    color: #1a1a1a;
+}
+html.dark-theme .community-action-buttons .btn-join:hover {
+    background-color: #00cc00;
+    box-shadow: 0 4px 10px rgba(0, 230, 0, 0.3);
+}
+
+html.dark-theme .community-action-buttons .btn-leave {
+    background-color: #ff6b6b;
+    color: white;
+}
+html.dark-theme .community-action-buttons .btn-leave:hover {
+    background-color: #cc5a5a;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+}
+
+html.dark-theme .community-action-buttons .btn-create-post {
+    background-color: #3cb371;
+    color: white;
+}
+
+html.dark-theme .community-action-buttons .btn-create-post:hover {
+    background-color: #349c63;
+    box-shadow: 0 4px 10px rgba(60, 179, 113, 0.3);
+}
+
+html.dark-theme .community-members-section h3,
+html.dark-theme .community-posts-section h3 {
+    color: #f0f0f0;
+    border-bottom-color: #3c3c3c;
+}
+
+html.dark-theme .member-avatar {
+    border-color: #444;
+}
+
+html.dark-theme .member-avatar:hover {
+    border-color: #00e600;
+}
+
+html.dark-theme .view-all-members-link {
+    color: #00e600;
+}
+
+html.dark-theme .community-posts-section p {
+    color: #aaa;
+}
+
+html.dark-theme .btn-create-post {
+    background-color: #00b000;
+    color: #fff;
+}
+
+html.dark-theme .btn-create-post:hover {
+    background-color: #008800;
+    box-shadow: 0 2px 8px rgba(0, 176, 0, 0.4);
+}
+
+html.dark-theme .community-posts-section {
+    background-color: #212121;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+html.dark-theme .community-posts-section h3 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .latest-community-post-preview {
+    background-color: #2c2c2c;
+    border-color: #444;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .latest-community-post-preview .post-preview-text {
+    color: #f0f0f0;
+}
+
+html.dark-theme .latest-community-post-preview .post-preview-meta {
+    color: #bbb;
+    border-top-color: #555;
+}
+
+html.dark-theme .latest-community-post-preview .post-preview-meta .meta-item i {
+    color: #ccc;
+}

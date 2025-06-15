@@ -1,0 +1,158 @@
+/* static/css/community/_community_search.css */
+
+.search-bar-container {
+    margin: 25px auto;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 750px;
+    width: 95%;
+    box-sizing: border-box;
+}
+
+.community-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.search-input-and-button-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-width: 150px;
+    background-color: #f8f9fa;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    border-color: #23e2dd;
+    box-shadow: 0 0 0 0.2rem rgba(35, 226, 221, 0.25);
+}
+
+.search-button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 40px;
+    height: 40px;
+}
+
+.search-button.compact-button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 18px;
+    background-color: #23e2dd;
+}
+
+.search-button.compact-button .fas {
+    margin: 0;
+}
+
+.search-button.compact-button:hover {
+    background-color: #1bcabc;
+    transform: translateY(-1px);
+}
+
+.search-button.compact-button:active {
+    background-color: #1a9e9a;
+    transform: translateY(0);
+}
+
+
+.reset-button-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.reset-search-button {
+    background-color: #6c757d;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.reset-search-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+.reset-search-button:active {
+    background-color: #4e545a;
+    transform: translateY(0);
+}
+
+.community-list-item .chat_name .fas {
+    color: #23e2dd;
+    margin-right: 5px;
+}
+
+.no-chats-message {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: #555;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.no-chats-message p {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.no-chats-message a {
+    color: #23e2dd;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.no-chats-message a:hover {
+    color: #1bcabc;
+    text-decoration: underline;
+}

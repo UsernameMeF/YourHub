@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редагувати профіль{% endblock %}
+
+{% block content %}
+<div class="auth-form-container"> {# Використовуй той самий клас контейнера для форм #}
+    <h2>Редагувати профіль</h2>
+    <form method="post" enctype="multipart/form-data"> {# enctype="multipart/form-data" обов'язковий для завантаження файлів (аватара) #}
+        {% csrf_token %}
+        {# Відображаємо форму для полів User (username, email) #}
+        {{ user_form.as_p }}
+        {# Відображаємо форму для полів Profile (avatar) #}
+        {{ profile_form.as_p }}
+        <button type="submit">Зберегти зміни</button>
+    </form>
+    <p><a href="{% url 'users:user_profile' user.id %}">Скасувати</a></p>
+</div>
+{% endblock %}

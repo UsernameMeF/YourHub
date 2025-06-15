@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Реєстрація{% endblock %}
+
+{% block content %}
+{# Огортаємо вміст форми в div з класом auth-form-container #}
+<div class="auth-form-container">
+    <h2>Реєстрація</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }} {# Рендеринг форми #}
+        <button type="submit">Зареєструватися</button>
+    </form>
+    {# Абзац з текстом і посиланням під формою #}
+    <p>Вже маєте обліковий запис? <a href="{% url 'users:login' %}">Увійдіть тут</a>.</p>
+</div>
+{% endblock %}

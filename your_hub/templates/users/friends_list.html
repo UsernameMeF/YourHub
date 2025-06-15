@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мої друзі та запити{% endblock %}
+
+{% block content %}
+<div class="friends-list-container"> {# Додайте CSS класи для стилізації #}
+    <h2>Мої друзі та запити</h2>
+
+    {# --- Навігація між списками (Друзі / Запити) --- #}
+    <div class="friends-nav"> {# Клас для кнопок перемикання #}
+        <button class="nav-button active" data-target="friends">Друзі ({{ friends|length }})</button>
+        <button class="nav-button" data-target="received-requests">Вхідні запити ({{ received_requests|length }})</button>
+        <button class="nav-button" data-target="sent-requests">Надіслані запити ({{ sent_requests|length }})</button>
+    </div>
+
+
+    {# --- Секція "Друзі" --- #}
+    <div id="friends" class="friends-section"> {# Клас для секції друзів #}
+        <h3>Список друзів</h3>
+        {% if friends %}
+            <ul class="friends-grid"> {# Додайте класи для сітки друзів #}
+                {% for friend in friends %}
+                    <li class="friend-item"> {# Клас для кожного елемента друга #}
+                        {# Посилання на профіль друга #}
+                        <a href="{% url 'users:user_profile' friend.id %}">
+                            {# Аватар друга (доступ до профілю через related_name) #}
+                            <img src="{% if friend.profile and friend.profile.avatar %}{{ friend.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ friend.username }} Аватар" class="friend-avatar">
+                            <span class="friend-username">{{ friend.username }}</span>
+                        </a>
+                        {# <form method="post" action="{% url 'remove_friend' user_id=friend.id %}" class="ajax-remove-friend-form" data-user-id="{{ friend.id }}" style="display:inline;"> {% csrf_token %} <button type="submit">Видалити</button> </form> #}
+                    </li>
+                {% endfor %}
+            </ul>
+            {# TODO: Додати пагінацію для списку друзів #}
+        {% else %}
+            <p>У вас поки немає друзів.</p>
+        {% endif %}
+    </div>
+
+    {# --- Секція "Вхідні запити на дружбу" --- #}
+    {# id секції змінено для унікальності #}
+    <div id="received-requests" class="friends-section hidden"> {# За замовчуванням прихована, буде показуватися через JS #}
+        <h3>Вхідні запити</h3>
+        {% if received_requests %}
+            <ul class="request-list"> {# Клас для списку запитів #}
+                {% for request in received_requests %}
+                    {# Кожному елементу запиту присвоюємо унікальний ID для зручності видалення через JS #}
+                    <li class="request-item" id="request-{{ request.id }}">
+                        {# Посилання на профіль відправника запиту #}
+                        <a href="{% url 'users:user_profile' request.from_user.id %}">
+                             {# Аватар відправника #}
+                            <img src="{% if request.from_user.profile and request.from_user.profile.avatar %}{{ request.from_user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ request.from_user.username }} Аватар" class="request-avatar">
+                            <span class="request-username">{{ request.from_user.username }}</span>
+                        </a>
+                        <div class="request-actions"> {# Контейнер для кнопок дій із запитом #}
+                            {# Форма для прийняття запиту - з класом для AJAX #}
+                            <form method="post" action="{% url 'users:accept_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Прийняти</button>
+                            </form>
+                            {# Форма для відхилення запиту - з класом для AJAX #}
+                            <form method="post" action="{% url 'users:decline_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Відхилити</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            {# TODO: Додати пагінацію для списку запитів #}
+        {% else %}
+            <p>У вас немає вхідних запитів на дружбу.</p>
+        {% endif %}
+    </div>
+
+    {# --- Секція "Надіслані запити" --- #}
+     {% if sent_requests %} {# Показуємо секцію тільки якщо є надіслані запити #}
+         <div id="sent-requests" class="friends-section hidden">
+            <h3>Надіслані запити</h3>
+            {% if sent_requests %}
+                <ul class="request-list">
+                    {% for request in sent_requests %}
+                         {# Кожному елементу запиту присвоюємо унікальний ID для зручності видалення через JS #}
+                        <li class="request-item" id="request-{{ request.id }}">
+                            {# Посилання на профіль одержувача запиту #}
+                            <a href="{% url 'users:user_profile' request.to_user.id %}">
+                                {# Аватар одержувача #}
+                                <img src="{% if request.to_user.profile and request.to_user.profile.avatar %}{{ request.to_user.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="{{ request.to_user.username }} Аватар" class="request-avatar">
+                                <span class="request-username">{{ request.to_user.username }}</span>
+                            </a>
+                            <div class="request-actions">
+                                {#- Очікує підтвердження #}
+                                {# Форма для скасування запиту - з класом для AJAX #}
+                                <form method="post" action="{% url 'users:cancel_friend_request' friendship_id=request.id %}" class="ajax-friend-request-form" data-request-id="{{ request.id }}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Скасувати</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {# TODO: Додати пагінацію для списку надісланих запитів #}
+            {% else %}
+                <p>У вас немає надісланих запитів на дружбу.</p>
+            {% endif %}
+           </div>
+     {% endif %}
+
+
+</div>
+
+{% block extra_js %}
+<script>
+    // JavaScript для перемикання між секціями "Друзі" та "Запити"
+    document.addEventListener('DOMContentLoaded', function() {
+        const navButtons = document.querySelectorAll('.friends-nav .nav-button');
+        const sections = document.querySelectorAll('.friends-list-container .friends-section');
+        // Збираємо всі форми з класом 'ajax-friend-request-form'
+        const ajaxForms = document.querySelectorAll('.ajax-friend-request-form');
+        const ajaxMessagesDiv = document.getElementById('ajax-messages');
+
+        // Функція для показу певної секції
+        function showSection(targetId) {
+             // Видаляємо активний клас з усіх кнопок і додаємо до поточної
+            navButtons.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Ховаємо всі секції та показуємо цільову
+            sections.forEach(section => section.classList.add('hidden'));
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                 targetSection.classList.remove('hidden');
+            }
+        }
+
+        // Обробники кліків для кнопок навігації
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+                showSection(target);
+            });
+        });
+
+        // Додаємо базовий стиль для приховування (якщо ще не доданий в загальний CSS)
+        // Це гарантує, що секції будуть приховані до завантаження JS
+        const style = document.createElement('style');
+        style.innerHTML = '.hidden { display: none; }';
+        document.head.appendChild(style);
+
+        // Показуємо секцію "Друзі" за замовчуванням при завантаженні
+        showSection('friends');
+
+
+        // --- AJAX для форм запитів на дружбу ---
+        ajaxForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Запобігаємо стандартній відправці форми
+
+                const form = event.target;
+                const actionUrl = form.action; // URL для відправки запиту
+                const method = form.method; // Метод (POST)
+                const formData = new FormData(form); // Збираємо дані форми (включаючи CSRF токен)
+                const requestId = form.getAttribute('data-request-id'); // ID запиту з атрибута data-*
+
+                // Виконуємо асинхронний запит за допомогою Fetch API
+                fetch(actionUrl, {
+                    method: method,
+                    body: formData,
+                    // Заголовок X-CSRFToken зазвичай не потрібен при використанні FormData,
+                    // оскільки токен відправляється в тілі запиту.
+                    // Але якщо виникнуть проблеми, можна розкоментувати і використовувати getCookie
+                    // headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                })
+                .then(response => {
+                    // Перевіряємо статус відповіді (успіх 2xx або помилка)
+                    if (!response.ok) {
+                        // Якщо статус не 2xx, парсимо JSON помилки і кидаємо виняток
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || 'Сталася помилка.');
+                        });
+                    }
+                    // Якщо статус 2xx, парсимо JSON відповідь
+                    return response.json();
+                })
+                .then(data => {
+                    // Обробляємо успішну відповідь від сервера (статус 'success' з нашого JsonResponse)
+                    if (data.status === 'success') {
+                        // Знаходимо елемент списку (<li>) відповідного запиту за його ID
+                        const requestItem = document.getElementById(`request-${data.request_id}`);
+                        if (requestItem) {
+                            requestItem.remove(); // Видаляємо елемент з DOM
+
+                            // TODO: Опціонально: оновити лічильники запитів/друзів на кнопках навігації
+                            updateCounts(); // Викликаємо функцію оновлення лічильників
+                            displayMessage(data.message, 'success'); // Показати повідомлення про успіх
+                        }
+                    } else {
+                           // Обробляємо відповідь зі статусом 'error' з нашого JsonResponse
+                        displayMessage(data.message || 'Сталася помилка.', 'error'); // Показати повідомлення про помилку
+                    }
+                })
+                .catch(error => {
+                    // Обробляємо помилки мережі або помилки, кинуті в .then
+                    console.error('AJAX помилка:', error);
+                    displayMessage(error.message || 'Сталася помилка під час виконання дії.', 'error');
+                });
+            });
+        });
+
+        // TODO: Функція для отримання CSRF токена з кукі (якщо знадобиться)
+        /*
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        */
+
+        // Функція для відображення повідомлень користувачеві в блоці #ajax-messages
+        function displayMessage(message, type) {
+            const messageElement = document.createElement('div');
+            // Додаємо CSS класи для стилізації (потрібно визначити в style.css)
+            messageElement.classList.add('ajax-message', `ajax-message-${type}`);
+            messageElement.textContent = message;
+
+            // Очищаємо попередні повідомлення перед додаванням нового
+            ajaxMessagesDiv.innerHTML = '';
+            ajaxMessagesDiv.appendChild(messageElement);
+
+            // Опціонально: автоматично приховувати повідомлення через кілька секунд
+            setTimeout(() => {
+                if (ajaxMessagesDiv.contains(messageElement)) {
+                     messageElement.remove();
+                }
+            }, 5000); // Повідомлення зникне через 5 секунд
+        }
+
+        // TODO: Функція для оновлення лічильників на кнопках навігації після AJAX дії
+        // Це може бути складнішим, тому що вимагає перерахунку елементів або отримання нових даних
+        // Для початку можна не реалізовувати або просто перераховувати видимі елементи
+        function updateCounts() {
+             // Приклад (дуже простий перерахунок видимих елементів у секції):
+             const friendsCount = document.getElementById('friends').querySelectorAll('.friend-item').length;
+             const receivedRequestsCount = document.getElementById('received-requests').querySelectorAll('.request-item').length;
+             const sentRequestsSection = document.getElementById('sent-requests');
+             const sentRequestsCount = sentRequestsSection ? sentRequestsSection.querySelectorAll('.request-item').length : 0;
+
+
+             document.querySelector('.friends-nav button[data-target="friends"]').textContent = `Друзі (${friendsCount})`;
+             document.querySelector('.friends-nav button[data-target="received-requests"]').textContent = `Вхідні запити (${receivedRequestsCount})`;
+             const sentRequestsButton = document.querySelector('.friends-nav button[data-target="sent-requests"]');
+             if (sentRequestsButton) {
+                 sentRequestsButton.textContent = `Надіслані запити (${sentRequestsCount})`;
+                 // Якщо надісланих запитів 0, можна приховати кнопку
+                 if (sentRequestsCount === 0) {
+                     sentRequestsButton.style.display = 'none';
+                 } else {
+                      sentRequestsButton.style.display = ''; // Або 'inline-block', залежно від стилів
+                 }
+             }
+
+             // TODO: Врахувати, що при прийнятті запиту, користувач додається до списку друзів.
+             // Це вимагатиме додавання елемента до списку друзів через JS або повного оновлення списків.
+             // Надійніший підхід - отримувати оновлені списки або їх частини з сервера після дії.
+        }
+
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

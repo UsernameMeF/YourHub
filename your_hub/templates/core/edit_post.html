@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Редагувати допис{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/core/create_post_form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core/create_post_form_dark.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="post-form-container">
+    <h1>Редагувати допис "{{ post.title }}"</h1>
+    <form id="post-edit-form" method="post" action="{% url 'core:post_edit_submit' post.pk %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="form-field-wrapper">
+            <label for="{{ form.title.id_for_label }}">Заголовок</label>
+            {{ form.title|add_class:"form-input-field" }}
+            {% if form.title.errors %}
+                <p class="error-message">{{ form.title.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-field-wrapper">
+            <label for="{{ form.content.id_for_label }}">Вміст</label>
+            {{ form.content|add_class:"form-input-field" }}
+            {% if form.content.errors %}
+                <p class="error-message">{{ form.content.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+
+        <div class="form-field-wrapper">
+            <label for="{{ form.tags_input.id_for_label }}">Теги</label>
+            {{ form.tags_input|add_class:"form-input-field" }}
+            <p class="help-text">{{ form.tags_input.help_text }}</p>
+            {% if form.tags_input.errors %}
+                <p class="error-message">{{ form.tags_input.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+
+        <div class="image-upload-section">
+            <h3>Зображення (до 5)</h3>
+            
+            {# Існуючі зображення #}
+            <div id="existing-images-preview" class="image-previews-grid">
+                {# JSON-дані для існуючих зображень #}
+                <script id="initial-images-data" type="application/json">
+                    {{ post_images_json|safe }}
+                </script>
+            </div>
+            {# Це приховане поле буде містити ID зображень, які потрібно видалити #}
+            <input type="hidden" name="existing_image_ids_to_delete" id="existing-image-ids-to-delete" value="{{ existing_image_ids_to_delete_json|default:'[]' }}">
+
+            {# Контейнер для попереднього перегляду нових зображень #}
+            <div id="image-inputs-wrapper" class="image-previews-grid">
+                {# Тут будуть динамічно додаватися попередні перегляди нових зображень #}
+            </div>
+            <button type="button" id="add-new-image-button" class="add-image-button">Додати нове зображення</button>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'core:post_detail' post.pk %}" class="form-button cancel">Скасувати</a>
+            <button type="submit" class="form-button primary">Зберегти зміни</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/core/post_form_manager.js' %}"></script>
+{% endblock %}

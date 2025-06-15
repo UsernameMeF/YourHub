@@ -1,0 +1,50 @@
+{# notifications/templates/notifications/notification_list.html #}
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Мої сповіщення{% endblock %}
+
+{% block extra_head %}
+    {# Важливо: тут ми підключаємо ваші нові стилі, переконайтеся, що вони існують за цим шляхом #}
+    <link rel="stylesheet" href="{% static 'css/notifications/_notification_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications/_notification_list_dark.css' %}" media="(prefers-color-scheme: dark)">
+    {# Якщо ви використовуєте Font Awesome 5, то посилання правильне, якщо 6, то потрібно 6.0.0-beta3 #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+{# Прибрано зайвий вкладений div.container notification-list-container #}
+<div class="notification-list-container">
+    <h1 class="notification-notification-title">Мої сповіщення</h1>
+    
+    <div id="notifications-list-wrapper">
+        {% if notifications %}
+        <ul class="notification-list" data-page="1" data-has-next="{{ notifications.has_next }}">
+            {% for notification in notifications %}
+                {% include 'notifications/_single_notification.html' %}
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="notification-no-notifications-message">У вас поки немає сповіщень.</p>
+        {% endif %}
+    </div>
+    
+    {# Переносимо індикатор завантаження та кнопку "Завантажити ще" в одне місце та з новими класами #}
+    {# Важливо: їх `display: none;` має бути встановлено в CSS, а не inline style, щоб стилі з файлу працювали #}
+    <div class="notification-loading-spinner" style="display: none;"> {# inline style тимчасово, краще в CSS #}
+        <i class="fas fa-spinner fa-spin fa-2x"></i> Завантаження...
+    </div>
+    {# Для кнопки "Завантажити ще" приберіть inline style display: block та margin: 20px auto; тому що це вже є в CSS #}
+    <button class="notification-load-more-button" style="display: none;">Завантажити ще</button> {# inline style тимчасово, краще в CSS #}
+
+</div> {# Закриття основного notification-list-container #}
+
+{% endblock %}
+
+{% block extra_js %}
+    {# Переконайтеся, що notification_list_infinite_scroll.js використовує нові класи та ID, якщо вони там використовуються #}
+    <script src="{% static 'js/notification_list_infinite_scroll.js' %}"></script>
+    {# notifications.js має бути підключений після notification_list_infinite_scroll.js, якщо він залежить від елементів, завантажених scroll'ом #}
+    <script src="{% static 'js/notifications.js' %}"></script>
+{% endblock %}

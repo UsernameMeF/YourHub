@@ -1,0 +1,66 @@
+/* SOCIAL_NETWORK/your_hub/static/css/global/_base_dark.css */
+
+html.dark-theme body {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+}
+
+html.dark-theme .header {
+    background-color: #252526;
+    border-bottom-color: #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .site-title {
+    color: #00e600;
+}
+html.dark-theme .site-title:hover {
+    color: #00ff00;
+}
+
+html.dark-theme .site-title .hub-icon {
+    color: #00e600;
+}
+
+html.dark-theme .user-menu-button {
+    color: #f0f0f0;
+}
+html.dark-theme .user-menu-button:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .dropdown-menu {
+    background-color: #252526;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+}
+
+html.dark-theme .dropdown-menu a {
+    color: #f0f0f0;
+}
+html.dark-theme .dropdown-menu a:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .navbar {
+    background-color: #252526;
+    border-right-color: #3a3a3a;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-theme .navbar a {
+    color: #ccc;
+}
+html.dark-theme .navbar a:hover {
+    background-color: rgba(0, 230, 0, 0.1);
+    color: #00e600;
+}
+
+html.dark-theme .theme-switch-button {
+    color: #f0f0f0;
+}
+html.dark-theme .theme-switch-button:hover {
+    background-color: #3a3a3a;
+}
+
+html.dark-theme .sun-icon { display: none; }
+html.dark-theme .moon-icon { display: block; }

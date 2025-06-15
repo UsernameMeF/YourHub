@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Головна сторінка - YourHub{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/core/_index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core/_index_dark.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">Стрічка дописів</h1>
+
+    <div class="tag-search-bar-container">
+        <form class="tag-search-bar-form" onsubmit="event.preventDefault(); document.getElementById('tag-search-button').click();">
+            <div class="tag-search-input-and-button-row">
+                <input type="text" id="tag-search-input" class="tag-search-bar-input" placeholder="Шукати за тегами #тег">
+                <button type="button" id="tag-search-button" class="tag-search-bar-button">Пошук</button>
+            </div>
+            <div class="tag-search-bar-clear-button-row">
+                <button type="button" id="clear-tag-search-button" class="tag-search-bar-clear-button" style="display: none;">Очистити</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="feed-controls">
+        <div class="sort-dropdown-container">
+            <button class="sort-dropdown-button">
+                Сортування: <span id="current-sort-label">Нові</span> <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="sort-dropdown-menu">
+                <a href="#" class="sort-option" data-sort="new">Нові</a> {# Прибрали active за замовчуванням #}
+                <a href="#" class="sort-option" data-sort="popular">Популярні</a>
+            </div>
+        </div>
+
+        <div class="view-toggle">
+            <button class="view-toggle-button" data-view="card"> {# Прибрали active за замовчуванням #}
+                <i class="fas fa-th-large"></i> Картки
+            </button>
+            <button class="view-toggle-button" data-view="compact">
+                <i class="fas fa-list"></i> Компактний
+            </button>
+        </div>
+    </div>
+
+    <div id="posts-container" class="posts-container"> {# Прибрали card-view за замовчуванням #}
+        <p id="no-posts-message" style="display: none;">Поки немає дописів у цій категорії.</p>
+    </div>
+
+    <div id="loading-indicator" class="loading-indicator" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i> Завантаження...
+    </div>
+
+    <div id="end-of-feed-message" class="end-of-feed-message" style="display: none;">
+        Ви досягли кінця стрічки.
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const postsContainer = document.getElementById('posts-container');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const endOfFeedMessage = document.getElementById('end-of-feed-message');
+    const noPostsMessage = document.getElementById('no-posts-message');
+
+    const getPostsAjaxUrl = "{% url 'core:get_posts_ajax' %}";
+
+    // Елементи керування сортуванням
+    const sortDropdownContainer = document.querySelector('.sort-dropdown-container');
+    const sortDropdownButton = document.querySelector('.sort-dropdown-button');
+    const currentSortLabel = document.getElementById('current-sort-label');
+    const sortDropdownMenu = document.querySelector('.sort-dropdown-menu');
+    const sortOptions = document.querySelectorAll('.sort-option');
+
+    // Елементи керування виглядом
+    const viewToggleButtons = document.querySelectorAll('.view-toggle-button');
+
+    // Нові елементи для пошуку за тегами
+    const tagSearchInput = document.getElementById('tag-search-input');
+    const tagSearchButton = document.getElementById('tag-search-button');
+    const clearTagSearchButton = document.getElementById('clear-tag-search-button');
+
+    let currentPage = 1;
+    let isLoading = false;
+    let hasNextPage = true;
+    let loadedPostsData = {};
+
+    // Ініціалізація з localStorage
+    let currentSort = localStorage.getItem('yourhub_sort_preference') || 'new';
+    let currentView = localStorage.getItem('yourhub_view_preference') || 'card';
+    let currentTag = localStorage.getItem('yourhub_tag_filter') || '';
+
+    // ===========================================
+    // Допоміжні функції
+    // ===========================================
+
+    function shortenText(text, maxLength) {
+        if (text.length <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + '...';
+    }
+
+    function renderPost(postData, viewMode) {
+        const postElement = document.createElement('div');
+        postElement.classList.add('post-card');
+        postElement.id = `post-${postData.id}`;
+
+        const detailUrl = postData.detail_url;
+
+        let attachmentsHtml = '';
+        if (viewMode === 'card') {
+            if (postData.attachments && postData.attachments.length > 0) {
+                attachmentsHtml = `
+                    <div class="post-images-grid">
+                        <img src="${postData.attachments[0].url}" alt="Вкладення до допису" class="post-grid-image">
+                    </div>
+                `;
+            }
+        } else { // compact-view
+            if (postData.attachments && postData.attachments.length > 0) {
+                attachmentsHtml = `
+                    <img src="${postData.attachments[0].url}" alt="Вкладення" class="post-image-thumbnail">
+                `;
+            } else {
+                attachmentsHtml = `
+                    <div class="post-image-thumbnail placeholder-thumbnail">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                `;
+            }
+        }
+
+        let postHeaderContent = '';
+        if (postData.is_community_post) {
+            postHeaderContent = `
+                <div class="community-header">
+                    <a href="${postData.community_url}" class="community-link">
+                        <span class="community-name">${postData.community_name}</span>
+                    </a>
+                    <i class="fas fa-angle-right community-arrow"></i>
+                    <span class="post-date">${postData.created_at}</span>
+                </div>
+            `;
+        } else {
+            postHeaderContent = `
+                <div class="post-header">
+                    ${viewMode === 'card' ? `<img src="${postData.author_avatar_url}" alt="Аватар" class="post-author-avatar">` : ''}
+                    <div class="post-info">
+                        <a href="/users/${postData.author_id}" class="post-author-username">${postData.author_username}</a>
+                        <span class="post-date">${postData.created_at}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const postContent = viewMode === 'compact' ? shortenText(postData.content, 150) : postData.content;
+
+        postElement.innerHTML = `
+            ${postHeaderContent}
+            ${attachmentsHtml}
+
+            ${postData.can_edit_delete ? `
+                <div class="post-actions-dropdown">
+                    <button class="post-actions-button">...</button>
+                    <div class="dropdown-menu">
+                        <a href="#" onclick="event.preventDefault(); openEditPostModal(${postData.id}, '${postData.title.replace(/'/g, "\\'")}', '${postData.content.replace(/'/g, "\\'")}', ${postData.is_community_post})">Редагувати</a>
+                        <a href="#" onclick="event.preventDefault(); openDeletePostModal(${postData.id}, ${postData.is_community_post})">Видалити</a>
+                    </div>
+                </div>
+            ` : ''}
+
+            <h2 class="post-title"><a href="${detailUrl}">${postData.title}</a></h2>
+            
+            <div class="post-content">${postContent}</div>
+
+            <div class="post-actions">
+                <button class="action-button like-button ${postData.is_liked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'like', ${postData.is_community_post})">
+                    <i class="fas fa-thumbs-up"></i> <span class="likes-count">${postData.total_likes}</span>
+                </button>
+                <button class="action-button dislike-button ${postData.is_disliked ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'dislike', ${postData.is_community_post})">
+                    <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">${postData.total_dislikes}</span>
+                </button>
+                <button class="action-button repost-button ${postData.is_reposted ? 'active' : ''}" onclick="handlePostAction(${postData.id}, 'repost', ${postData.is_community_post})">
+                    <i class="fas fa-retweet"></i> <span class="reposts-count">${postData.total_reposts}</span>
+                </button>
+                <a href="${detailUrl}" class="action-button">
+                    <i class="fas fa-comment"></i> <span class="comments-count total-comments-${postData.id}">${postData.total_comments}</span>
+                </a>
+            </div>
+        `;
+        return postElement;
+    }
+
+    // ===========================================
+    // Основна логіка завантаження та керування дописами
+    // ===========================================
+
+    async function loadPosts(append = true) {
+        if (isLoading && append) return;
+
+        isLoading = true;
+        loadingIndicator.style.display = 'block';
+        endOfFeedMessage.style.display = 'none';
+
+        try {
+            let url = `${getPostsAjaxUrl}?page=${currentPage}&sort=${currentSort}`;
+            if (currentTag) { // Додаємо параметр тегу, якщо він встановлений
+                url += `&tag=${encodeURIComponent(currentTag)}`; // encodeURIComponent потрібен для коректної передачі українських символів в URL
+            }
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (!append) {
+                postsContainer.innerHTML = '';
+                loadedPostsData = {}; // Очищаємо дані при новому завантаженні (сортування/вигляд/тег)
+            }
+
+            if (data.posts.length === 0 && currentPage === 1) {
+                noPostsMessage.style.display = 'block';
+            } else {
+                noPostsMessage.style.display = 'none';
+            }
+
+            data.posts.forEach(postData => {
+                loadedPostsData[postData.id] = postData;
+                const postElement = renderPost(postData, currentView);
+                postsContainer.appendChild(postElement);
+            });
+
+            hasNextPage = data.has_next_page;
+            if (!hasNextPage) {
+                endOfFeedMessage.style.display = 'block';
+            }
+            currentPage++;
+
+        } catch (error) {
+            console.error('Помилка під час завантаження дописів:', error);
+        } finally {
+            isLoading = false;
+            loadingIndicator.style.display = 'none';
+        }
+    }
+
+    // Обробник для нескінченного прокручування
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) && hasNextPage && !isLoading) {
+            loadPosts(true);
+        }
+    });
+
+    // ===========================================
+    // Обробники подій для елементів керування
+    // ===========================================
+
+    // Показ/приховування випадаючого меню сортування
+    sortDropdownButton.addEventListener('click', () => {
+        sortDropdownMenu.classList.toggle('show');
+    });
+
+    // Обробка вибору опції сортування
+    sortOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newSort = e.target.dataset.sort;
+            if (newSort !== currentSort) {
+                currentSort = newSort;
+                localStorage.setItem('yourhub_sort_preference', currentSort);
+                currentSortLabel.textContent = e.target.textContent;
+                sortOptions.forEach(opt => opt.classList.remove('active'));
+                e.target.classList.add('active');
+                sortDropdownMenu.classList.remove('show');
+
+                currentPage = 1;
+                loadPosts(false);
+            }
+        });
+    });
+
+    // Приховування випадаючого меню при кліку поза ним
+    document.addEventListener('click', (e) => {
+        if (!sortDropdownContainer.contains(e.target)) {
+            sortDropdownMenu.classList.remove('show');
+        }
+    });
+
+    // Обробка перемикання вигляду
+    viewToggleButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const newView = e.currentTarget.dataset.view;
+            if (newView !== currentView) {
+                currentView = newView;
+                localStorage.setItem('yourhub_view_preference', currentView);
+
+                viewToggleButtons.forEach(btn => btn.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+
+                postsContainer.classList.remove('card-view', 'compact-view');
+                postsContainer.classList.add(`${currentView}-view`);
+
+                renderLoadedPosts();
+            }
+        });
+    });
+
+    // Обробник кнопки пошуку за тегами
+    tagSearchButton.addEventListener('click', () => {
+        let tagValue = tagSearchInput.value.trim();
+        if (tagValue.startsWith('#')) {
+            tagValue = tagValue.substring(1); // Видаляємо '#' якщо він є
+        }
+        
+        // *** ЗМІНЕНО: Не перетворюємо в slug, просто використовуємо введене значення ***
+        const newTag = tagValue; 
+
+        if (newTag !== currentTag) {
+            currentTag = newTag;
+            localStorage.setItem('yourhub_tag_filter', currentTag);
+            currentPage = 1; // Скидаємо сторінку
+            loadPosts(false); // Завантажуємо дописи з новим тегом
+
+            if (currentTag) {
+                clearTagSearchButton.style.display = 'inline-block';
+            } else {
+                clearTagSearchButton.style.display = 'none';
+            }
+        }
+    });
+
+    // Обробник очищення пошуку за тегами
+    clearTagSearchButton.addEventListener('click', () => {
+        tagSearchInput.value = '';
+        if (currentTag !== '') {
+            currentTag = '';
+            localStorage.removeItem('yourhub_tag_filter');
+            currentPage = 1; // Скидаємо сторінку
+            loadPosts(false); // Завантажуємо всі дописи
+            clearTagSearchButton.style.display = 'none';
+        }
+    });
+
+    // Дозволяємо натискати Enter у полі пошуку для активації пошуку
+    tagSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            tagSearchButton.click();
+        }
+    });
+
+    // ===========================================
+    // Функція для перерендерингу всіх вже завантажених дописів при зміні вигляду
+    // ===========================================
+    function renderLoadedPosts() {
+        postsContainer.innerHTML = '';
+        
+        const postsToRender = Object.values(loadedPostsData);
+
+        postsToRender.forEach(postData => {
+            const postElement = renderPost(postData, currentView);
+            postsContainer.appendChild(postElement);
+        });
+
+        if (Object.keys(loadedPostsData).length === 0) {
+            noPostsMessage.style.display = 'block';
+        } else {
+            noPostsMessage.style.display = 'none';
+        }
+    }
+
+
+    // ===========================================
+    // Ініціалізація при завантаженні сторінки
+    // ===========================================
+
+    function initializeUIFromPreferences() {
+        // Встановлюємо активну опцію сортування
+        sortOptions.forEach(option => {
+            if (option.dataset.sort === currentSort) {
+                option.classList.add('active');
+                currentSortLabel.textContent = option.textContent;
+            } else {
+                option.classList.remove('active');
+            }
+        });
+
+        // Встановлюємо активну кнопку вигляду
+        viewToggleButtons.forEach(button => {
+            if (button.dataset.view === currentView) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+
+        // Застосовуємо клас вигляду до контейнера дописів
+        postsContainer.classList.add(`${currentView}-view`);
+
+        // Ініціалізуємо поле пошуку тегів та кнопку очищення
+        if (currentTag) {
+            tagSearchInput.value = `#${currentTag}`; // Відображаємо тег з #
+            clearTagSearchButton.style.display = 'inline-block';
+        } else {
+            tagSearchInput.value = '';
+            clearTagSearchButton.style.display = 'none';
+        }
+    }
+
+    // Викликаємо ініціалізацію UI перед першим завантаженням дописів
+    initializeUIFromPreferences();
+    loadPosts(false); // Завантажуємо першу порцію дописів з урахуванням збереженого сортування, вигляду та тегу.
+
+
+    // === ФУНКЦІЇ handlePostAction, openEditPostModal, openDeletePostModal ===
+    // (Без змін)
+
+    function handlePostAction(postId, actionType, isCommunityPost) {
+        const url = isCommunityPost 
+            ? `/community/posts/${postId}/${actionType}/` 
+            : `/posts/${postId}/${actionType}/`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const postElement = document.getElementById(`post-${postId}`);
+                if (!postElement) return;
+
+                if (actionType === 'like') {
+                    const likeButton = postElement.querySelector('.like-button');
+                    const likesCount = postElement.querySelector('.likes-count');
+                    likesCount.textContent = data.likes_count;
+                    if (data.is_liked) {
+                        likeButton.classList.add('active');
+                    } else {
+                        likeButton.classList.remove('active');
+                    }
+                    if (data.is_liked && postElement.querySelector('.dislike-button').classList.contains('active')) {
+                        postElement.querySelector('.dislike-button').classList.remove('active');
+                        postElement.querySelector('.dislikes-count').textContent = parseInt(postElement.querySelector('.dislikes-count').textContent) - 1;
+                    }
+                } else if (actionType === 'dislike') {
+                    const dislikeButton = postElement.querySelector('.dislike-button');
+                    const dislikesCount = postElement.querySelector('.dislikes-count');
+                    dislikesCount.textContent = data.dislikes_count;
+                    if (data.is_disliked) {
+                        dislikeButton.classList.add('active');
+                    } else {
+                        dislikeButton.classList.remove('active');
+                    }
+                    if (data.is_disliked && postElement.querySelector('.like-button').classList.contains('active')) {
+                        postElement.querySelector('.like-button').classList.remove('active');
+                        postElement.querySelector('.likes-count').textContent = parseInt(postElement.querySelector('.likes-count').textContent) - 1;
+                    }
+                } else if (actionType === 'repost') {
+                    const repostButton = postElement.querySelector('.repost-button');
+                    const repostsCount = postElement.querySelector('.reposts-count');
+                    repostsCount.textContent = data.reposts_count;
+                    if (data.is_reposted) {
+                        repostButton.classList.add('active');
+                    } else {
+                        repostButton.classList.remove('active');
+                    }
+                }
+            } else if (data.status === 'error') {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Помилка під час виконання дії:', error));
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function openEditPostModal(postId, title, content, isCommunityPost) {
+        const editUrl = isCommunityPost 
+            ? `/community/posts/${postId}/edit/` 
+            : `/posts/${postId}/edit/`;
+        window.location.href = editUrl; 
+    }
+
+    function openDeletePostModal(postId, isCommunityPost) {
+        const deleteUrl = isCommunityPost 
+            ? `/community/posts/${postId}/delete/` 
+            : `/posts/${postId}/delete/`;
+        if (confirm('Ви впевнені, що хочете видалити цей допис?')) {
+            window.location.href = deleteUrl;
+        }
+    }
+</script>
+{% endblock %}

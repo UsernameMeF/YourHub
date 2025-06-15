@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ваші Чати{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_list_dark.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="chat_list-container">
+    <h1>Ваші Чати</h1>
+
+    <div class="chat_category-buttons">
+        <button id="showPrivateChatsBtn" class="btn btn-primary active">Приватні чати</button> {# Translated #}
+        <button id="showGroupChatsBtn" class="btn btn-secondary">Групи</button> {# Translated #}
+        <a href="{% url 'chat:create_group_chat' %}" class="btn btn-success create-group-btn">
+            <i class="fas fa-plus-circle"></i> Створити групу {# Translated #}
+        </a>
+    </div>
+
+    {% if chat_rooms or group_chats %}
+        <ul id="privateChatsList" class="chat_list">
+            {% if chat_rooms %}
+                {% for chat_room in chat_rooms %}
+                    <li class="chat_list-item">
+                        <a href="{% url 'chat:chat_room' room_id=chat_room.id %}">
+                            {% for participant in chat_room.participants.all %}
+                                {% if participant != request.user %}
+                                    <img src="{% if participant.profile.avatar %}{{ participant.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар" class="chat_avatar">
+                                    <div class="chat_info">
+                                        <span class="chat_name">{{ participant.username }}</span>
+                                        <span class="chat_last-message">
+                                            {% if chat_room.messages.last %}
+                                                {% if chat_room.messages.last.sender == request.user %}
+                                                    Ви: {# Translated #}
+                                                {% else %}
+                                                    {{ chat_room.messages.last.sender.username }}:
+                                                {% endif %}
+                                                {% if chat_room.messages.last.content %}
+                                                    {{ chat_room.messages.last.content|truncatechars:50 }}
+                                                {% elif chat_room.messages.last.attachments.exists %}
+                                                    [Вкладення] {# Translated #}
+                                                {% else %}
+                                                    Немає тексту {# Translated #}
+                                                {% endif %}
+                                            {% else %}
+                                                Почніть спілкування... {# Translated #}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            {% empty %}
+                                <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="chat_avatar">
+                                <div class="chat_info">
+                                    <span class="chat_name">Мої нотатки</span> {# Translated #}
+                                    <span class="chat_last-message">Почніть спілкування...</span> {# Translated #}
+                                </div>
+                                <span class="chat_timestamp">&nbsp;</span>
+                            {% endfor %}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li class="no-chats-message">У вас поки немає приватних чатів.</li> {# Translated #}
+            {% endif %}
+        </ul>
+
+        <ul id="groupChatsList" class="chat_list" style="display: none;">
+            {% if group_chats %}
+                {% for group_chat in group_chats %}
+                    <li class="chat_list-item group-chat-item">
+                        <a href="{% url 'chat:group_chat_room' group_chat_id=group_chat.id %}">
+                            <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар групи" class="chat_avatar"> {# Translated #}
+                            <div class="chat_info">
+                                <span class="chat_name">
+                                    <i class="fas fa-users"></i> {{ group_chat.name }}
+                                </span>
+                                <span class="chat_last-message">
+                                    {% if group_chat.messages.last %}
+                                        {% if group_chat.messages.last.sender == request.user %}
+                                            Ви: {# Translated #}
+                                        {% else %}
+                                            {{ group_chat.messages.last.sender.username }}:
+                                        {% endif %}
+                                        {% if group_chat.messages.last.content %}
+                                            {{ group_chat.messages.last.content|truncatechars:50 }}
+                                        {% elif group_chat.messages.last.attachments.exists %}
+                                            [Вкладення] {# Translated #}
+                                        {% else %}
+                                            Немає тексту {# Translated #}
+                                        {% endif %}
+                                    {% else %}
+                                        Група створена. Почніть спілкування! {# Translated #}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <span class="chat_timestamp">
+                                {% if group_chat.messages.last %}
+                                    {% with last_msg_time=group_chat.messages.last.timestamp %}
+                                        {% if last_msg_time|date:"Y-m-d" == today_date %}
+                                            {{ last_msg_time|date:"H:i" }}
+                                        {% elif last_msg_time|date:"Y" == today_date|date:"Y" %}
+                                            {{ last_msg_time|date:"d M" }}
+                                        {% else %}
+                                            {{ last_msg_time|date:"d.m.Y" }}
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    &nbsp;
+                                {% endif %}
+                            </span>
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li class="no-chats-message">У вас поки немає групових чатів. Ви можете <a href="#" id="openCreateGroupChatModal">створити нову групу</a>.</li> {# Translated #}
+            {% endif %}
+        </ul>
+    {% else %}
+        <p>У вас поки немає активних приватних або групових чатів.</p> {# Translated #}
+        <p>Ви можете розпочати чат з другом, перейшовши на його профіль, або <a href="#" id="openCreateGroupChatModal">створити нову групу</a>.</p> {# Translated #}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const privateChatsBtn = document.getElementById('showPrivateChatsBtn');
+            const groupChatsBtn = document.getElementById('showGroupChatsBtn');
+            const privateChatsList = document.getElementById('privateChatsList');
+            const groupChatsList = document.getElementById('groupChatsList');
+
+            privateChatsList.style.display = 'block';
+            groupChatsList.style.display = 'none';
+            privateChatsBtn.classList.add('active');
+            groupChatsBtn.classList.remove('active');
+
+            privateChatsBtn.addEventListener('click', function() {
+                privateChatsList.style.display = 'block';
+                groupChatsList.style.display = 'none';
+                privateChatsBtn.classList.add('active');
+                groupChatsBtn.classList.remove('active');
+            });
+
+            groupChatsBtn.addEventListener('click', function() {
+                privateChatsList.style.display = 'none';
+                groupChatsList.style.display = 'block';
+                groupChatsBtn.classList.add('active');
+                privateChatsBtn.classList.remove('active');
+            });
+        });
+    </script>
+{% endblock %}

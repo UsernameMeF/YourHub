@@ -1,0 +1,889 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Чат з {% for participant in chat_room.participants.all %}{% if participant != request.user %}{{ participant.username }}{% endif %}{% endfor %}{% endblock %} {# Translated #}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_room.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat/_chat_room_dark.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="chat_room-container">
+    <h1>
+        <div class="chat_header-left-elements">
+            <a href="{% url 'chat:chat_list' %}" class="chat_back-button" title="Назад до чатів"><i class="fas fa-arrow-left"></i></a> {# Translated #}
+            {% for participant in chat_room.participants.all %}
+                {% if participant != request.user %}
+                    <img src="{{ participant.profile.avatar.url }}" alt="{{ participant.username }}" class="chat_partner-avatar">
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% for participant in chat_room.participants.all %}
+            {% if participant != request.user %}
+                <a href="{% url 'users:user_profile' user_id=participant.id %}">{{ participant.username }}</a>
+            {% endif %}
+        {% endfor %}
+        <div id="typing-indicator" style="display: none; font-style: italic; color: gray; margin-top: -30px; margin-bottom: 5px; text-align: center;"></div>
+    </h1>
+
+    <div id="chat_log" class="chat_log">
+        {% for message in messages %}
+            <div class="chat_message-item {% if message.sender == request.user %}my_message{% else %}other_message{% endif %}"
+                 data-message-id="{{ message.id }}"
+                 data-read-by-current="{% if message.sender == request.user or request.user in message.read_by.all %}true{% else %}false{% endif %}">
+                <div class="chat_message-header">
+                    <span class="chat_sender-username">{% if message.sender == request.user %}Ви{% else %}{{ message.sender.username }}{% endif %}</span> {# Translated #}
+                    <span class="chat_message-timestamp">{{ message.timestamp|date:"d.m.Y H:i" }}</span>
+                    {% if message.is_edited %}
+                        <span class="chat_edited-status">(відредаговано)</span> {# Translated #}
+                    {% endif %}
+                </div>
+                <div class="chat_message-content-wrapper">
+                    <div class="chat_message-content">{{ message.content|linebreaksbr }}
+                        {% for attachment in message.attachments.all %}
+                            <div class="chat_attachment-item" data-attachment-id="{{ attachment.id }}">
+                                {% if attachment.file_type == 'image' %}
+                                    <img src="{{ attachment.file.url }}" alt="{{ attachment.original_filename }}" class="chat_image" onclick="window.open(this.src)">
+                                {% elif attachment.file_type == 'video' %}
+                                    <video controls class="chat_video">
+                                        <source src="{{ attachment.file.url }}" type="video/mp4">
+                                        Ваш браузер не підтримує відео тег. {# Translated #}
+                                    </video>
+                                {% elif attachment.file_type == 'document' %}
+                                    <a href="{{ attachment.file.url }}" target="_blank" class="chat_document-link">
+                                        <i class="fas fa-file-alt"></i> {{ attachment.original_filename }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if message.sender == request.user %}
+                        <div class="chat_read-status" data-read-count="{{ message.read_by.count }}">
+                            {% if chat_room.participants.count == 2 %}
+                                {% if message.read_by.count == 2 %}
+                                    <i class="fas fa-check-double"></i>
+                                {% else %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            {% else %}
+                                {% if message.read_by.count > 1 %}
+                                    <i class="fas fa-check-double"></i> <span>{{ message.read_by.count }}</span>
+                                {% else %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% if message.sender == request.user %}
+                <div class="chat_message-actions">
+                    <button class="chat_edit-button btn btn-sm btn-info" data-message-id="{{ message.id }}"><i class="fas fa-edit"></i> Редагувати</button> {# Translated #}
+                    <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="{{ message.id }}"><i class="fas fa-trash"></i> Видалити</button> {# Translated #}
+                </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="chat_no-messages">Поки немає повідомлень у цьому чаті. Почніть спілкування!</p> {# Translated #}
+        {% endfor %}
+    </div>
+
+    <div class="chat_input-area">
+        <textarea id="chat_message-input" placeholder="Введіть ваше повідомлення..." rows="3"></textarea> {# Translated #}
+        <div class="chat_attachments-preview" id="chat_attachments-preview">
+        </div>
+        <div class="chat_actions">
+            <input type="file" id="chat_file-input" multiple hidden accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+            <button id="chat_attach-file-button" class="btn btn-secondary"><i class="fas fa-paperclip"></i> Прикріпити</button> {# Translated #}
+            <button id="chat_message-submit" class="btn btn-primary">Надіслати</button> {# Translated #}
+            <button id="chat_cancel-edit-button" class="btn btn-warning" style="display: none;">Скасувати</button> {# Translated #}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<div id="room-id" data-room-id="{{ chat_room.id }}" style="display: none;">{{ chat_room.id|json_script:"room-id" }}</div>
+<div id="current-user-id" data-current-user-id="{{ request.user.id }}" style="display: none;">{{ request.user.id|json_script:"current-user-id" }}</div>
+<div id="chat-participants-count" data-count="{{ chat_room.participants.count }}" style="display: none;"></div>
+
+<script id="room-id-data" type="application/json">{{ chat_room.id }}</script>
+<script id="room-type-data" type="application/json">"private"</script>
+
+<script>
+    const roomId = JSON.parse(document.getElementById('room-id-data').textContent);
+    const roomType = JSON.parse(document.getElementById('room-type-data').textContent);
+    const current_user_username = "{{ request.user.username|escapejs }}";
+    const currentUserId = "{{ request.user.id }}";
+    const chatParticipantsCount = parseInt(document.getElementById('chat-participants-count').dataset.count);
+
+    const chatLog = document.getElementById('chat_log');
+    const messageInput = document.getElementById('chat_message-input');
+    const messageSubmit = document.getElementById('chat_message-submit');
+    const fileInput = document.getElementById('chat_file-input');
+    const attachFileButton = document.getElementById('chat_attach-file-button');
+    const attachmentsPreview = document.getElementById('chat_attachments-preview');
+    const cancelEditButton = document.getElementById('chat_cancel-edit-button');
+
+    let editingMessageId = null;
+    let originalAttachments = [];
+
+    const typingStatusContainer = document.getElementById('typing-indicator');
+    let typingTimeout = null;
+    let isTypingLocally = false;
+    const typingUsers = new Set();
+
+    let selectedFiles = [];
+    let currentAttachments = [];
+
+    const chatSocket = new WebSocket(
+        'ws://127.0.0.1:8001/chat/'
+        + roomType + '/'
+        + roomId + '/'
+    );
+
+    const readMessagesCache = new Set();
+
+    const intersectionObserverOptions = {
+        root: chatLog,
+        rootMargin: '0px',
+        threshold: 0.8
+    };
+
+    const messageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const messageElement = entry.target;
+                const messageId = messageElement.dataset.messageId;
+                if (messageElement.classList.contains('other_message') && !readMessagesCache.has(messageId) && chatSocket.readyState === WebSocket.OPEN) {
+                    console.log(`Повідомлення ${messageId} видно і не прочитано поточним користувачем. Надсилаємо підтвердження про прочитання.`); {# Translated #}
+                    chatSocket.send(JSON.stringify({
+                        'type': 'read_receipt',
+                        'message_id': messageId
+                    }));
+                    readMessagesCache.add(messageId);
+                }
+            }
+        });
+    }, intersectionObserverOptions);
+
+    function addMessageToObserver(messageElement) {
+        if (messageElement.classList.contains('other_message') && messageElement.dataset.readByCurrent === 'false') {
+            messageObserver.observe(messageElement);
+        }
+    }
+
+    function observeMessagesForReadReceipts() {
+        const messages = chatLog.querySelectorAll('.chat_message-item');
+        messages.forEach(messageElement => {
+            if (messageElement.dataset.readByCurrent === 'true') {
+                readMessagesCache.add(messageElement.dataset.messageId);
+            }
+            addMessageToObserver(messageElement);
+        });
+    }
+
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket підключено'); {# Translated #}
+        scrollToBottom();
+        observeMessagesForReadReceipts();
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('WebSocket неочікувано закрито:', e); {# Translated #}
+        messageObserver.disconnect();
+    };
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Отримано повідомлення:', data); {# Translated #}
+
+        if (data.type === 'chat_message') {
+            const newMessageElement = createMessageElement({
+                id: data.message_id,
+                sender_id: data.sender_id,
+                sender_username: data.sender_username,
+                sender_avatar_url: data.sender_avatar_url,
+                content: data.message,
+                timestamp: data.timestamp,
+                attachments: data.attachments || [],
+                read_count: data.read_count || 0,
+                is_edited: data.is_edited || false
+            });
+            chatLog.appendChild(newMessageElement);
+            scrollToBottom();
+            addMessageToObserver(newMessageElement);
+            addMessageActionListeners(newMessageElement);
+        } else if (data.type === 'typing_status') {
+            handleTypingStatus(data.username, data.is_typing);
+        } else if (data.type === 'read_receipt_notification') {
+            handleReadReceiptNotification(data.message_id, data.reader_id, data.read_count);
+        } else if (data.type === 'message_edited') {
+            handleMessageEdited(data.message_id, data.new_content, data.attachments); {# Added data.attachments #}
+        } else if (data.type === 'message_deleted') {
+            handleMessageDeleted(data.message_id);
+        }
+    };
+
+    chatSocket.onerror = function(e) {
+        console.error('Помилка WebSocket:', e); {# Translated #}
+    };
+
+    function createMessageElement(message) {
+        const messageClass = message.sender_id == currentUserId ? 'my_message' : 'other_message';
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat_message-item', messageClass);
+        messageElement.dataset.messageId = message.id;
+        messageElement.dataset.readByCurrent = message.sender_id == currentUserId || (message.read_count > 0 && message.sender_id != currentUserId) ? 'true' : 'false';
+
+        let attachmentsHtml = '';
+        let attachmentsData = [];
+        if (message.attachments && message.attachments.length > 0) {
+            attachmentsHtml += '<div class="chat_message-attachments">';
+            message.attachments.forEach(function(attachment) {
+                const attachmentFileName = attachment.original_filename || attachment.file_url.split('/').pop();
+                attachmentsData.push({
+                    id: attachment.id,
+                    file_url: attachment.file_url,
+                    file_type: attachment.file_type,
+                    original_filename: attachmentFileName
+                });
+
+                if (attachment.file_type === 'image') {
+                    attachmentsHtml += `<a href="${attachment.file_url}" target="_blank"><img src="${attachment.file_url}" alt="Вкладення" class="chat_image" onclick="window.open(this.src)"></a>`; {# Translated #}
+                } else if (attachment.file_type === 'video') {
+                    attachmentsHtml += `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не підтримує відео тег.</video>`; {# Translated #}
+                } else {
+                    attachmentsHtml += `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachmentFileName}</a>`;
+                }
+            });
+            attachmentsHtml += '</div>';
+        }
+        messageElement.dataset.attachments = JSON.stringify(attachmentsData);
+
+        const senderDisplayName = message.sender_id == currentUserId ? 'Ви' : message.sender_username; {# Translated #}
+        const isMyMessage = message.sender_id == currentUserId;
+
+        let readStatusHtml = '';
+        if (isMyMessage) {
+            const readCount = message.read_count || 0;
+            let iconClass = 'fa-check';
+            let countSpan = '';
+
+            if (chatParticipantsCount === 2) {
+                if (readCount >= chatParticipantsCount) {
+                    iconClass = 'fa-check-double';
+                }
+                countSpan = '';
+            } else {
+                if (readCount > 1) {
+                    iconClass = 'fa-check-double';
+                    countSpan = `<span>${readCount}</span>`;
+                }
+            }
+
+            readStatusHtml = `
+                <div class="chat_read-status" data-read-count="${readCount}">
+                    <i class="fas ${iconClass}"></i> ${countSpan}
+                </div>`;
+        }
+
+        const editedStatusHtml = message.is_edited ? '<span class="chat_edited-status">відредаговано</span>' : ''; {# Translated #}
+
+        messageElement.innerHTML = `
+            <div class="chat_message-header">
+                <span class="chat_sender-username">${senderDisplayName}</span>
+                <span class="chat_message-timestamp">${message.timestamp}</span>
+                ${editedStatusHtml}
+            </div>
+            <div class="chat_message-content-wrapper">
+                ${message.content ? `<div class="chat_message-content">${message.content.replace(/\n/g, '<br>')}</div>` : ''}
+                ${attachmentsHtml}
+                ${readStatusHtml}
+            </div>
+            ${isMyMessage ? `
+            <div class="chat_message-actions">
+                <button class="chat_edit-button btn btn-sm btn-info" data-message-id="${message.id}"><i class="fas fa-edit"></i> Редагувати</button> {# Translated #}
+                <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="${message.id}"><i class="fas fa-trash"></i> Видалити</button> {# Translated #}
+            </div>` : ''}
+        `;
+        return messageElement;
+    }
+
+    function scrollToBottom() {
+        if (chatLog.querySelector('.chat_message-item')) {
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+    }
+
+    messageInput.addEventListener('input', function() {
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            if (!isTypingLocally) {
+                chatSocket.send(JSON.stringify({
+                    'type': 'typing_status',
+                    'is_typing': true
+                }));
+                isTypingLocally = true;
+            }
+
+            clearTimeout(typingTimeout);
+
+            typingTimeout = setTimeout(() => {
+                chatSocket.send(JSON.stringify({
+                    'type': 'typing_status',
+                    'is_typing': false
+                }));
+                isTypingLocally = false;
+            }, 2000);
+        }
+    });
+
+    function resetTypingStatus() {
+        if (isTypingLocally) {
+            clearTimeout(typingTimeout);
+            if (chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'type': 'typing_status',
+                    'is_typing': false
+                }));
+            }
+            isTypingLocally = false;
+        }
+    }
+
+    function handleTypingStatus(username, isTyping) {
+        if (username === current_user_username) {
+            return;
+        }
+
+        if (isTyping) {
+            typingUsers.add(username);
+        } else {
+            typingUsers.delete(username);
+        }
+        updateTypingIndicator();
+    }
+
+    function updateTypingIndicator() {
+        if (typingUsers.size === 0) {
+            typingStatusContainer.textContent = '';
+            typingStatusContainer.style.display = 'none';
+        } else {
+            const usersList = Array.from(typingUsers).join(', ');
+            typingStatusContainer.textContent = `${usersList} друкує...`; {# Translated #}
+            typingStatusContainer.style.display = 'block';
+        }
+    }
+
+    function handleReadReceiptNotification(messageId, readerId, readCount) {
+        const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            if (messageElement.classList.contains('my_message')) {
+                const readStatusElement = messageElement.querySelector('.chat_read-status');
+                if (readStatusElement) {
+                    readStatusElement.dataset.readCount = readCount;
+                    const icon = readStatusElement.querySelector('i');
+                    let countSpan = readStatusElement.querySelector('span');
+
+                    if (chatParticipantsCount === 2) {
+                        if (readCount >= chatParticipantsCount) {
+                            icon.classList.remove('fa-check');
+                            icon.classList.add('fa-check-double');
+                            if (countSpan) {
+                                countSpan.remove();
+                            }
+                        } else {
+                            icon.classList.remove('fa-check-double');
+                            icon.classList.add('fa-check');
+                            if (countSpan) {
+                                countSpan.remove();
+                            }
+                        }
+                    } else {
+                        if (readCount > 1) {
+                            icon.classList.remove('fa-check');
+                            icon.classList.add('fa-check-double');
+                            if (!countSpan) {
+                                countSpan = document.createElement('span');
+                                readStatusElement.appendChild(countSpan);
+                            }
+                            countSpan.textContent = readCount;
+                        } else {
+                            icon.classList.remove('fa-check-double');
+                            icon.classList.add('fa-check');
+                            if (countSpan) {
+                                countSpan.remove();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function handleMessageEdited(messageId, newContent, attachments) {
+        const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            const contentElement = messageElement.querySelector('.chat_message-content');
+            if (contentElement) {
+                contentElement.innerHTML = newContent.replace(/\n/g, '<br>');
+
+                let editedStatus = messageElement.querySelector('.chat_edited-status');
+                if (!editedStatus) {
+                    editedStatus = document.createElement('span');
+                    editedStatus.classList.add('chat_edited-status');
+                    messageElement.querySelector('.chat_message-header').appendChild(editedStatus);
+                }
+                editedStatus.textContent = '(відредаговано)'; {# Translated #}
+            }
+
+            const messageContentWrapper = messageElement.querySelector('.chat_message-content-wrapper');
+            let attachmentsContainer = messageContentWrapper.querySelector('.chat_attachments-wrapper');
+
+            if (attachmentsContainer) {
+                attachmentsContainer.innerHTML = '';
+            }
+
+            if (attachments && attachments.length > 0) {
+                if (!attachmentsContainer) {
+                    attachmentsContainer = document.createElement('div');
+                    attachmentsContainer.classList.add('chat_attachments-wrapper');
+                    if (contentElement) {
+                        contentElement.after(attachmentsContainer);
+                    } else {
+                        messageContentWrapper.appendChild(attachmentsContainer);
+                    }
+                }
+
+                attachments.forEach(attachment => {
+                    const attachmentItem = document.createElement('div');
+                    attachmentItem.classList.add('chat_attachment-item');
+                    attachmentItem.dataset.attachmentId = attachment.id;
+
+                    let innerHtml = '';
+                    if (attachment.file_type === 'image') {
+                        innerHtml = `<img src="${attachment.file_url}" alt="Вкладення" class="chat_image" onclick="window.open(this.src)">`; {# Translated #}
+                    } else if (attachment.file_type === 'video') {
+                        innerHtml = `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не підтримує відео тег.</video>`; {# Translated #}
+                    } else if (attachment.file_type === 'document') {
+                        innerHtml = `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachment.original_filename}</a>`;
+                    }
+                    attachmentItem.innerHTML = innerHtml;
+                    attachmentsContainer.appendChild(attachmentItem);
+                });
+            } else {
+                if (attachmentsContainer) {
+                    attachmentsContainer.remove();
+                }
+            }
+        }
+    }
+
+    function handleMessageDeleted(messageId) {
+        const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            messageElement.remove();
+        }
+        if (chatLog.children.length === 0) {
+            const noMessagesP = document.createElement('p');
+            noMessagesP.classList.add('chat_no-messages');
+            noMessagesP.textContent = 'Поки немає повідомлень у цьому чаті. Почніть спілкування!'; {# Translated #}
+            chatLog.appendChild(noMessagesP);
+        }
+    }
+
+    function addMessageActionListeners(container) {
+        const editButtons = container.querySelectorAll('.chat_edit-button');
+        editButtons.forEach(button => {
+            button.onclick = function() {
+                const messageId = this.dataset.messageId;
+                editMessage(messageId);
+            };
+        });
+
+        const deleteButtons = container.querySelectorAll('.chat_delete-button');
+        deleteButtons.forEach(button => {
+            button.onclick = function() {
+                const messageId = this.dataset.messageId;
+                deleteMessage(messageId);
+            };
+        });
+    }
+
+    async function editMessage(messageId) {
+        const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
+        if (!messageElement) return;
+
+        editingMessageId = messageId;
+        messageSubmit.textContent = 'Зберегти'; {# Translated #}
+        cancelEditButton.style.display = 'inline-block';
+        attachFileButton.style.display = 'inline-block';
+
+        const messageContentElement = messageElement.querySelector('.chat_message-content');
+        messageInput.value = messageContentElement ? messageContentElement.innerText : '';
+
+        currentAttachments = JSON.parse(messageElement.dataset.attachments || '[]');
+        selectedFiles = currentAttachments.map(att => {
+            return {
+                name: att.original_filename,
+                size: 0,
+                type: att.file_type === 'image' ? 'image/jpeg' : (att.file_type === 'video' ? 'video/mp4' : 'application/octet-stream'),
+                url: att.file_url,
+                id: att.id,
+                isExisting: true
+            };
+        });
+        updateAttachmentsPreview();
+        scrollToBottom();
+        messageInput.focus();
+    }
+
+    cancelEditButton.onclick = function() {
+        editingMessageId = null;
+        messageInput.value = '';
+        selectedFiles = [];
+        currentAttachments = [];
+        updateAttachmentsPreview();
+        messageSubmit.textContent = 'Надіслати'; {# Translated #}
+        cancelEditButton.style.display = 'none';
+    };
+
+    async function deleteMessage(messageId) {
+        if (!confirm('Ви впевнені, що хочете видалити це повідомлення?')) { {# Translated #}
+            return;
+        }
+
+        try {
+            const response = await fetch(`/chat/${roomType}/${roomId}/delete_message/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); {# Translated #}
+            }
+
+            console.log(`Повідомлення ${messageId} успішно видалено.`); {# Translated #}
+        } catch (error) {
+            console.error('Помилка видалення повідомлення:', error); {# Translated #}
+            alert('Помилка при видаленні повідомлення: ' + error.message); {# Translated #}
+        }
+    }
+
+    messageSubmit.onclick = async function(e) {
+        if (chatSocket.readyState !== WebSocket.OPEN) {
+            console.error('WebSocket не відкритий. Неможливо відправити повідомлення.'); {# Translated #}
+            alert('З\'єднання з чатом не встановлено. Будь ласка, оновіть сторінку.'); {# Translated #}
+            return;
+        }
+
+        const message = messageInput.value.trim();
+        if (message === '' && selectedFiles.length === 0) {
+            alert('Повідомлення не може бути пустим і без вкладень!'); {# Translated #}
+            return;
+        }
+
+        if (editingMessageId) {
+            await sendEditMessage(message, editingMessageId);
+        } else {
+            if (selectedFiles.length > 0) {
+                await uploadFiles(message);
+            } else {
+                chatSocket.send(JSON.stringify({
+                    'type': 'chat_message',
+                    'message': message
+                }));
+                messageInput.value = '';
+                scrollToBottom();
+            }
+        }
+        resetTypingStatus();
+        cancelEditButton.click();
+    };
+
+    messageInput.onkeyup = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageSubmit.click();
+        }
+    };
+
+    async function sendEditMessage(newContent, messageId) {
+        console.log('Викликано sendEditMessage з параметрами:'); // Translated
+        console.log('Тип кімнати:', roomType); // Translated
+        console.log('ID кімнати:', roomId); // Translated
+        console.log('ID повідомлення:', messageId); // Translated
+        console.log('Новий вміст:', newContent); // Translated
+
+        const formData = new FormData();
+        formData.append('message_content', newContent);
+
+        const existingAttachmentIds = selectedFiles
+            .filter(file => file.isExisting)
+            .map(file => file.id);
+        formData.append('existing_attachments', JSON.stringify(existingAttachmentIds));
+
+        selectedFiles.filter(file => !file.isExisting).forEach(file => {
+            formData.append('new_files', file);
+        });
+
+        try {
+            const response = await fetch(`/chat/${roomType}/${roomId}/edit_message/${messageId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); // Translated
+            }
+
+            const result = await response.json();
+            console.log('Повідомлення успішно відредаговано:', result); // Translated
+
+            editingMessageId = null;
+            messageInput.value = '';
+            selectedFiles = [];
+            currentAttachments = [];
+            updateAttachmentsPreview();
+            messageSubmit.textContent = 'Надіслати'; // Translated
+            cancelEditButton.style.display = 'none';
+        } catch (error) {
+            console.error('Помилка редагування повідомлення:', error); // Translated
+            alert('Помилка при редагуванні повідомлення: ' + error.message); // Translated
+        }
+    }
+
+    attachFileButton.onclick = function() {
+        fileInput.click();
+    };
+
+    fileInput.onchange = function(e) {
+        const newFiles = Array.from(e.target.files);
+        selectedFiles = selectedFiles.concat(newFiles);
+        updateAttachmentsPreview();
+    };
+
+    function updateAttachmentsPreview() {
+        attachmentsPreview.innerHTML = '';
+        if (selectedFiles.length > 0) {
+            attachmentsPreview.style.display = 'flex';
+        } else {
+            attachmentsPreview.style.display = 'none';
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('chat_preview-item');
+
+            let fileContent;
+            let fileSrc = file.isExisting ? file.url : URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                fileContent = document.createElement('img');
+                fileContent.src = fileSrc;
+                fileContent.classList.add('chat_preview-image');
+            } else if (file.type.startsWith('video/')) {
+                fileContent = document.createElement('video');
+                fileContent.src = fileSrc;
+                fileContent.setAttribute('preload', 'metadata');
+                fileContent.classList.add('chat_preview-video');
+            } else {
+                fileContent = document.createElement('i');
+                fileContent.classList.add('chat_file-icon', getFileIconClass(file.name));
+            }
+
+            const removeButton = document.createElement('span');
+            removeButton.classList.add('chat_remove-file');
+            removeButton.innerHTML = '&times;';
+            removeButton.onclick = () => {
+                if (!file.isExisting && fileContent.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(fileContent.src);
+                }
+                selectedFiles.splice(index, 1);
+                updateAttachmentsPreview();
+            };
+
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.classList.add('chat_file-name');
+            fileNameSpan.textContent = file.name;
+
+            previewItem.appendChild(fileContent);
+            previewItem.appendChild(removeButton);
+            previewItem.appendChild(fileNameSpan);
+            attachmentsPreview.appendChild(previewItem);
+        });
+    }
+
+    function getFileIconClass(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        switch (ext) {
+            case 'pdf': return 'fas fa-file-pdf';
+            case 'doc':
+            case 'docx': return 'fas fa-file-word';
+            case 'xls':
+            case 'xlsx': return 'fas fa-file-excel';
+            case 'txt': return 'fas fa-file-alt';
+            case 'zip':
+            case 'rar': return 'fas fa-file-archive';
+            default: return 'fas fa-file';
+        }
+    }
+
+    async function uploadFiles(messageText) {
+        const formData = new FormData();
+        formData.append('chat_room_id', roomId);
+        formData.append('message_content', messageText);
+
+        selectedFiles.forEach(file => {
+            formData.append('files', file);
+        });
+
+        try {
+            const response = await fetch(`/chat/${roomType}/${roomId}/upload_attachment/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); // Translated
+            }
+
+            const result = await response.json();
+            console.log('Файли успішно завантажено:', result); // Translated
+
+            selectedFiles = [];
+            updateAttachmentsPreview();
+            messageInput.value = '';
+        } catch (error) {
+            console.error('Помилка завантаження файлів:', error); // Translated
+            alert('Помилка при завантаженні файлів: ' + error.message); // Translated
+        } finally {
+            resetTypingStatus();
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    let isLoadingMessages = false;
+    let hasMoreMessages = true;
+
+    async function loadOldMessages() {
+        if (isLoadingMessages || !hasMoreMessages) {
+            return;
+        }
+
+        isLoadingMessages = true;
+
+        const firstMessageElement = chatLog.querySelector('.chat_message-item');
+        const beforeMessageId = firstMessageElement ? firstMessageElement.dataset.messageId : null;
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'loading-indicator';
+        loadingIndicator.textContent = 'Завантаження старих повідомлень...'; // Translated
+        loadingIndicator.style.textAlign = 'center';
+        loadingIndicator.style.padding = '10px 0';
+        loadingIndicator.style.color = '#888';
+        chatLog.prepend(loadingIndicator);
+
+        const oldScrollHeight = chatLog.scrollHeight;
+        const oldScrollTop = chatLog.scrollTop;
+
+        try {
+            const response = await fetch(`/chat/${roomType}/${roomId}/load_more_messages/?before_message_id=${beforeMessageId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP помилка! статус: ${response.status}`); // Translated
+            }
+            const data = await response.json();
+
+            hasMoreMessages = data.has_more;
+
+            if (data.messages.length > 0) {
+                const fragment = document.createDocumentFragment();
+                data.messages.forEach(message => {
+                    const msgElement = createMessageElement({
+                        id: message.id,
+                        sender_id: message.sender_id,
+                        sender_username: message.sender_username,
+                        sender_avatar_url: message.sender_avatar_url,
+                        content: message.content,
+                        timestamp: message.timestamp,
+                        attachments: message.attachments || [],
+                        read_count: message.read_count || 0,
+                        is_edited: message.is_edited || false
+                    });
+                    fragment.appendChild(msgElement);
+                    addMessageToObserver(msgElement);
+                    addMessageActionListeners(msgElement);
+                });
+                chatLog.insertBefore(fragment, chatLog.firstChild);
+
+                const newScrollHeight = chatLog.scrollHeight;
+                chatLog.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
+
+                if (chatSocket.readyState === WebSocket.OPEN) {
+                    observeMessagesForReadReceipts();
+                }
+            } else {
+                hasMoreMessages = false;
+                const endOfHistoryIndicator = document.createElement('div');
+                endOfHistoryIndicator.textContent = 'Початок історії чату.'; // Translated
+                endOfHistoryIndicator.style.textAlign = 'center';
+                endOfHistoryIndicator.style.padding = '10px 0';
+                endOfHistoryIndicator.style.color = '#888';
+                chatLog.prepend(endOfHistoryIndicator);
+            }
+        } catch (error) {
+            console.error('Помилка завантаження старих повідомлень:', error); // Translated
+        } finally {
+            if (loadingIndicator.parentNode) {
+                loadingIndicator.parentNode.removeChild(loadingIndicator);
+            }
+            isLoadingMessages = false;
+            if (hasMoreMessages && chatLog.scrollTop === 0 && chatLog.scrollHeight <= chatLog.clientHeight) {
+                loadOldMessages();
+            }
+        }
+    }
+
+    chatLog.addEventListener('scroll', function() {
+        if (chatLog.scrollTop === 0 && !isLoadingMessages && hasMoreMessages) {
+            loadOldMessages();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        scrollToBottom();
+        addMessageActionListeners(chatLog);
+    });
+
+</script>
+{% endblock %}

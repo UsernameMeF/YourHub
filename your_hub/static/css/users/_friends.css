@@ -1,0 +1,213 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_friends.css */
+
+.friends-list-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.friends-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.nav-button {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+    color: #555;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+}
+
+.nav-button:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+.nav-button.active {
+    background-color: #23e2dd;
+    color: #fff;
+    border-color: #23e2dd;
+    font-weight: bold;
+}
+
+.nav-button.active:hover {
+    background-color: #1bcabc;
+    border-color: #1bcabc;
+}
+
+.friends-section {
+    margin-top: 20px;
+}
+
+.friends-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    transition: color 0.5s ease;
+}
+
+.friends-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.friend-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.friend-item:hover {
+    background-color: #eee;
+    border-color: #ccc;
+}
+
+.friend-item a {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.friend-item a:hover {
+    color: #23e2dd;
+}
+
+.friend-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.friend-item a:hover .friend-avatar {
+    border-color: #23e2dd;
+}
+
+.friend-username {
+    font-size: 0.9em;
+    word-break: break-word;
+}
+
+.request-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.request-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.request-item:last-child {
+    margin-bottom: 0;
+}
+
+.request-item:hover {
+    background-color: #eee;
+    border-color: #ccc;
+}
+
+.request-item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    flex-grow: 1;
+    margin-right: 10px;
+    transition: color 0.3s ease;
+}
+
+.request-item a:hover {
+    color: #23e2dd;
+}
+
+.request-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.request-item a:hover .request-avatar {
+    border-color: #23e2dd;
+}
+
+.request-username {
+    font-size: 1em;
+    word-break: break-word;
+}
+
+.request-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.request-actions .btn {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.request-actions .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+.request-actions .btn-success:hover {
+    background-color: #218838;
+}
+
+.request-actions .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+.request-actions .btn-danger:hover {
+    background-color: #c82333;
+}
+.request-actions .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.request-actions .btn-secondary:hover {
+    background-color: #5a6268;
+}

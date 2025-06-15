@@ -1,0 +1,73 @@
+html.dark-theme .modal-content {
+    background-color: #252526;
+    border-color: #3a3a3a;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .close-button {
+    color: #ccc;
+}
+html.dark-theme .close-button:hover,
+html.dark-theme .close-button:focus {
+    color: #f0f0f0;
+}
+html.dark-theme .modal h2 {
+    color: #f0f0f0;
+}
+html.dark-theme .modal form label {
+    color: #ccc;
+}
+html.dark-theme .modal form input[type="text"],
+html.dark-theme .modal form textarea {
+    background-color: #333;
+    border-color: #555;
+    color: #f0f0f0;
+}
+html.dark-theme .modal form input::placeholder,
+html.dark-theme .modal form textarea::placeholder {
+    color: #aaa;
+}
+
+html.dark-theme .reposts-modal-content {
+    background-color: #1a1a1a;
+    border-color: #3a3a3a;
+    box-shadow: 0 5px 15px rgba(0,255,0,0.1);
+}
+
+html.dark-theme .reposts-close-button {
+    color: #00e600;
+}
+
+html.dark-theme .reposts-close-button:hover,
+html.dark-theme .reposts-close-button:focus {
+    color: #00ff00;
+}
+
+html.dark-theme .reposts-modal h2 {
+    color: #00ff00;
+}
+
+html.dark-theme .reposts-modal-empty,
+html.dark-theme .reposts-modal-loading {
+    color: #cccccc;
+}
+
+html.dark-theme .reposts-user-item {
+    border-bottom-color: #2a2a2a;
+}
+
+html.dark-theme .reposts-user-item:hover {
+    background-color: #222;
+}
+
+html.dark-theme .reposts-user-link {
+    color: #eee;
+}
+
+html.dark-theme .reposts-user-link:hover {
+    color: #00ff00;
+}
+
+html.dark-theme .reposts-user-avatar {
+    border-color: #3a3a3a;
+}

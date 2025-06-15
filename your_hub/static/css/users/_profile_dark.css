@@ -1,0 +1,102 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_profile_dark.css */
+
+html.dark-theme .profile-container {
+    background-color: #252526;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .profile-header-top h2,
+html.dark-theme .profile-info h3,
+html.dark-theme .profile-section h3,
+html.dark-theme .profile-actions-top p,
+html.dark-theme .profile-info p,
+html.dark-theme .profile-section ul li
+html.dark-theme .status-option {
+    color: #f0f0f0;
+}
+
+html.dark-theme .profile-actions-top p a {
+    color: #00e600;
+}
+html.dark-theme .profile-actions-top p a:hover {
+    color: #00ff00;
+}
+
+html.dark-theme .profile-avatar-large {
+    border-color: #00e600;
+}
+
+html.dark-theme .status-indicator {
+    border: 2px solid #252526;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+html.dark-theme .status-indicator .status-icon {
+    color: #f0f0f0;
+}
+
+
+html.dark-theme .status-dropdown {
+    background-color: #333;
+    border: 1px solid #444;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+html.dark-theme .status-option {
+    color: #f0f0f0;
+}
+
+
+html.dark-theme .status-option:hover {
+    background-color: #444;
+}
+
+html.dark-theme .status-option .status-dot {
+    color: #f0f0f0;
+}
+
+
+html.dark-theme .profile-section {
+    border-bottom-color: #3a3a3a;
+}
+
+html.dark-theme .profile-section ul li a {
+    color: #00e600;
+}
+html.dark-theme .profile-section ul li a:hover {
+    color: #00ff00;
+}
+
+
+html.dark-theme .latest-post-card {
+    background-color: #333333;
+    border-color: #4a4a4a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+html.dark-theme .latest-post-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+}
+
+html.dark-theme .latest-post-card h4 {
+    color: #00e600;
+}
+
+html.dark-theme .latest-post-card p {
+    color: #cccccc;
+}
+
+html.dark-theme .latest-post-card .post-date {
+    color: #aaaaaa;
+}
+
+html.dark-theme .latest-post-link {
+    color: inherit;
+}
+
+html.dark-theme .no-posts-message {
+    color: #aaaaaa;
+    border-color: #4a4a4a;
+    background-color: #333333;
+}

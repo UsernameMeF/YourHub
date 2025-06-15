@@ -1,0 +1,24 @@
+/* SOCIAL_NETWORK/your_hub/static/css/global/_ajax_messages_dark.css */
+
+html.dark-theme .ajax-message.ajax-message-success {
+   background-color: #214d2a; 
+   color: #b8da9d;
+   border-color: #3a6f43;
+}
+
+html.dark-theme .ajax-message.ajax-message-error {
+   background-color: #6c1f23;
+   color: #f5c6cb;
+   border-color: #8b2c33;
+}
+
+html.dark-theme .ajax-message.ajax-message-info {
+   background-color: #084298;
+   color: #cfe2ff; 
+   border-color: #0a53be;
+}
+html.dark-theme .ajax-friend-request-form {
+   background: transparent;
+   border: none;
+   box-shadow: none;
+}

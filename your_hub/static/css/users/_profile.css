@@ -1,0 +1,328 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_profile.css */
+
+.profile-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    overflow: hidden;
+}
+
+.profile-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.profile-header-top h2 {
+    margin: 0;
+    font-size: 1.8em;
+    color: #333;
+    transition: color 0.5s ease;
+}
+
+.profile-actions-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.profile-actions-top form {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.profile-actions-top p {
+    margin: 0;
+    color: #555;
+    font-size: 1em;
+    transition: color 0.5s ease;
+}
+
+.profile-actions-top p a {
+    color: #23e2dd;
+    text-decoration: none;
+    font-weight: normal;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+.profile-actions-top p a:hover {
+    color: #1bcabc;
+    text-decoration: underline;
+}
+
+
+.profile-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-avatar-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #23e2dd;
+    flex-shrink: 0;
+    transition: border-color 0.3s ease;
+}
+
+.status-indicator {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.status-indicator .status-icon {
+    font-size: 14px;
+    color: #fff;
+    line-height: 1;
+}
+
+.status-online {
+    background-color: #28a745;
+}
+
+.status-away {
+    background-color: #ffc107;
+}
+
+.status-dnd {
+    background-color: #dc3545;
+}
+
+.status-invisible,
+.status-offline {
+    background-color: #6c757d;
+}
+
+.status-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 170px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    padding: 5px 0;
+}
+
+.status-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    cursor: pointer;
+    color: #333;
+}
+
+.status-option:hover {
+    background-color: #f0f0f0;
+}
+
+.status-option .status-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 12px;
+    box-sizing: border-box;
+    border: none;
+}
+
+.status-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+}
+
+.status-option .status-online {
+    background-color: #28a745;
+}
+.status-option .status-away {
+    background-color: #ffc107;
+}
+.status-option .status-dnd {
+    background-color: #dc3545;
+}
+.status-option .status-invisible {
+    background-color: #6c757d;
+}
+
+
+.profile-info {
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.profile-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color: #333;
+    transition: color 0.5s ease;
+}
+
+.profile-info p {
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 1em;
+    line-height: 1.4;
+    transition: color 0.5s ease;
+}
+
+.profile-sections {
+    margin-top: 30px;
+}
+
+.profile-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    transition: border-color 0.5s ease;
+}
+
+.profile-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.profile-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.3em;
+    transition: color 0.5s ease;
+}
+
+.profile-section ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.profile-section ul li {
+    margin-bottom: 8px;
+    color: #555;
+    transition: color 0.5s ease;
+}
+
+.profile-section ul li a {
+    color: #23e2dd;
+    text-decoration: none;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+.profile-section ul li a:hover {
+    color: #1bcabc;
+    text-decoration: underline;
+}
+.profile-actions-buttons-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-actions-buttons-wrapper form {
+    margin: 0;
+}
+
+
+.latest-post-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-top: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s ease-in-out;
+}
+
+.latest-post-card:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.latest-post-card h4 {
+    color: #007bff;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.latest-post-card p {
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.latest-post-card .post-date {
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: #999;
+}
+
+.latest-post-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.no-posts-message {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 15px;
+}

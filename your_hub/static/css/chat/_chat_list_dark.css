@@ -1,0 +1,132 @@
+/* social_network/your_hub/static/css/chat/chat_list_dark.css */
+
+html.dark-theme .chat_list-container {
+    background-color: #2a2a2a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+html.dark-theme .chat_list-container h1 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .chat_list-item {
+    border-bottom-color: #3c3c3c;
+}
+
+html.dark-theme .chat_list-item:hover {
+    background-color: #383838;
+}
+
+html.dark-theme .chat_list-item a {
+    color: #f0f0f0;
+}
+
+html.dark-theme .chat_avatar {
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+html.dark-theme .chat_name {
+    color: #f0f0f0;
+}
+
+html.dark-theme .chat_last-message {
+    color: #b0b0b0;
+}
+
+html.dark-theme .chat_timestamp {
+    color: #b0b0b0;
+}
+
+html.dark-theme .chat_unread-count {
+    background-color: #00e600;
+    color: #1a1a1a;
+}
+
+html.dark-theme .chat_list-container {
+    background-color: #1a1a1a;
+    color: #eee;
+}
+
+html.dark-theme .chat_list-container h1 {
+    color: #fff;
+}
+
+html.dark-theme .chat_category-buttons button {
+    border: 1px solid #00e600;
+    background-color: #333;
+    color: #00e600;
+}
+
+html.dark-theme .chat_category-buttons button:hover {
+    background-color: #4a4a4a;
+    color: #00cc00;
+    border-color: #00cc00;
+}
+
+html.dark-theme .chat_category-buttons button.active {
+    background-color: #00e600;
+    color: white;
+    border-color: #00e600;
+    box-shadow: 0 2px 5px rgba(0, 230, 0, 0.25);
+}
+
+html.dark-theme .chat_list-item {
+    border: 1px solid #333;
+    background-color: #2b2b2b;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+html.dark-theme .chat_list-item a {
+    color: #eee;
+}
+
+html.dark-theme .no-chats-message {
+    background-color: #333;
+    border: 1px dashed #555;
+    color: #bbb;
+}
+
+html.dark-theme .no-chats-message a {
+    color: #00e600;
+}
+
+html.dark-theme .chat_name {
+    color: #fff;
+}
+
+html.dark-theme .chat_last-message {
+    color: #aaa;
+}
+
+html.dark-theme .chat_timestamp {
+    color: #888;
+}
+
+html.dark-theme .group-chat-item .chat_name .fas {
+    color: #a0a0a0;
+}
+
+html.dark-theme .create-group-btn {
+    background-color: #2e8b57;
+    color: #f0f0f0;
+    border: 1px solid #1e6c3f;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+html.dark-theme .create-group-btn:hover {
+    background-color: #3cb371;
+    border-color: #258c54;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    transform: translateY(-1px);
+}
+
+html.dark-theme .create-group-btn:active {
+    background-color: #287a4a;
+    border-color: #1a5c37;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(1px);
+}
+
+html.dark-theme .create-group-btn i {
+    color: #f0f0f0;
+}

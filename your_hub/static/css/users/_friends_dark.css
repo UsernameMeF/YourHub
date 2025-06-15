@@ -1,0 +1,81 @@
+/* SOCIAL_NETWORK/your_hub/static/css/users/_friends_dark.css */
+
+html.dark-theme .friends-list-container {
+    background-color: #252526;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+html.dark-theme .friends-section h3 {
+    color: #f0f0f0;
+}
+
+html.dark-theme .friends-nav .nav-button {
+    background-color: #333;
+    color: #ccc;
+    border-color: #555;
+}
+html.dark-theme .friends-nav .nav-button:hover {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+}
+html.dark-theme .friends-nav .nav-button.active {
+    background-color: #00e600;
+    color: #1a1a1a;
+    border-color: #00e600;
+}
+html.dark-theme .friends-nav .nav-button.active:hover {
+    background-color: #00ff00;
+    border-color: #00ff00;
+    color: #0a0a0a;
+}
+
+
+html.dark-theme .friend-item,
+html.dark-theme .request-item {
+    background-color: #333;
+    border-color: #555;
+}
+html.dark-theme .friend-item:hover,
+html.dark-theme .request-item:hover {
+    background-color: #3a3a3a;
+    border-color: #666;
+}
+
+html.dark-theme .friend-item a,
+html.dark-theme .request-item a {
+    color: #f0f0f0;
+}
+html.dark-theme .friend-item a:hover,
+html.dark-theme .request-item a:hover {
+    color: #00e600;
+}
+
+html.dark-theme .friend-item a:hover .friend-avatar,
+html.dark-theme .request-item a:hover .request-avatar {
+    border-color: #00e600;
+}
+
+html.dark-theme .request-actions .btn-success {
+    background-color: #00e600;
+    color: #1a1a1a;
+}
+html.dark-theme .request-actions .btn-success:hover {
+    background-color: #00ff00;
+    color: #0a0a0a;
+}
+
+html.dark-theme .request-actions .btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+html.dark-theme .request-actions .btn-danger:hover {
+    background-color: #c82333;
+}
+
+html.dark-theme .request-actions .btn-secondary {
+    background-color: #555;
+    color: #f0f0f0;
+}
+html.dark-theme .request-actions .btn-secondary:hover {
+    background-color: #666;
+}
