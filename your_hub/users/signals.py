@@ -23,8 +23,8 @@ def sync_profile_status_with_dnd_setting(sender, instance, **kwargs):
             settings.do_not_disturb = False
             settings.save(update_fields=['do_not_disturb'])
     except LookupError:
-        print("Warning: 'notifications.UserNotificationSettings' model not found when syncing Profile status. Is 'notifications' in INSTALLED_APPS?")
+        print("Попередження: Модель 'notifications.UserNotificationSettings' не знайдена під час синхронізації статусу профілю. Чи є 'notifications' у INSTALLED_APPS?")
     except Exception as e:
-        print(f"Error syncing Profile status with DND setting for {instance.user.username}: {e}")
+        print(f"Помилка синхронізації статусу профілю з налаштуваннями 'Не турбувати' для {instance.user.username}: {e}")
     finally:
         _DND_SYNC_IN_PROGRESS_PROFILE = False

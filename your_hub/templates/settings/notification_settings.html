@@ -2,7 +2,7 @@
 {% extends 'settings/settings_base.html' %}
 {% load static %}
 
-{% block title %}Настройки уведомлений{% endblock %}
+{% block title %}Налаштування сповіщень{% endblock %}
 
 {% block settings_extra_head %}
     <link rel="stylesheet" href="{% static 'css/notifications/_notification_settings.css' %}">
@@ -10,17 +10,17 @@
 {% endblock %}
 
 {% block settings_content %}
-{# Устанавливаем активную вкладку для settings_base.html #}
+{# Встановлюємо активну вкладку для settings_base.html #}
 {% with active_tab='notifications' %}
     {{ block.super }}
 {% endwith %}
 
 <div class="notification-settings-form-wrapper">
-    <h2>Настройки уведомлений</h2>
+    <h2>Налаштування сповіщень</h2>
     <form method="post">
         {% csrf_token %}
         <div class="form-section">
-            <h3>Звук уведомлений</h3>
+            <h3>Звук сповіщень</h3>
             <div class="form-group">
                 {{ form.notification_sound.label_tag }}
                 {{ form.notification_sound }}
@@ -31,12 +31,12 @@
                     {{ form.volume }}
                     <span id="volume-value">{{ form.volume.value }}</span>
                 </div>
-                <button type="button" id="play-sound-btn" class="play-sound-btn"><i class="fas fa-volume-up"></i> Прослушать</button>
+                <button type="button" id="play-sound-btn" class="play-sound-btn"><i class="fas fa-volume-up"></i> Прослухати</button>
             </div>
         </div>
 
         <div class="form-section">
-            <h3>Получать уведомления о:</h3>
+            <h3>Отримувати сповіщення про:</h3>
             <div class="form-grid">
                 <div class="form-group form-check-group">
                     {{ form.receive_messages_notifications }}
@@ -94,7 +94,7 @@
             </div>
         {% endif %}
 
-        <button type="submit" class="submit-btn">Сохранить настройки</button>
+        <button type="submit" class="submit-btn">Зберегти налаштування</button>
     </form>
 </div>
 
@@ -114,7 +114,7 @@
             if (soundSelect.value) {
                 previewSoundPlayer.src = staticUrl + soundSelect.value;
                 previewSoundPlayer.volume = parseFloat(volumeSlider.value);
-                previewSoundPlayer.play().catch(e => console.error("Error playing sound:", e));
+                previewSoundPlayer.play().catch(e => console.error("Помилка відтворення звуку:", e));
             }
         }
 
@@ -125,7 +125,7 @@
         updateVolumeDisplay();
 
         volumeSlider.addEventListener('input', updateVolumeDisplay);
-        volumeSlider.addEventListener('change', updateAndPlaySound); // Play sound on release
+        volumeSlider.addEventListener('change', updateAndPlaySound); // Відтворити звук при відпусканні повзунка
         playSoundBtn.addEventListener('click', updateAndPlaySound);
         soundSelect.addEventListener('change', updateAndPlaySound);
     });

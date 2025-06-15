@@ -30,7 +30,7 @@ def process_and_assign_tags(post, tags_input_string):
         author_tag, created = Tag.objects.get_or_create(name=author_tag_name_clean) 
         post.tags.add(author_tag)
     except Exception as e:
-        print(f"Ошибка при создании/добавлении тега автора '{author_tag_name_clean}': {e}")
+        print(f"Помилка при створенні/додаванні тегу автора '{author_tag_name_clean}': {e}") # Translated
 
 
     if tags_input_string:
@@ -50,7 +50,7 @@ def process_and_assign_tags(post, tags_input_string):
                 post.tags.add(tag_obj)
                 current_user_tags_count += 1
             except Exception as e:
-                print(f"Не удалось добавить тег '{clean_tag_name}': {e}")
+                print(f"Не вдалося додати тег '{clean_tag_name}': {e}") # Translated
 
 
 def index(request):
@@ -157,7 +157,7 @@ def get_posts_ajax(request):
         all_posts.append({
             'id': post.pk,
             'is_community_post': True, 
-            'author_username': post.posted_by.username if post.posted_by else '[Удаленный пользователь]',
+            'author_username': post.posted_by.username if post.posted_by else '[Видалений користувач]', # Translated
             'author_id': post.posted_by.id if post.posted_by else None,
             'author_avatar_url': author_avatar_url,
             'title': post.title, 
@@ -216,7 +216,7 @@ def get_posts_ajax(request):
                     ).exists()
                 
                 post_data['can_edit_delete'] = (request.user.is_authenticated and 
-                                                (current_user_id == post_data['author_id'] or is_community_admin))
+                                                 (current_user_id == post_data['author_id'] or is_community_admin))
 
             else:
                 post_data['is_liked'] = post_data['id'] in request.user._liked_posts_ids_cache
@@ -224,7 +224,7 @@ def get_posts_ajax(request):
                 post_data['is_reposted'] = post_data['id'] in request.user._reposted_posts_ids_cache
                 
                 post_data['can_edit_delete'] = (request.user.is_authenticated and 
-                                                current_user_id == post_data['author_id'])
+                                                 current_user_id == post_data['author_id'])
         else:
             post_data['is_liked'] = False
             post_data['is_disliked'] = False
@@ -308,21 +308,21 @@ def get_post_reposts_list(request, post_id):
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Вы (репостнули)', 
+                'relationship': 'Ви (репостнули)', # Translated
             })
         elif user in friends:
             repost_users_data.append({
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Друг',
+                'relationship': 'Друг', # Translated
             })
         elif user.id in following_ids: 
             repost_users_data.append({
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Подписка',
+                'relationship': 'Підписка', # Translated
             })
 
     return JsonResponse({
@@ -385,7 +385,7 @@ def post_edit(request, pk):
                         existing_image_ids = json.loads(existing_image_ids_json)
                         post.attachments.exclude(id__in=existing_image_ids).delete()
                     except json.JSONDecodeError:
-                        print("Ошибка декодирования JSON для existing_image_ids при редактировании поста.")
+                        print("Помилка декодування JSON для existing_image_ids під час редагування допису.") # Translated
                 else:
                     post.attachments.all().delete() 
 
@@ -408,7 +408,7 @@ def post_edit(request, pk):
                 'post_images_json': json.dumps(post_images, cls=DjangoJSONEncoder)
             })
     else:
-        raise Http404("Страница редактирования доступна через отдельный URL.")
+        raise Http404("Сторінка редагування доступна через окремий URL.") # Translated
 
 
 @login_required
@@ -419,8 +419,8 @@ def post_delete(request, pk):
         post_id = post.id
         with transaction.atomic(): 
             post.delete()
-        return JsonResponse({'success': True, 'message': 'Пост успешно удален.', 'deleted_post_id': post_id, 'redirect_url': reverse('core:index')})
-    return JsonResponse({'success': False, 'message': 'Недопустимый метод запроса.'}, status=405)
+        return JsonResponse({'success': True, 'message': 'Допис успішно видалено.', 'deleted_post_id': post_id, 'redirect_url': reverse('core:index')}) # Translated
+    return JsonResponse({'success': False, 'message': 'Недопустимий метод запиту.'}, status=405) # Translated
 
 
 
@@ -490,7 +490,7 @@ def post_like(request, pk):
             recipient = post.author
             sender_user = user
             notification_type = 'like'
-            content = f"{sender_user.username} оценил(а) ваш пост: \"{post.title}\"" 
+            content = f"{sender_user.username} оцінив(ла) ваш допис: \"{post.title}\"" # Translated
             related_object = post 
             custom_url = reverse('core:post_detail', args=[post.id]) 
 
@@ -502,7 +502,7 @@ def post_like(request, pk):
                 related_object=related_object,
                 custom_url=custom_url
             )
-            print(f"DEBUG: Notification 'like' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
+            print(f"DEBUG: Сповіщення 'вподобання' надіслано {recipient.username} від {sender_user.username} щодо допису {post.id}") # Translated
         post.likes.add(user)
         if user in post.dislikes.all():
             post.dislikes.remove(user)
@@ -551,7 +551,7 @@ def post_repost(request, pk):
             recipient = post.author
             sender_user = user
             notification_type = 'repost'
-            content = f"{sender_user.username} репостнул(а) ваш пост: \"{post.title}\"" 
+            content = f"{sender_user.username} репостнув(ла) ваш допис: \"{post.title}\"" # Translated
             related_object = post 
             custom_url = reverse('core:post_detail', args=[post.id]) 
 
@@ -563,7 +563,7 @@ def post_repost(request, pk):
                 related_object=related_object,
                 custom_url=custom_url
             )
-            print(f"DEBUG: Notification 'repost' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
+            print(f"DEBUG: Сповіщення 'репост' надіслано {recipient.username} від {sender_user.username} щодо допису {post.id}") # Translated
         post.reposts.add(user)
 
     return JsonResponse({
@@ -592,7 +592,7 @@ def add_comment(request, pk):
             if len(display_content) > 50:
                 display_content = display_content[:47] + '...'
             
-            content = f"{sender_user.username} прокомментировал(а) ваш пост: \"{display_content}\""
+            content = f"{sender_user.username} прокоментував(ла) ваш допис: \"{display_content}\"" # Translated
             related_object = comment 
             custom_url = reverse('core:post_detail', args=[post.id]) 
 
@@ -604,11 +604,11 @@ def add_comment(request, pk):
                 related_object=related_object,
                 custom_url=custom_url
             )
-            print(f"DEBUG: Notification 'comment' sent to {recipient.username} from {sender_user.username} about Post {post.id}")
+            print(f"DEBUG: Сповіщення 'коментар' надіслано {recipient.username} від {sender_user.username} щодо допису {post.id}") # Translated
 
         return JsonResponse({
             'success': True, 
-            'message': 'Комментарий успешно добавлен!',
+            'message': 'Коментар успішно додано!', # Translated
             'comment': {
                 'id': comment.id,
                 'author_username': comment.author.username,
@@ -619,4 +619,4 @@ def add_comment(request, pk):
         })
     else:
         errors = {field: form.errors[field] for field in form.errors} 
-        return JsonResponse({'success': False, 'message': 'Ошибка при добавлении комментария.', 'errors': errors}, status=400)
+        return JsonResponse({'success': False, 'message': 'Помилка при додаванні коментаря.', 'errors': errors}, status=400) # Translated

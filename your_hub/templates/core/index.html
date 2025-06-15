@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Главная страница - YourHub{% endblock %}
+{% block title %}Головна сторінка - YourHub{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/core/_index.css' %}">
@@ -9,16 +9,16 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="page-title">Лента постов</h1>
+    <h1 class="page-title">Стрічка дописів</h1>
 
     <div class="tag-search-bar-container">
         <form class="tag-search-bar-form" onsubmit="event.preventDefault(); document.getElementById('tag-search-button').click();">
             <div class="tag-search-input-and-button-row">
-                <input type="text" id="tag-search-input" class="tag-search-bar-input" placeholder="Искать по тегам #tag">
-                <button type="button" id="tag-search-button" class="tag-search-bar-button">Поиск</button>
+                <input type="text" id="tag-search-input" class="tag-search-bar-input" placeholder="Шукати за тегами #тег">
+                <button type="button" id="tag-search-button" class="tag-search-bar-button">Пошук</button>
             </div>
             <div class="tag-search-bar-clear-button-row">
-                <button type="button" id="clear-tag-search-button" class="tag-search-bar-clear-button" style="display: none;">Очистить</button>
+                <button type="button" id="clear-tag-search-button" class="tag-search-bar-clear-button" style="display: none;">Очистити</button>
             </div>
         </form>
     </div>
@@ -26,34 +26,34 @@
     <div class="feed-controls">
         <div class="sort-dropdown-container">
             <button class="sort-dropdown-button">
-                Сортировка: <span id="current-sort-label">Новое</span> <i class="fas fa-chevron-down"></i>
+                Сортування: <span id="current-sort-label">Нові</span> <i class="fas fa-chevron-down"></i>
             </button>
             <div class="sort-dropdown-menu">
-                <a href="#" class="sort-option" data-sort="new">Новое</a> {# Убрали active по умолчанию #}
-                <a href="#" class="sort-option" data-sort="popular">Популярное</a>
+                <a href="#" class="sort-option" data-sort="new">Нові</a> {# Прибрали active за замовчуванням #}
+                <a href="#" class="sort-option" data-sort="popular">Популярні</a>
             </div>
         </div>
 
         <div class="view-toggle">
-            <button class="view-toggle-button" data-view="card"> {# Убрали active по умолчанию #}
-                <i class="fas fa-th-large"></i> Карточки
+            <button class="view-toggle-button" data-view="card"> {# Прибрали active за замовчуванням #}
+                <i class="fas fa-th-large"></i> Картки
             </button>
             <button class="view-toggle-button" data-view="compact">
-                <i class="fas fa-list"></i> Компактный
+                <i class="fas fa-list"></i> Компактний
             </button>
         </div>
     </div>
 
-    <div id="posts-container" class="posts-container"> {# Убрали card-view по умолчанию #}
-        <p id="no-posts-message" style="display: none;">Пока нет постов в этой категории.</p>
+    <div id="posts-container" class="posts-container"> {# Прибрали card-view за замовчуванням #}
+        <p id="no-posts-message" style="display: none;">Поки немає дописів у цій категорії.</p>
     </div>
 
     <div id="loading-indicator" class="loading-indicator" style="display: none;">
-        <i class="fas fa-spinner fa-spin"></i> Загрузка...
+        <i class="fas fa-spinner fa-spin"></i> Завантаження...
     </div>
 
     <div id="end-of-feed-message" class="end-of-feed-message" style="display: none;">
-        Вы достигли конца ленты.
+        Ви досягли кінця стрічки.
     </div>
 {% endblock %}
 
@@ -66,17 +66,17 @@
 
     const getPostsAjaxUrl = "{% url 'core:get_posts_ajax' %}";
 
-    // Элементы управления сортировкой
+    // Елементи керування сортуванням
     const sortDropdownContainer = document.querySelector('.sort-dropdown-container');
     const sortDropdownButton = document.querySelector('.sort-dropdown-button');
     const currentSortLabel = document.getElementById('current-sort-label');
     const sortDropdownMenu = document.querySelector('.sort-dropdown-menu');
     const sortOptions = document.querySelectorAll('.sort-option');
 
-    // Элементы управления видом
+    // Елементи керування виглядом
     const viewToggleButtons = document.querySelectorAll('.view-toggle-button');
 
-    // Новые элементы для поиска по тегам
+    // Нові елементи для пошуку за тегами
     const tagSearchInput = document.getElementById('tag-search-input');
     const tagSearchButton = document.getElementById('tag-search-button');
     const clearTagSearchButton = document.getElementById('clear-tag-search-button');
@@ -86,13 +86,13 @@
     let hasNextPage = true;
     let loadedPostsData = {};
 
-    // Инициализация из localStorage
+    // Ініціалізація з localStorage
     let currentSort = localStorage.getItem('yourhub_sort_preference') || 'new';
     let currentView = localStorage.getItem('yourhub_view_preference') || 'card';
     let currentTag = localStorage.getItem('yourhub_tag_filter') || '';
 
     // ===========================================
-    // Вспомогательные функции
+    // Допоміжні функції
     // ===========================================
 
     function shortenText(text, maxLength) {
@@ -114,14 +114,14 @@
             if (postData.attachments && postData.attachments.length > 0) {
                 attachmentsHtml = `
                     <div class="post-images-grid">
-                        <img src="${postData.attachments[0].url}" alt="Вложение к посту" class="post-grid-image">
+                        <img src="${postData.attachments[0].url}" alt="Вкладення до допису" class="post-grid-image">
                     </div>
                 `;
             }
         } else { // compact-view
             if (postData.attachments && postData.attachments.length > 0) {
                 attachmentsHtml = `
-                    <img src="${postData.attachments[0].url}" alt="Вложение" class="post-image-thumbnail">
+                    <img src="${postData.attachments[0].url}" alt="Вкладення" class="post-image-thumbnail">
                 `;
             } else {
                 attachmentsHtml = `
@@ -165,8 +165,8 @@
                 <div class="post-actions-dropdown">
                     <button class="post-actions-button">...</button>
                     <div class="dropdown-menu">
-                        <a href="#" onclick="event.preventDefault(); openEditPostModal(${postData.id}, '${postData.title.replace(/'/g, "\\'")}', '${postData.content.replace(/'/g, "\\'")}', ${postData.is_community_post})">Редактировать</a>
-                        <a href="#" onclick="event.preventDefault(); openDeletePostModal(${postData.id}, ${postData.is_community_post})">Удалить</a>
+                        <a href="#" onclick="event.preventDefault(); openEditPostModal(${postData.id}, '${postData.title.replace(/'/g, "\\'")}', '${postData.content.replace(/'/g, "\\'")}', ${postData.is_community_post})">Редагувати</a>
+                        <a href="#" onclick="event.preventDefault(); openDeletePostModal(${postData.id}, ${postData.is_community_post})">Видалити</a>
                     </div>
                 </div>
             ` : ''}
@@ -194,7 +194,7 @@
     }
 
     // ===========================================
-    // Основная логика загрузки и управления постами
+    // Основна логіка завантаження та керування дописами
     // ===========================================
 
     async function loadPosts(append = true) {
@@ -206,15 +206,15 @@
 
         try {
             let url = `${getPostsAjaxUrl}?page=${currentPage}&sort=${currentSort}`;
-            if (currentTag) { // Добавляем параметр тега, если он установлен
-                url += `&tag=${encodeURIComponent(currentTag)}`; // encodeURIComponent нужен для корректной передачи русских символов в URL
+            if (currentTag) { // Додаємо параметр тегу, якщо він встановлений
+                url += `&tag=${encodeURIComponent(currentTag)}`; // encodeURIComponent потрібен для коректної передачі українських символів в URL
             }
             const response = await fetch(url);
             const data = await response.json();
 
             if (!append) {
                 postsContainer.innerHTML = '';
-                loadedPostsData = {}; // Очищаем данные при новой загрузке (сортировка/вид/тег)
+                loadedPostsData = {}; // Очищаємо дані при новому завантаженні (сортування/вигляд/тег)
             }
 
             if (data.posts.length === 0 && currentPage === 1) {
@@ -236,14 +236,14 @@
             currentPage++;
 
         } catch (error) {
-            console.error('Ошибка при загрузке постов:', error);
+            console.error('Помилка під час завантаження дописів:', error);
         } finally {
             isLoading = false;
             loadingIndicator.style.display = 'none';
         }
     }
 
-    // Обработчик для бесконечного скроллинга
+    // Обробник для нескінченного прокручування
     window.addEventListener('scroll', () => {
         if ((window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) && hasNextPage && !isLoading) {
             loadPosts(true);
@@ -251,15 +251,15 @@
     });
 
     // ===========================================
-    // Обработчики событий для элементов управления
+    // Обробники подій для елементів керування
     // ===========================================
 
-    // Показ/скрытие выпадающего меню сортировки
+    // Показ/приховування випадаючого меню сортування
     sortDropdownButton.addEventListener('click', () => {
         sortDropdownMenu.classList.toggle('show');
     });
 
-    // Обработка выбора опции сортировки
+    // Обробка вибору опції сортування
     sortOptions.forEach(option => {
         option.addEventListener('click', (e) => {
             e.preventDefault();
@@ -278,14 +278,14 @@
         });
     });
 
-    // Скрытие выпадающего меню при клике вне его
+    // Приховування випадаючого меню при кліку поза ним
     document.addEventListener('click', (e) => {
         if (!sortDropdownContainer.contains(e.target)) {
             sortDropdownMenu.classList.remove('show');
         }
     });
 
-    // Обработка переключения вида
+    // Обробка перемикання вигляду
     viewToggleButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             const newView = e.currentTarget.dataset.view;
@@ -304,21 +304,21 @@
         });
     });
 
-    // Обработчик кнопки поиска по тегам
+    // Обробник кнопки пошуку за тегами
     tagSearchButton.addEventListener('click', () => {
         let tagValue = tagSearchInput.value.trim();
         if (tagValue.startsWith('#')) {
-            tagValue = tagValue.substring(1); // Удаляем '#' если он есть
+            tagValue = tagValue.substring(1); // Видаляємо '#' якщо він є
         }
         
-        // *** ИЗМЕНЕНО: Не преобразуем в slug, просто используем введенное значение ***
+        // *** ЗМІНЕНО: Не перетворюємо в slug, просто використовуємо введене значення ***
         const newTag = tagValue; 
 
         if (newTag !== currentTag) {
             currentTag = newTag;
             localStorage.setItem('yourhub_tag_filter', currentTag);
-            currentPage = 1; // Сбрасываем страницу
-            loadPosts(false); // Загружаем посты с новым тегом
+            currentPage = 1; // Скидаємо сторінку
+            loadPosts(false); // Завантажуємо дописи з новим тегом
 
             if (currentTag) {
                 clearTagSearchButton.style.display = 'inline-block';
@@ -328,19 +328,19 @@
         }
     });
 
-    // Обработчик очистки поиска по тегам
+    // Обробник очищення пошуку за тегами
     clearTagSearchButton.addEventListener('click', () => {
         tagSearchInput.value = '';
         if (currentTag !== '') {
             currentTag = '';
             localStorage.removeItem('yourhub_tag_filter');
-            currentPage = 1; // Сбрасываем страницу
-            loadPosts(false); // Загружаем все посты
+            currentPage = 1; // Скидаємо сторінку
+            loadPosts(false); // Завантажуємо всі дописи
             clearTagSearchButton.style.display = 'none';
         }
     });
 
-    // Позволяем нажимать Enter в поле поиска для активации поиска
+    // Дозволяємо натискати Enter у полі пошуку для активації пошуку
     tagSearchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             tagSearchButton.click();
@@ -348,7 +348,7 @@
     });
 
     // ===========================================
-    // Функция для перерендеринга всех уже загруженных постов при смене вида
+    // Функція для перерендерингу всіх вже завантажених дописів при зміні вигляду
     // ===========================================
     function renderLoadedPosts() {
         postsContainer.innerHTML = '';
@@ -369,11 +369,11 @@
 
 
     // ===========================================
-    // Инициализация при загрузке страницы
+    // Ініціалізація при завантаженні сторінки
     // ===========================================
 
     function initializeUIFromPreferences() {
-        // Устанавливаем активную опцию сортировки
+        // Встановлюємо активну опцію сортування
         sortOptions.forEach(option => {
             if (option.dataset.sort === currentSort) {
                 option.classList.add('active');
@@ -383,7 +383,7 @@
             }
         });
 
-        // Устанавливаем активную кнопку вида
+        // Встановлюємо активну кнопку вигляду
         viewToggleButtons.forEach(button => {
             if (button.dataset.view === currentView) {
                 button.classList.add('active');
@@ -392,12 +392,12 @@
             }
         });
 
-        // Применяем класс вида к контейнеру постов
+        // Застосовуємо клас вигляду до контейнера дописів
         postsContainer.classList.add(`${currentView}-view`);
 
-        // Инициализируем поле поиска тегов и кнопку очистки
+        // Ініціалізуємо поле пошуку тегів та кнопку очищення
         if (currentTag) {
-            tagSearchInput.value = `#${currentTag}`; // Отображаем тег с #
+            tagSearchInput.value = `#${currentTag}`; // Відображаємо тег з #
             clearTagSearchButton.style.display = 'inline-block';
         } else {
             tagSearchInput.value = '';
@@ -405,13 +405,13 @@
         }
     }
 
-    // Вызываем инициализацию UI перед первой загрузкой постов
+    // Викликаємо ініціалізацію UI перед першим завантаженням дописів
     initializeUIFromPreferences();
-    loadPosts(false); // Загружаем первую порцию постов с учетом сохраненной сортировки, вида и тега.
+    loadPosts(false); // Завантажуємо першу порцію дописів з урахуванням збереженого сортування, вигляду та тегу.
 
 
-    // === ФУНКЦИИ handlePostAction, openEditPostModal, openDeletePostModal ===
-    // (Без изменений)
+    // === ФУНКЦІЇ handlePostAction, openEditPostModal, openDeletePostModal ===
+    // (Без змін)
 
     function handlePostAction(postId, actionType, isCommunityPost) {
         const url = isCommunityPost 
@@ -472,7 +472,7 @@
                 alert(data.message);
             }
         })
-        .catch(error => console.error('Ошибка при выполнении действия:', error));
+        .catch(error => console.error('Помилка під час виконання дії:', error));
     }
 
     function getCookie(name) {
@@ -501,7 +501,7 @@
         const deleteUrl = isCommunityPost 
             ? `/community/posts/${postId}/delete/` 
             : `/posts/${postId}/delete/`;
-        if (confirm('Вы уверены, что хотите удалить этот пост?')) {
+        if (confirm('Ви впевнені, що хочете видалити цей допис?')) {
             window.location.href = deleteUrl;
         }
     }

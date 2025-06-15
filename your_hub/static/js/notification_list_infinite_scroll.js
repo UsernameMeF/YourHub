@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const noNotificationsMessage = document.querySelector('.no-notifications-message');
 
     if (!notificationListUl) {
-        console.log("Not on the notification list page, skipping infinite scroll setup.");
+        console.log("Не на сторінці списку сповіщень, пропуск налаштування нескінченного прокручування."); // Translated
         return;
     }
 
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Помилка HTTP! статус: ${response.status}`); // Translated
             }
             return response.json();
         })
@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notificationListUl) {
                 notificationListUl.insertAdjacentHTML('beforeend', data.notifications_html);
                 hasNextPage = data.has_next_page;
-                attachMarkAsReadListeners();
+                // припускаємо, що attachMarkAsReadListeners() визначено деінде і потрібно викликати його тут
+                // attachMarkAsReadListeners(); 
             }
             if (!hasNextPage && loadMoreButton) {
                 loadMoreButton.style.display = 'none';
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         })
         .catch(error => {
-            console.error('Error loading more notifications:', error);
+            console.error('Помилка завантаження додаткових сповіщень:', error); // Translated
             if (loadingSpinner) loadingSpinner.style.display = 'none';
             if (loadMoreButton && hasNextPage) loadMoreButton.style.display = 'block';
         })

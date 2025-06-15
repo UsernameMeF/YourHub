@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Создать групповой чат{% endblock %}
+{% block title %}Створити груповий чат{% endblock %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -10,7 +10,7 @@
 {% block content %}
 <div class="main-container">
     <div class="form-card">
-        <h2 class="form-title">Создать новый групповой чат</h2>
+        <h2 class="form-title">Створити новий груповий чат</h2>
         
         <form method="post">
             {% csrf_token %}
@@ -41,7 +41,7 @@
                 </div>
             {% endfor %}
 
-            <button type="submit" class="submit-button">Создать группу</button>
+            <button type="submit" class="submit-button">Створити групу</button>
         </form>
     </div>
 </div>

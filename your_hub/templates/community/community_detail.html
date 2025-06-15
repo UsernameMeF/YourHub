@@ -15,17 +15,17 @@
         <div class="community-header-content">
             <div class="community-text-content">
                 <h1 class="community-title">{{ community.name }}</h1>
-                <p class="community-description">{{ community.description|default:"Без описания." }}</p>
+                <p class="community-description">{{ community.description|default:"Без опису." }}</p>
                 
                 <div class="community-meta">
                     <span class="community-meta-item">
-                        <i class="fas fa-users"></i> {{ community.members.count }} участников
+                        <i class="fas fa-users"></i> {{ community.members.count }} учасників
                     </span>
                     <span class="community-meta-item">
-                        <i class="fas fa-calendar-alt"></i> Создано: {{ community.created_at|date:"d M Y" }}
+                        <i class="fas fa-calendar-alt"></i> Створено: {{ community.created_at|date:"d M Y" }}
                     </span>
                     <span class="community-meta-item">
-                        <i class="fas fa-user-tie"></i> Создатель: {{ community.creator.username }}
+                        <i class="fas fa-user-tie"></i> Творець: {{ community.creator.username }}
                     </span>
                 </div>
             </div>
@@ -34,9 +34,9 @@
         <div class="community-action-buttons">
             {% if request.user.is_authenticated %}
                 {% if is_creator %}
-                    <a href="{% url 'community:community_edit' pk=community.pk %}" class="btn btn-edit">Редактировать</a>
-                    <a href="{% url 'community:community_delete' pk=community.pk %}" class="btn btn-delete">Удалить сообщество</a>
-                    <a href="{% url 'community:community_post_create' pk=community.pk %}" class="btn btn-create-post">Создать публикацию</a>
+                    <a href="{% url 'community:community_edit' pk=community.pk %}" class="btn btn-edit">Редагувати</a>
+                    <a href="{% url 'community:community_delete' pk=community.pk %}" class="btn btn-delete">Видалити спільноту</a>
+                    <a href="{% url 'community:community_post_create' pk=community.pk %}" class="btn btn-create-post">Створити публікацію</a>
                 {% else %}
                     <button 
                         id="toggleMembershipBtn" 
@@ -44,33 +44,33 @@
                         data-community-id="{{ community.id }}"
                         data-is-member="{{ is_member|lower }}"
                     >
-                        {% if is_member %}Отписаться{% else %}Присоединиться{% endif %}
+                        {% if is_member %}Відписатися{% else %}Приєднатися{% endif %}
                     </button>
                 {% endif %}
             {% else %}
-                <a href="{% url 'users:login' %}" class="btn btn-join">Войти, чтобы присоединиться</a>
+                <a href="{% url 'users:login' %}" class="btn btn-join">Увійти, щоб приєднатися</a>
             {% endif %}
         </div>
     </div>
 
     <div class="community-members-section">
-        <h3>Участники</h3>
+        <h3>Учасники</h3>
         <div class="members-avatars-list">
             {% for member in first_members %}
                 <a href="{% url 'users:user_profile' member.id %}" title="{{ member.username }}">
                     <img src="{% if member.profile.avatar %}{{ member.profile.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="{{ member.username }}" class="member-avatar">
                 </a>
             {% empty %}
-                <p>Пока нет участников.</p>
+                <p>Поки немає учасників.</p>
             {% endfor %}
         </div>
     </div>
 
     <div class="community-posts-section">
-        <h3>Публикации сообщества</h3>
+        <h3>Публікації спільноти</h3>
         {% if last_post %}
             <div class="latest-community-post-preview">
-                {# Превью поста: его текст и статистика #}
+                {# Попередній перегляд допису: його текст та статистика #}
                 <a href="{% url 'community:community_post_detail' pk=community.pk post_pk=last_post.pk %}" class="post-preview-link-wrapper">
                     <p class="post-preview-text">
                         {{ last_post.title|truncatechars:150 }} 
@@ -78,11 +78,11 @@
                 </a>
                 <div class="post-preview-meta">
                     <span class="meta-item">
-                        Опубликовано 
-                        {% if last_post.posted_by %} {# <-- ДОБАВЛЕНА ПРОВЕРКА #}
+                        Опубліковано 
+                        {% if last_post.posted_by %} {# <-- ДОДАНО ПЕРЕВІРКУ #}
                             {{ last_post.posted_by.username }}
                         {% else %}
-                            [Удаленный пользователь]
+                            [Видалений користувач]
                         {% endif %}
                         в {{ last_post.created_at|date:"d M Y" }}
                     </span>
@@ -93,7 +93,7 @@
                 </div>
             </div>
         {% else %}
-            <p>В этом сообществе пока нет публикаций.</p>
+            <p>У цій спільноті поки немає публікацій.</p>
         {% endif %}
     </div>
 </div>
@@ -121,7 +121,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        this.textContent = data.action === 'joined' ? 'Отписаться' : 'Присоединиться';
+                        this.textContent = data.action === 'joined' ? 'Відписатися' : 'Приєднатися';
                         this.classList.toggle('btn-join', data.action === 'left');
                         this.classList.toggle('btn-leave', data.action === 'joined');
                         
@@ -129,18 +129,18 @@
 
                         const membersCountSpan = document.querySelector('.community-meta-item i.fa-users').parentNode;
                         if (membersCountSpan) {
-                            membersCountSpan.innerHTML = `<i class="fas fa-users"></i> ${data.members_count} участников`;
+                            membersCountSpan.innerHTML = `<i class="fas fa-users"></i> ${data.members_count} учасників`;
                         }
 
-                        console.log(`Успешно ${data.action} сообщество! Новое количество участников: ${data.members_count}`);
+                        console.log(`Успішно ${data.action} спільноту! Нова кількість учасників: ${data.members_count}`);
                     } else {
-                        console.error('Ошибка при смене статуса членства:', data.message);
-                        alert('Произошла ошибка: ' + data.message);
+                        console.error('Помилка при зміні статусу членства:', data.message);
+                        alert('Сталася помилка: ' + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('Произошла ошибка сети или сервера:', error);
-                    alert('Произошла ошибка сети. Попробуйте ещё раз.');
+                    console.error('Сталася помилка мережі або сервера:', error);
+                    alert('Сталася помилка мережі. Спробуйте ще раз.');
                 });
             });
         }

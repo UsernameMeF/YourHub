@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 
-{% block title %}Подтверждение выхода{% endblock %}
+{% block title %}Підтвердження виходу{% endblock %}
 
 {% block content %}
-<div class="auth-form-container"> {# Можем использовать тот же контейнер для центрирования #}
-    <h2>Вы уверены, что хотите выйти?</h2>
-    <p>Выход завершит вашу текущую сессию на этом сайте.</p>
+<div class="auth-form-container"> {# Можемо використовувати той самий контейнер для центрування #}
+    <h2>Ви впевнені, що бажаєте вийти?</h2>
+    <p>Вихід завершить вашу поточну сесію на цьому сайті.</p>
 
-    <form method="post" action="{% url 'users:logout' %}"> {# Форма отправляет POST запрос на этот же URL #}
+    <form method="post" action="{% url 'users:logout' %}"> {# Форма надсилає POST запит на цей самий URL #}
         {% csrf_token %}
-        <button type="submit" class="btn-primary">Выйти</button> {# Добавь подходящий CSS класс для кнопки #}
+        <button type="submit" class="btn-primary">Вийти</button> {# Додай відповідний CSS клас для кнопки #}
     </form>
 
-    <p><a href="{% url 'core:index' %}">Отмена (Вернуться на главную)</a></p> {# Ссылка на главную страницу #}
+    <p><a href="{% url 'core:index' %}">Скасувати (Повернутися на головну)</a></p> {# Посилання на головну сторінку #}
 </div>
 {% endblock %}

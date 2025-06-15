@@ -12,7 +12,7 @@ from django.db import transaction
 from .models import ChatRoom, ChatMessage, ChatAttachment
 from django.contrib.auth import get_user_model
 
-# Импортируем Channel Layer
+# Імпортуємо Channel Layer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -24,22 +24,22 @@ from .forms import GroupChatCreateForm
 User = get_user_model()
 
 def get_chat_models_and_instance(room_type, room_id):
-    print(f"DEBUG: get_chat_models_and_instance called with type={room_type}, id={room_id}")
+    print(f"DEBUG: get_chat_models_and_instance викликано з типом={room_type}, id={room_id}") # Translated
     if room_type == 'private':
         try:
             chat_instance = ChatRoom.objects.get(id=room_id)
-            print(f"DEBUG: ChatRoom found: {chat_instance.id}")
+            print(f"DEBUG: ChatRoom знайдено: {chat_instance.id}") # Translated
             return ChatRoom, ChatMessage, ChatAttachment, 'private', chat_instance
         except ChatRoom.DoesNotExist:
-            print(f"DEBUG: ChatRoom with ID {room_id} not found.")
+            print(f"DEBUG: ChatRoom з ID {room_id} не знайдено.") # Translated
             return None, None, None, None, None
     elif room_type == 'group':
         try:
             chat_instance = GroupChat.objects.get(id=room_id)
-            print(f"DEBUG: GroupChat found: {chat_instance.id}")
+            print(f"DEBUG: GroupChat знайдено: {chat_instance.id}") # Translated
             return GroupChat, GroupChatMessage, GroupChatAttachment, 'group', chat_instance
         except GroupChat.DoesNotExist:
-            print(f"DEBUG: GroupChat with ID {room_id} not found.")
+            print(f"DEBUG: GroupChat з ID {room_id} не знайдено.") # Translated
             return None, None, None, None, None
     else:
         return None, None, None, None, None
@@ -91,23 +91,23 @@ def chat_room_view(request, room_id):
 @login_required
 def group_chat_room_view(request, group_chat_id):
     """
-    Отображает страницу конкретного группового чата.
-    """
+    Відображає сторінку конкретного групового чату.
+    """ # Translated
     group_chat = get_object_or_404(
         GroupChat.objects.filter(participants=request.user)
-                       .prefetch_related('participants')
-                       .select_related('owner'),
+                         .prefetch_related('participants')
+                         .select_related('owner'),
         id=group_chat_id
     )
 
     messages_in_group = GroupChatMessage.objects.filter(group_chat=group_chat) \
-                                        .select_related('sender') \
-                                        .prefetch_related('attachments', 'read_by') \
-                                        .order_by('timestamp')
+                                         .select_related('sender') \
+                                         .prefetch_related('attachments', 'read_by') \
+                                         .order_by('timestamp')
 
     with transaction.atomic():
         unread_messages_for_user = messages_in_group.exclude(sender=request.user) \
-                                                    .exclude(read_by=request.user)
+                                                     .exclude(read_by=request.user)
         for message in unread_messages_for_user:
             message.read_by.add(request.user)
 
@@ -121,14 +121,14 @@ def group_chat_room_view(request, group_chat_id):
 @login_required
 def get_or_create_private_chat(request, other_user_id):
     """
-    Находит или создает приватный чат между текущим пользователем и другим пользователем.
-    Перенаправляет на страницу этого чата.
-    """
+    Знаходить або створює приватний чат між поточним користувачем та іншим користувачем.
+    Перенаправляє на сторінку цього чату.
+    """ # Translated
     other_user = get_object_or_404(User, id=other_user_id)
 
     if request.user.id == other_user.id:
-        print(f"DEBUG: Пользователь {request.user.username} пытается создать чат с самим собой. Перенаправление.")
-        return redirect('users:profile', pk=request.user.id) # Проверьте это имя URL
+        print(f"DEBUG: Користувач {request.user.username} намагається створити чат із самим собою. Перенаправлення.") # Translated
+        return redirect('users:profile', pk=request.user.id) # Проверьте это имя URL # Translated
 
 
     possible_chats = ChatRoom.objects.annotate(num_participants=models.Count('participants')).filter(
@@ -139,19 +139,19 @@ def get_or_create_private_chat(request, other_user_id):
         participants=other_user 
     )
     
-    print(f"DEBUG: До поиска: QuerySet: {possible_chats.query}") 
+    print(f"DEBUG: До пошуку: QuerySet: {possible_chats.query}") # Translated
     
     chat_room = possible_chats.first()
 
     if not chat_room:
-        print("DEBUG: Существующий чат не найден. Создаю новый чат.")
+        print("DEBUG: Існуючий чат не знайдено. Створюю новий чат.") # Translated
         with transaction.atomic(): 
             chat_room = ChatRoom.objects.create()
             chat_room.participants.add(request.user, other_user)
             chat_room.save()
-            print(f"DEBUG: Новый чат создан с ID: {chat_room.id}")
+            print(f"DEBUG: Новий чат створено з ID: {chat_room.id}") # Translated
     else:
-        print(f"DEBUG: Существующий чат найден. ID: {chat_room.id}")
+        print(f"DEBUG: Існуючий чат знайдено. ID: {chat_room.id}") # Translated
 
     return redirect('chat:chat_room', room_id=chat_room.id)
 
@@ -167,15 +167,15 @@ def upload_attachment(request, room_type, room_id):
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
-        return JsonResponse({'error': 'Чат не найден.'}, status=404)
+        return JsonResponse({'error': 'Чат не знайдено.'}, status=404) # Translated
 
     if actual_room_type != room_type:
-        return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
+        return JsonResponse({'error': 'Невідповідність типу чату.'}, status=400) # Translated
 
 
     try:
         if not chat_instance.participants.filter(id=request.user.id).exists():
-            return JsonResponse({'error': 'Вы не являетесь участником этого чата.'}, status=403)
+            return JsonResponse({'error': 'Ви не є учасником цього чату.'}, status=403) # Translated
 
         with transaction.atomic():
             if room_type == 'private':
@@ -233,8 +233,8 @@ def upload_attachment(request, room_type, room_id):
         return JsonResponse({'status': 'success', 'message_id': chat_message.id, 'attachments': attachments_data})
 
     except Exception as e:
-        print(f"Ошибка при загрузке вложения: {e}")
-        return JsonResponse({'error': f'Произошла ошибка при загрузке: {str(e)}'}, status=500)
+        print(f"Помилка при завантаженні вкладення: {e}") # Translated
+        return JsonResponse({'error': f'Сталася помилка при завантаженні: {str(e)}'}, status=500) # Translated
 
 
 @login_required
@@ -242,14 +242,14 @@ def load_more_messages(request, room_type, room_id):
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
-        return JsonResponse({'error': 'Чат не найден.'}, status=404)
+        return JsonResponse({'error': 'Чат не знайдено.'}, status=404) # Translated
 
     if actual_room_type != room_type:
-        return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
+        return JsonResponse({'error': 'Невідповідність типу чату.'}, status=400) # Translated
 
     try:
         if not chat_instance.participants.filter(id=request.user.id).exists():
-            return JsonResponse({'error': 'Вы не являетесь участником этого чата.'}, status=403)
+            return JsonResponse({'error': 'Ви не є учасником цього чату.'}, status=403) # Translated
 
         before_message_id = request.GET.get('before_message_id')
         messages_per_load = 50
@@ -259,7 +259,7 @@ def load_more_messages(request, room_type, room_id):
         elif room_type == 'group':
             messages_query = MessageModel.objects.filter(group_chat=chat_instance).order_by('-timestamp').select_related('sender').prefetch_related('attachments')
         else:
-            return JsonResponse({'error': 'Неизвестный тип чата.'}, status=400)
+            return JsonResponse({'error': 'Невідомий тип чату.'}, status=400) # Translated
 
         if before_message_id:
             messages_query = messages_query.filter(id__lt=before_message_id)
@@ -304,76 +304,76 @@ def load_more_messages(request, room_type, room_id):
         })
 
     except Exception as e:
-        print(f"Ошибка при загрузке старых сообщений: {e}")
-        return JsonResponse({'error': f'Произошла ошибка: {str(e)}'}, status=500)
+        print(f"Помилка при завантаженні старих повідомлень: {e}") # Translated
+        return JsonResponse({'error': f'Сталася помилка: {str(e)}'}, status=500) # Translated
 
 
 @login_required
 @require_POST
 def edit_message(request, room_type, room_id, message_id):
-    print(f"DEBUG: Entering edit_message view for room_type={room_type}, room_id={room_id}, message_id={message_id}")
+    print(f"DEBUG: Вхід у функцію edit_message для room_type={room_type}, room_id={room_id}, message_id={message_id}") # Translated
 
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
     
-    print(f"DEBUG: From get_chat_models_and_instance: ChatModel={ChatModel.__name__ if ChatModel else None}, MessageModel={MessageModel.__name__ if MessageModel else None}, actual_room_type={actual_room_type}, chat_instance={chat_instance}")
+    print(f"DEBUG: З get_chat_models_and_instance: ChatModel={ChatModel.__name__ if ChatModel else None}, MessageModel={MessageModel.__name__ if MessageModel else None}, actual_room_type={actual_room_type}, chat_instance={chat_instance}") # Translated
 
     if not ChatModel or not chat_instance:
-        print("DEBUG: ChatModel or chat_instance is None. Returning 404 (Чат не найден).")
-        return JsonResponse({'error': 'Чат не найден.'}, status=404)
+        print("DEBUG: ChatModel або chat_instance є None. Повертаю 404 (Чат не знайдено).") # Translated
+        return JsonResponse({'error': 'Чат не знайдено.'}, status=404) # Translated
 
     if actual_room_type != room_type:
-        print(f"DEBUG: Room type mismatch: actual={actual_room_type}, expected={room_type}. Returning 400.")
-        return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
+        print(f"DEBUG: Невідповідність типу кімнати: фактичний={actual_room_type}, очікуваний={room_type}. Повертаю 400.") # Translated
+        return JsonResponse({'error': 'Невідповідність типу чату.'}, status=400) # Translated
 
     try:
         if room_type == 'private':
-            print(f"DEBUG: Attempting to get private message {message_id} from chat {chat_instance.id} for user {request.user.id}.")
+            print(f"DEBUG: Спроба отримати приватне повідомлення {message_id} з чату {chat_instance.id} для користувача {request.user.id}.") # Translated
             message = get_object_or_404(MessageModel, id=message_id, sender=request.user, chat_room=chat_instance)
-            print(f"DEBUG: Private message {message_id} found by get_object_or_404.")
+            print(f"DEBUG: Приватне повідомлення {message_id} знайдено за допомогою get_object_or_404.") # Translated
         elif room_type == 'group':
-            print(f"DEBUG: Attempting to get group message {message_id} from chat {chat_instance.id} for user {request.user.id}.")
+            print(f"DEBUG: Спроба отримати групове повідомлення {message_id} з чату {chat_instance.id} для користувача {request.user.id}.") # Translated
             message = get_object_or_404(MessageModel, id=message_id, sender=request.user, group_chat=chat_instance)
-            print(f"DEBUG: Group message {message_id} found by get_object_or_404.")
+            print(f"DEBUG: Групове повідомлення {message_id} знайдено за допомогою get_object_or_404.") # Translated
         else:
-            print(f"DEBUG: Unknown chat type: {room_type}. Returning 400.")
-            return JsonResponse({'error': 'Неизвестный тип чата.'}, status=400)
+            print(f"DEBUG: Невідомий тип чату: {room_type}. Повертаю 400.") # Translated
+            return JsonResponse({'error': 'Невідомий тип чату.'}, status=400) # Translated
 
         new_content = request.POST.get('message_content', '').strip()
         existing_attachment_ids_str = request.POST.get('existing_attachments', '[]')
         
-        print(f"DEBUG: new_content='{new_content}', existing_attachment_ids_str='{existing_attachment_ids_str}'")
+        print(f"DEBUG: new_content='{new_content}', existing_attachment_ids_str='{existing_attachment_ids_str}'") # Translated
 
         try:
             existing_attachment_ids = json.loads(existing_attachment_ids_str)
         except json.JSONDecodeError:
-            print("DEBUG: JSONDecodeError for existing_attachments.")
-            return JsonResponse({'error': 'Некорректный JSON-формат для existing_attachments.'}, status=400)
+            print("DEBUG: JSONDecodeError для existing_attachments.") # Translated
+            return JsonResponse({'error': 'Некоректний JSON-формат для existing_attachments.'}, status=400) # Translated
 
         new_files = request.FILES.getlist('new_files')
-        print(f"DEBUG: new_files count: {len(new_files)}")
+        print(f"DEBUG: new_files count: {len(new_files)}") # Translated
 
         if not new_content and not new_files and not existing_attachment_ids:
-            print("DEBUG: Message content, new files, and existing attachments are all empty. Returning 400.")
-            return JsonResponse({'error': 'Сообщение не может быть пустым и без вложений.'}, status=400)
+            print("DEBUG: Зміст повідомлення, нові файли та існуючі вкладення порожні. Повертаю 400.") # Translated
+            return JsonResponse({'error': 'Повідомлення не може бути порожнім і без вкладень.'}, status=400) # Translated
 
         with transaction.atomic():
             message.content = new_content
             message.is_edited = True
             message.save()
-            print(f"DEBUG: Message {message_id} content updated.")
+            print(f"DEBUG: Зміст повідомлення {message_id} оновлено.") # Translated
 
             attachments_to_delete = message.attachments.exclude(id__in=existing_attachment_ids)
             for attachment in attachments_to_delete:
-                print(f"DEBUG: Deleting attachment {attachment.id} ({attachment.original_filename}).")
+                print(f"DEBUG: Видалення вкладення {attachment.id} ({attachment.original_filename}).") # Translated
                 attachment.delete()
 
             for f in new_files:
                 AttachmentModel.objects.create(message=message, file=f, original_filename=f.name)
-                print(f"DEBUG: Created new attachment {f.name}.")
+                print(f"DEBUG: Створено нове вкладення {f.name}.") # Translated
 
             channel_layer = get_channel_layer()
             room_group_name = f'{room_type}_chat_{room_id}'
-            print(f"DEBUG: Sending message_edited to channel layer group: {room_group_name}")
+            print(f"DEBUG: Надсилання message_edited до групи шарів каналу: {room_group_name}") # Translated
 
             updated_attachments_data = []
             for att in message.attachments.all():
@@ -383,7 +383,7 @@ def edit_message(request, room_type, room_id, message_id):
                     'original_filename': att.original_filename,
                     'file_type': att.file_type
                 })
-            print(f"DEBUG: updated_attachments_data: {updated_attachments_data}")
+            print(f"DEBUG: updated_attachments_data: {updated_attachments_data}") # Translated
 
 
             async_to_sync(channel_layer.group_send)(
@@ -395,9 +395,9 @@ def edit_message(request, room_type, room_id, message_id):
                     'attachments': updated_attachments_data
                 }
             )
-            print("DEBUG: Channel layer group_send completed.")
+            print("DEBUG: Channel layer group_send завершено.") # Translated
 
-        print("DEBUG: edit_message function finished successfully. Returning success JsonResponse.")
+        print("DEBUG: Функція edit_message успішно завершена. Повертаю JsonResponse про успіх.") # Translated
         return JsonResponse({
             'status': 'success',
             'message_id': message.id,
@@ -405,10 +405,10 @@ def edit_message(request, room_type, room_id, message_id):
             'attachments': updated_attachments_data
         })
     except MessageModel.DoesNotExist:
-        print(f"DEBUG: Caught MessageModel.DoesNotExist for message {message_id}. Returning 403.")
-        return JsonResponse({'error': 'Сообщение не найдено или у вас нет прав на его редактирование.'}, status=403)
+        print(f"DEBUG: Виявлено MessageModel.DoesNotExist для повідомлення {message_id}. Повертаю 403.") # Translated
+        return JsonResponse({'error': 'Повідомлення не знайдено або у вас немає прав на його редагування.'}, status=403) # Translated
     except Exception as e:
-        print(f"DEBUG: General error in edit_message: {e}. Returning 500.")
+        print(f"DEBUG: Загальна помилка в edit_message: {e}. Повертаю 500.") # Translated
         return JsonResponse({'error': str(e)}, status=500)
 
 
@@ -418,10 +418,10 @@ def delete_message(request, room_type, room_id, message_id):
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
-        return JsonResponse({'error': 'Чат не найден.'}, status=404)
+        return JsonResponse({'error': 'Чат не знайдено.'}, status=404) # Translated
 
     if actual_room_type != room_type:
-        return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
+        return JsonResponse({'error': 'Невідповідність типу чату.'}, status=400) # Translated
 
     try:
         if room_type == 'private':
@@ -429,7 +429,7 @@ def delete_message(request, room_type, room_id, message_id):
         elif room_type == 'group':
             message = get_object_or_404(MessageModel, id=message_id, sender=request.user, group_chat=chat_instance)
         else:
-            return JsonResponse({'error': 'Неизвестный тип чата.'}, status=400)
+            return JsonResponse({'error': 'Невідомий тип чату.'}, status=400) # Translated
 
         with transaction.atomic():
             message_id_str = str(message.id)
@@ -448,9 +448,9 @@ def delete_message(request, room_type, room_id, message_id):
             )
         return JsonResponse({'status': 'success', 'message_id': message_id_str})
     except MessageModel.DoesNotExist:
-        return JsonResponse({'error': 'Сообщение не найдено или у вас нет прав на его удаление.'}, status=403)
+        return JsonResponse({'error': 'Повідомлення не знайдено або у вас немає прав на його видалення.'}, status=403) # Translated
     except Exception as e:
-        print(f"Ошибка при удалении сообщения: {e}")
+        print(f"Помилка при видаленні повідомлення: {e}") # Translated
         return JsonResponse({'error': str(e)}, status=500)
 
 
@@ -459,8 +459,8 @@ def delete_message(request, room_type, room_id, message_id):
 @require_POST
 def create_group_chat_ajax(request):
     """
-    Обрабатывает AJAX-запрос для создания нового группового чата.
-    """
+    Обробляє AJAX-запит для створення нового групового чату.
+    """ # Translated
     form = GroupChatCreateForm(request.POST, request_user=request.user)
 
     if form.is_valid():
@@ -483,10 +483,10 @@ def create_group_chat_ajax(request):
             })
 
         except Exception as e:
-            return JsonResponse({'error': 'Произошла ошибка при создании группового чата.'}, status=500)
+            return JsonResponse({'error': 'Сталася помилка при створенні групового чату.'}, status=500) # Translated
     else:
         errors = {field: [str(err) for err in form.errors[field]] for field in form.errors}
-        return JsonResponse({'error': 'Некорректные данные формы.', 'details': errors}, status=400)
+        return JsonResponse({'error': 'Некоректні дані форми.', 'details': errors}, status=400) # Translated
 
 
 @login_required
@@ -499,8 +499,8 @@ def create_group_chat_view(request):
             participants = form.cleaned_data['participants']
 
             with transaction.atomic():
-                # Создаем групповой чат
-                group_chat = GroupChat.objects.create(
+                # Створюємо груповий чат
+                group_chat = GroupChat.objects.create( # Translated
                     name=name,
                     description=description, 
                     owner=request.user 
@@ -513,5 +513,5 @@ def create_group_chat_view(request):
             pass 
     else:
         form = GroupChatCreateForm(request_user=request.user)
-    print("DEBUG: Rendering create_group_chat.html") 
+    print("DEBUG: Відображення create_group_chat.html") # Translated
     return render(request, 'chat/create_group_chat.html', {'form': form})

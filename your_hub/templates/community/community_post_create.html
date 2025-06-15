@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Создать пост в {{ community.name }}{% endblock %}
+{% block title %}Створити допис у {{ community.name }}{% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/community/_community_post_create.css' %}"> {# Обновлено #}
-    <link rel="stylesheet" href="{% static 'css/community/_community_post_create_dark.css' %}" media="(prefers-color-scheme: dark)"> {# Обновлено #}
+    <link rel="stylesheet" href="{% static 'css/community/_community_post_create.css' %}"> {# Оновлено #}
+    <link rel="stylesheet" href="{% static 'css/community/_community_post_create_dark.css' %}" media="(prefers-color-scheme: dark)"> {# Оновлено #}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 <div class="main-container form-container">
-    <h1 class="form-title">Создать публикацию в "{{ community.name }}"</h1>
+    <h1 class="form-title">Створити публікацію у "{{ community.name }}"</h1>
     <form method="post" enctype="multipart/form-data"> 
         {% csrf_token %}
 
@@ -38,8 +38,8 @@
             {% endfor %}
         </div>
         
-        <button type="submit" class="submit-button">Опубликовать</button>
-        <a href="{% url 'community:community_detail' pk=community.pk %}" class="cancel-button">Отмена</a>
+        <button type="submit" class="submit-button">Опублікувати</button>
+        <a href="{% url 'community:community_detail' pk=community.pk %}" class="cancel-button">Скасувати</a>
     </form>
 </div>
 {% endblock %}
@@ -60,14 +60,14 @@
                 fileNameDisplay.textContent = fileNames.join(', ');
                 clearFilesButton.style.display = 'inline-block';
             } else {
-                fileNameDisplay.textContent = 'Файлы не выбраны';
+                fileNameDisplay.textContent = 'Файли не вибрані';
                 clearFilesButton.style.display = 'none';
             }
         });
 
         clearFilesButton.addEventListener('click', function() {
             fileInput.value = ''; 
-            fileNameDisplay.textContent = 'Файлы не выбраны';
+            fileNameDisplay.textContent = 'Файли не вибрані';
             clearFilesButton.style.display = 'none';
         });
     });

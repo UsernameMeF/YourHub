@@ -2,7 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Создать пост{% endblock %}
+{% block title %}Створити допис{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/core/create_post_form.css' %}">
@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="post-form-container">
-    <h1>Создать новый пост</h1>
+    <h1>Створити новий допис</h1>
     <form id="post-create-form" method="post" action="{% url 'core:post_create_submit' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-field-wrapper">
-            <label for="{{ form.content.id_for_label }}">Содержимое</label>
+            <label for="{{ form.content.id_for_label }}">Вміст</label>
             {{ form.content|add_class:"form-input-field" }}
             {% if form.content.errors %}
                 <p class="error-message">{{ form.content.errors|join:", " }}</p>
@@ -49,16 +49,16 @@
         </div>
 
         <div class="image-upload-section">
-            <h3>Изображения (до 5)</h3>
+            <h3>Зображення (до 5)</h3>
             <div id="image-inputs-wrapper" class="image-previews-grid">
-                {# Здесь будут динамически добавляться предпросмотры новых изображений #}
+                {# Тут будуть динамічно додаватися попередні перегляди нових зображень #}
             </div>
-            <button type="button" id="add-new-image-button" class="add-image-button">Добавить изображение</button>
+            <button type="button" id="add-new-image-button" class="add-image-button">Додати зображення</button>
         </div>
 
         <div class="form-actions">
-            <a href="{% url 'core:index' %}" class="form-button cancel">Отмена</a>
-            <button type="submit" class="form-button primary">Создать пост</button>
+            <a href="{% url 'core:index' %}" class="form-button cancel">Скасувати</a>
+            <button type="submit" class="form-button primary">Створити допис</button>
         </div>
     </form>
 </div>

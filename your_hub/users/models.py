@@ -16,10 +16,10 @@ def profile_avatar_upload_path(instance, filename):
 
 class Profile(models.Model):
     STATUS_CHOICES = (
-        ('online', 'В сети'),
-        ('away', 'Нет на месте'),
-        ('dnd', 'Не беспокоить'),
-        ('invisible', 'Невидимый'),
+        ('online', 'В мережі'),
+        ('away', 'Немає на місці'),
+        ('dnd', 'Не турбувати'),
+        ('invisible', 'Невидимий'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -30,7 +30,7 @@ class Profile(models.Model):
 
 
     def __str__(self):
-        return f'{self.user.username} Profile'
+        return f'Профіль {self.user.username}'
 
 
     def save(self, *args, **kwargs):
@@ -62,7 +62,7 @@ class Profile(models.Model):
             except FileNotFoundError:
                 pass
             except Exception as e:
-                print(f"Error processing image for user {self.user.username}: {e}")
+                print(f"Помилка обробки зображення для користувача {self.user.username}: {e}")
 
 
 
@@ -79,8 +79,8 @@ def auto_delete_avatar_on_delete(sender, instance, **kwargs):
 
 class Friendship(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'Ожидает подтверждения'),
-        ('accepted', 'Принято'),
+        ('pending', 'Очікує підтвердження'),
+        ('accepted', 'Прийнято'),
     )
 
     from_user = models.ForeignKey(User, related_name='sent_friend_requests', on_delete=models.CASCADE)
@@ -95,7 +95,7 @@ class Friendship(models.Model):
 
 
     def __str__(self):
-        return f"Запрос дружбы от {self.from_user.username} к {self.to_user.username} ({self.status})"
+        return f"Запит дружби від {self.from_user.username} до {self.to_user.username} ({self.status})"
 
 
     def accept(self):
@@ -121,4 +121,4 @@ class Follow(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.follower.username} подписан на {self.following.username}'
+        return f'{self.follower.username} підписаний на {self.following.username}'

@@ -8,18 +8,18 @@
             <a href="{% url 'users:user_profile' post.author.id %}" class="post-author-username">{{ post.author.username }}</a>
             <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
             {% if post.updated_at and post.created_at != post.updated_at %}
-                <span class="post-date">(обновлено: {{ post.updated_at|date:"d M Y H:i" }})</span>
+                <span class="post-date">(оновлено: {{ post.updated_at|date:"d M Y H:i" }})</span>
             {% endif %}
         </div>
         {% if user.is_authenticated and user == post.author %}
             <div class="post-actions-dropdown">
                 <button class="post-actions-button">...</button>
                 <div class="dropdown-menu">
-                    {# Кнопка "Редактировать" теперь ведет на отдельную страницу #}
-                    <a href="{% url 'core:edit_post_page' post.pk %}">Редактировать</a>
+                    {# Кнопка "Редагувати" тепер веде на окрему сторінку #}
+                    <a href="{% url 'core:edit_post_page' post.pk %}">Редагувати</a>
                     
-                    {# Кнопка "Удалить" остается с модальным окном #}
-                    <a href="#" onclick="event.preventDefault(); openDeletePostModal({{ post.id }});">Удалить</a>
+                    {# Кнопка "Видалити" залишається з модальним вікном #}
+                    <a href="#" onclick="event.preventDefault(); openDeletePostModal({{ post.id }});">Видалити</a>
                 </div>
             </div>
         {% endif %}
@@ -27,15 +27,15 @@
 
     <h2 class="post-title"><a href="{% url 'core:post_detail' post.id %}">{{ post.title }}</a></h2>
     
-    {# --- ИЗМЕНЕНИЯ ЗДЕСЬ: Текст поста без обрезания --- #}
-    <div class="post-content-wrapper"> {# Оставляем обёртку для консистентности стилей, если это нужно #}
-        <p class="post-content">{{ post.content|safe }}</p> {# Полный текст, без |truncatechars_html #}
+    {# --- ЗМІНИ ТУТ: Текст допису без обрізання --- #}
+    <div class="post-content-wrapper"> {# Залишаємо обгортку для консистентності стилів, якщо це потрібно #}
+        <p class="post-content">{{ post.content|safe }}</p> {# Повний текст, без |truncatechars_html #}
     </div>
-    {# --- КОНЕЦ ИЗМЕНЕНИЙ --- #}
+    {# --- КІНЕЦЬ ЗМІН --- #}
 
-    {% if post.attachments.first %} {# Проверяем, есть ли хотя бы одно вложение #}
+    {% if post.attachments.first %} {# Перевіряємо, чи є хоча б одне вкладення #}
         <div class="post-images-grid">
-            <img src="{{ post.attachments.first.image.url }}" alt="Вложение к посту" class="post-grid-image">
+            <img src="{{ post.attachments.first.image.url }}" alt="Вкладення до допису" class="post-grid-image">
         </div>
     {% endif %}
 
@@ -55,6 +55,6 @@
     </div>
 
     {% if show_full_comments %}
-        {# Комментарии будут отображаться только на странице детального просмотра #}
+        {# Коментарі будуть відображатися тільки на сторінці детального перегляду #}
     {% endif %}
 </div>

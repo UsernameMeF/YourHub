@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Вход{% endblock %}
+{% block title %}Вхід{% endblock %}
 
 {% block content %}
-<div class="auth-form-container"> {# Используй CSS класс для контейнера формы #}
-    <h2>Вход</h2>
+<div class="auth-form-container"> {# Використовуй CSS клас для контейнера форми #}
+    <h2>Вхід</h2>
     <form method="post">
         {% csrf_token %}
-        {# AuthenticationForm по умолчанию содержит поля username и password #}
+        {# AuthenticationForm за замовчуванням містить поля username та password #}
         {{ form.as_p }}
-        <button type="submit">Войти</button>
+        <button type="submit">Увійти</button>
     </form>
-    <p>Нет аккаунта? <a href="{% url 'users:register' %}">Зарегистрироваться здесь</a>.</p>
+    <p>Немає облікового запису? <a href="{% url 'users:register' %}">Зареєструватися тут</a>.</p>
 </div>
 {% endblock %}

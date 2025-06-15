@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Создать сообщество{% endblock %}
+{% block title %}Створити спільноту{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -11,7 +11,7 @@
 {% block content %}
 <div class="main-container">
     <div class="form-card">
-        <h2 class="form-title">Создать новое сообщество</h2>
+        <h2 class="form-title">Створити нову спільноту</h2>
         
         <form method="post">
             {% csrf_token %}
@@ -29,7 +29,7 @@
                 </div>
             {% endfor %}
 
-            <button type="submit" class="submit-button">Создать сообщество</button>
+            <button type="submit" class="submit-button">Створити спільноту</button>
         </form>
     </div>
 </div>

@@ -30,7 +30,6 @@ def register_view(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Profile.objects.create(user=user)
             return redirect('users:login')
         else:
             pass
@@ -70,13 +69,13 @@ def custom_logout_view(request):
         return logout_view(request)
     else:
         if not request.user.is_authenticated:
-             return redirect(settings.LOGIN_REDIRECT_URL or settings.LOGIN_URL or '/')
+            return redirect(settings.LOGIN_REDIRECT_URL or settings.LOGIN_URL or '/')
 
         return render(request, 'users/logout_confirm.html', {})
 
 
 def profile_view(request, user_id):
-    """Представление для отображения профиля любого пользователя по ID."""
+    """Представлення для відображення профілю будь-якого користувача за ID."""
     viewed_user = get_object_or_404(User, pk=user_id)
     user_profile = viewed_user.profile 
 
@@ -207,20 +206,20 @@ def edit_profile_view(request):
 @login_required
 def set_user_status(request):
     if not hasattr(request.user, 'profile'):
-        return JsonResponse({'status': 'error', 'message': 'Не удалось найти профиль пользователя.'}, status=404)
+        return JsonResponse({'status': 'error', 'message': 'Не вдалося знайти профіль користувача.'}, status=404)
 
     chosen_status = request.POST.get('status_type')
 
     try:
         valid_statuses = [choice[0] for choice in Profile.STATUS_CHOICES]
     except AttributeError:
-        return JsonResponse({'status': 'error', 'message': 'Ошибка: Не могу получить список статусов. Проверьте модель Profile.'}, status=500)
+        return JsonResponse({'status': 'error', 'message': 'Помилка: Не можу отримати список статусів. Перевірте модель Profile.'}, status=500)
     except NameError:
-         return JsonResponse({'status': 'error', 'message': 'Ошибка: Модель Profile не импортирована или недоступна.'}, status=500)
+        return JsonResponse({'status': 'error', 'message': 'Помилка: Модель Profile не імпортована або недоступна.'}, status=500)
 
 
     if chosen_status not in valid_statuses:
-        return JsonResponse({'status': 'error', 'message': 'Недопустимый статус'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Недійсний статус'}, status=400)
 
     
     try:
@@ -240,8 +239,8 @@ def set_user_status(request):
         })
 
     except Exception as e:
-        print(f"Ошибка при изменении статуса: {e}") 
-        return JsonResponse({'status': 'error', 'message': f'Произошла ошибка при изменении статуса: {str(e)}'}, status=500)
+        print(f"Помилка при зміні статусу: {e}") 
+        return JsonResponse({'status': 'error', 'message': f'Сталася помилка при зміні статусу: {str(e)}'}, status=500)
 
 
 
@@ -272,7 +271,7 @@ def send_friend_request(request, to_user_id):
     to_user = get_object_or_404(User, pk=to_user_id)
 
     if request.user == to_user:
-        return JsonResponse({'status': 'error', 'message': ""}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Ви не можете відправити запит дружби самому собі."}, status=400)
 
     friendship_status = 'not_friends'
     sent_request = None
@@ -288,14 +287,18 @@ def send_friend_request(request, to_user_id):
         if existing_friendship:
             if existing_friendship.status == 'accepted':
                 friendship_status = 'friends'
+                message = "Ви вже друзі."
             elif existing_friendship.status == 'pending':
                 if existing_friendship.from_user == request.user:
                     friendship_status = 'pending_sent'
                     sent_request = existing_friendship
+                    message = "Запит дружби вже відправлено."
                 else:
                     friendship_status = 'pending_received'
                     received_request = existing_friendship
+                    message = "Вам вже надіслано запит дружби від цього користувача."
             else:
+                # Should not happen with current status choices, but as a fallback
                 existing_friendship.from_user = request.user
                 existing_friendship.to_user = to_user
                 existing_friendship.status = 'pending'
@@ -303,16 +306,20 @@ def send_friend_request(request, to_user_id):
                 existing_friendship.save()
                 friendship_status = 'pending_sent'
                 sent_request = existing_friendship
+                is_new_request = True
+                message = "Запит дружби відправлено."
         else:
             friendship = Friendship.objects.create(from_user=request.user, to_user=to_user, status='pending')
             friendship_status = 'pending_sent'
             sent_request = friendship
+            is_new_request = True
+            message = "Запит дружби відправлено."
 
         if is_new_request:
             recipient = to_user
             sender_user = request.user
             notification_type = 'friend_request'
-            content = f"{sender_user.username} отправил(-а) вам запрос на дружбу."
+            content = f"{sender_user.username} надіслав(-ла) вам запит на дружбу."
             related_object = sent_request
             custom_url = reverse('users:profile', args=[sender_user.id])
 
@@ -339,27 +346,31 @@ def send_friend_request(request, to_user_id):
             'received_request': received_request,
         }, request=request)
 
-        return JsonResponse({'status': 'success', 'message': '', 'new_button_html': new_button_html})
+        return JsonResponse({'status': 'success', 'message': message, 'new_button_html': new_button_html})
 
     except IntegrityError:
         print("IntegrityError caught in send_friend_request. Re-evaluating friendship status.")
+        message = "Запит дружби вже існує або ви вже друзі."
 
         current_friendship = Friendship.objects.filter(
-            Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user)
+            (Q(from_user=request.user, to_user=to_user) | Q(from_user=to_user, to_user=request.user))
         ).first()
 
         if current_friendship:
             if current_friendship.status == 'accepted':
                 friendship_status = 'friends'
+                message = "Ви вже друзі."
             elif current_friendship.status == 'pending':
                 if current_friendship.from_user == request.user:
                     friendship_status = 'pending_sent'
                     sent_request = current_friendship
+                    message = "Запит дружби вже відправлено."
                 else:
                     friendship_status = 'pending_received'
                     received_request = current_friendship
+                    message = "Вам вже надіслано запит дружби від цього користувача."
             else:
-                friendship_status = 'not_friends'
+                friendship_status = 'not_friends' # Fallback for unknown status
         else:
             friendship_status = 'not_friends'
 
@@ -377,13 +388,13 @@ def send_friend_request(request, to_user_id):
 
         return JsonResponse({
             'status': 'info',
-            'message': '',
+            'message': message,
             'new_button_html': new_button_html
         }, status=200)
 
     except Exception as e:
         print(f"An unexpected error occurred in send_friend_request: {e}")
-        return JsonResponse({'status': 'error', 'message': ''}, status=500)
+        return JsonResponse({'status': 'error', 'message': 'Сталася невідома помилка.'}, status=500)
 
 
 @require_POST
@@ -397,7 +408,7 @@ def accept_friend_request(request, friendship_id):
         recipient = friendship_request.from_user
         sender_user = request.user
         notification_type = 'friend_accept'
-        content = f"{sender_user.username} принял(-а) ваш запрос на дружбу."
+        content = f"{sender_user.username} прийняв(-ла) ваш запит на дружбу."
         related_object = friendship_request
         custom_url = reverse('users:profile', args=[sender_user.id])
 
@@ -431,12 +442,12 @@ def accept_friend_request(request, friendship_id):
 
         return JsonResponse({
             'status': 'success',
-            'message': '',
+            'message': 'Запит дружби прийнято.',
             'request_id': friendship_id,
             'new_button_html': new_button_html
         })
     else:
-        return JsonResponse({'status': 'error', 'message': ''}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Не вдалося прийняти запит дружби.'}, status=400)
 
 
 @require_POST
@@ -467,12 +478,12 @@ def decline_friend_request(request, friendship_id):
 
         return JsonResponse({
             'status': 'success',
-            'message': '',
+            'message': 'Запит дружби відхилено.',
             'request_id': friendship_id,
             'new_button_html': new_button_html
         })
     else:
-        return JsonResponse({'status': 'error', 'message': ''}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Не вдалося відхилити запит дружби.'}, status=400)
 
 
 @require_POST
@@ -502,7 +513,7 @@ def cancel_friend_request(request, friendship_id):
 
     return JsonResponse({
         'status': 'success',
-        'message': '',
+        'message': 'Запит дружби скасовано.',
         'request_id': friendship_id,
         'new_button_html': new_button_html
     })
@@ -519,7 +530,7 @@ def remove_friend(request, user_id):
 
     if friendship_instance:
         friendship_instance.delete()
-        message_text = ''
+        message_text = 'Друга видалено.'
 
         friendship_status = 'not_friends'
         follow_status = Follow.objects.filter(follower=request.user, following=friend_to_remove).exists()
@@ -534,9 +545,9 @@ def remove_friend(request, user_id):
             'received_request': None,
         }, request=request)
 
-        return JsonResponse({'status': 'success', 'message': '', 'new_button_html': new_button_html})
+        return JsonResponse({'status': 'success', 'message': message_text, 'new_button_html': new_button_html})
     else:
-        return JsonResponse({'status': 'error', 'message': ''}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Користувача не знайдено серед ваших друзів.'}, status=400)
 
 
 @require_POST
@@ -545,7 +556,7 @@ def follow_user(request, user_id):
     following_user = get_object_or_404(User, pk=user_id)
 
     if request.user == following_user:
-        return JsonResponse({'status': 'error', 'message': ''}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Ви не можете підписатися на самого себе.'}, status=400)
 
     follow_instance, created = Follow.objects.get_or_create(
         follower=request.user,
@@ -554,13 +565,13 @@ def follow_user(request, user_id):
 
     if created:
         status_response = 'success'
-        message_response = ''
+        message_response = 'Ви успішно підписалися.'
         follow_status = True
 
         recipient = following_user
         sender_user = request.user
         notification_type = 'follow'
-        content = f"{sender_user.username} подписался(-ась) на вас."
+        content = f"{sender_user.username} підписався(-ась) на вас."
         related_object = follow_instance
         custom_url = reverse('users:profile', args=[sender_user.id])
 
@@ -576,7 +587,7 @@ def follow_user(request, user_id):
 
     else:
         status_response = 'info'
-        message_response = ''
+        message_response = 'Ви вже підписані на цього користувача.'
         follow_status = True
 
     sent_request = Friendship.objects.filter(
@@ -630,11 +641,11 @@ def unfollow_user(request, user_id):
         follow_instance.delete()
 
         status_response = 'success'
-        message_response = ''
+        message_response = 'Ви успішно відписалися.'
         follow_status = False
     else:
         status_response = 'info'
-        message_response = ''
+        message_response = 'Ви не підписані на цього користувача.'
         follow_status = False
 
     sent_request = Friendship.objects.filter(

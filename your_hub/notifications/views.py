@@ -94,9 +94,9 @@ class MarkNotificationAsReadAPIView(LoginRequiredMixin, View):
                 notification.is_read = True
                 notification.save()
                 return JsonResponse({'status': 'success', 'notification_id': notification_id})
-            return JsonResponse({'status': 'already_read'})
+            return JsonResponse({'status': 'already_read'}) # Translated
         except Notification.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Уведомление не найдено'}, status=404)
+            return JsonResponse({'status': 'error', 'message': 'Сповіщення не знайдено'}, status=404) # Translated
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
@@ -116,6 +116,6 @@ class NotificationDetailAPIView(LoginRequiredMixin, View):
             )
             return JsonResponse({'status': 'success', 'notification_html': notification_html})
         except Notification.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Уведомление не найдено'}, status=404)
+            return JsonResponse({'status': 'error', 'message': 'Сповіщення не знайдено'}, status=404) # Translated
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

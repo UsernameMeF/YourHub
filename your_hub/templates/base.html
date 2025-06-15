@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,21 +34,21 @@
         </a>
 
         <div class="auth-buttons">
-            {# Кнопка смены темы теперь всегда видна #}
-            <button class="theme-switch-button" id="theme-switch-button" aria-label="Переключить тему">
+            {# Кнопка зміни теми тепер завжди видима #}
+            <button class="theme-switch-button" id="theme-switch-button" aria-label="Перемкнути тему">
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                 <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.11 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
 
             {% if user.is_authenticated %}
-                {# Пользователь авторизован #}
-                <a href="{% url 'chat:chat_list' %}" class="header-icon-button" title="Открыть чат">
+                {# Користувач авторизований #}
+                <a href="{% url 'chat:chat_list' %}" class="header-icon-button" title="Відкрити чат">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </a>
 
-                {# Кнопка "Создать пост" - добавим ID для JS и уберем href="#" #}
-                {# Кнопка "Создать пост" - теперь ведет на страницу создания #}
-                <a href="{% url 'core:create_post_page' %}" class="header-button-create" id="create-post-link" title="Создать пост">
+                {# Кнопка "Створити пост" - додамо ID для JS і приберемо href="#" #}
+                {# Кнопка "Створити пост" - тепер веде на сторінку створення #}
+                <a href="{% url 'core:create_post_page' %}" class="header-button-create" id="create-post-link" title="Створити пост">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </a>
 
@@ -58,24 +58,24 @@
                         <span id="notification-count" class="badge badge-danger" style="display: none; position: absolute; top: 0px; right: 0px; background-color: red; color: white; border-radius: 50%; padding: 2px 5px; font-size: 0.7em;">0</span>
                     </button>
                     <div class="dropdown-menu profile-dropdown-menu" id="profile-dropdown-menu">
-                        <a href="{% url 'users:user_profile' user.id %}">Мой профиль</a>
-                        <a href="{% url 'users:edit_profile' %}">Редактировать профиль</a>
-                        <a href="{% url 'notifications:settings' %}">Настройки</a>
+                        <a href="{% url 'users:user_profile' user.id %}">Мій профіль</a>
+                        <a href="{% url 'users:edit_profile' %}">Редагувати профіль</a>
+                        <a href="{% url 'notifications:settings' %}">Налаштування</a>
                         <a href="{% url 'notifications:list' %}" class="dropdown-item notifications-link">
-                            Уведомления
+                            Сповіщення
                             <span id="notification-count_2" class="badge badge-danger" style="background-color: red; color: white; border-radius: 50%; padding: 2px 5px; font-size: 0.7em; margin-left: 5px; vertical-align: middle;">
                                 {{ unread_notifications_count|default:0 }}
                             </span>
                         </a>
-                
-                        <a href="{% url 'users:logout' %}">Выход</a>
+                    
+                        <a href="{% url 'users:logout' %}">Вийти</a>
                     </div>
                 </div>
 
             {% else %}
-                {# Пользователь не авторизован #}
-                <a href="{% url 'users:register' %}" class="btn-primary">Зарегистрироваться</a>
-                <a href="{% url 'users:login' %}" class="btn-secondary">Войти</a>
+                {# Користувач не авторизований #}
+                <a href="{% url 'users:register' %}" class="btn-primary">Зареєструватися</a>
+                <a href="{% url 'users:login' %}" class="btn-secondary">Увійти</a>
             {% endif %}
         </div>
     </header>
@@ -88,60 +88,58 @@
         </main>
     </div>
 
-    {# --- Модальные окна (добавляем в конец body) --- #}
+    {# --- Модальні вікна (додаємо в кінець body) --- #}
 
-    {# Модальное окно для создания/редактирования поста #}
+    {# Модальне вікно для створення/редагування посту #}
     <div id="post-modal" class="modal">
         <div class="modal-content">
             <span class="close-button" id="close-post-modal">&times;</span>
-            <h2 id="post-modal-title">Создать новый пост</h2>
+            <h2 id="post-modal-title">Створити новий допис</h2>
             <form id="post-form" method="post" enctype="multipart/form-data" action="{% url 'core:create_post_page' %}">
                 {% csrf_token %}
                 {{ post_form.title }}
                 {{ post_form.content }}
 
-                {# Контейнер для существующих изображений (только для режима редактирования) #}
+                {# Контейнер для існуючих зображень (тільки для режиму редагування) #}
                 <div id="existing-images-container" class="existing-images-container">
-                    <h3>Текущие изображения:</h3>
+                    <h3>Поточні зображення:</h3>
                     <div id="existing-images-preview" class="image-preview-container">
-                        {# Изображения будут динамически добавляться сюда через JS #}
+                        {# Зображення будуть динамічно додаватися сюди через JS #}
                     </div>
                 </div>
                 
-                {# Контейнер для добавления НОВЫХ изображений с динамическими полями #}
+                {# Контейнер для додавання НОВИХ зображень з динамічними полями #}
                 <div id="new-images-upload-container">
-                    <label>Добавить новые фотографии (до 5 штук):</label>
+                    <label>Додати нові фотографії (до 5 штук):</label>
                     <div id="new-image-inputs-wrapper">
                         {# Dynamic image inputs will be added here by JS #}
                     </div>
                     <button type="button" id="add-new-image-button" class="btn-secondary add-another-button">
-                        <i class="fas fa-plus-circle"></i> Добавить еще фото
+                        <i class="fas fa-plus-circle"></i> Додати ще фото
                     </button>
                 </div>
 
-                <button type="submit" class="btn-primary">Опубликовать</button>
+                <button type="submit" class="btn-primary">Опублікувати</button>
             </form>
         </div>
     </div>
 
-    {# Модальное окно для подтверждения удаления поста #}
+    {# Модальне вікно для підтвердження видалення допису #}
     <div id="delete-post-modal" class="modal">
         <div class="modal-content small-modal">
             <span class="close-button" id="close-delete-modal">&times;</span>
-            <h2>Подтвердите удаление</h2>
-            <p>Вы уверены, что хотите удалить этот пост? Это действие необратимо.</p>
-            <form id="delete-post-form" method="post" action=""> {# action будет устанавливаться через JS #}
+            <h2>Підтвердьте видалення</h2>
+            <p>Ви впевнені, що хочете видалити цей допис? Ця дія незворотна.</p>
+            <form id="delete-post-form" method="post" action=""> {# action буде встановлюватися через JS #}
                 {% csrf_token %}
-                <input type="hidden" name="confirm" value="true"> {# Скрытое поле для подтверждения #}
-                <button type="submit" class="btn-danger">Удалить</button>
-                <button type="button" class="btn-secondary" id="cancel-delete-post">Отмена</button>
+                <input type="hidden" name="confirm" value="true"> {# Приховане поле для підтвердження #}
+                <button type="submit" class="btn-danger">Видалити</button>
+                <button type="button" class="btn-secondary" id="cancel-delete-post">Скасувати</button>
             </form>
         </div>
     </div>
 
-    {# Подключение notifications.js первым - НАЧАЛО #}
     <script src="{% static 'js/notifications.js' %}"></script>
-    {# Подключение notifications.js первым - КОНЕЦ #}
 
     {# --- JavaScript --- #}
     <script>

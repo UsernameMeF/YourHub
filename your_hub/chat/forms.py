@@ -7,20 +7,20 @@ User = get_user_model()
 class GroupChatCreateForm(forms.Form):
     name = forms.CharField(
         max_length=255,
-        label="Название группы",
-        widget=forms.TextInput(attrs={'placeholder': 'Название группового чата'})
+        label="Назва групи",
+        widget=forms.TextInput(attrs={'placeholder': 'Назва групового чату'})
     )
     description = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Краткое описание группы (необязательно)'}),
-        label="Описание группы (необязательно)",
-        required=False 
+        widget=forms.Textarea(attrs={'placeholder': 'Короткий опис групи (необов\'язково)'}),
+        label="Опис групи (необов'язково)",
+        required=False
     )
 
     participants = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        label="Выберите участников",
-        help_text="Выберите пользователей, которых вы хотите добавить в группу."
+        label="Оберіть учасників",
+        help_text="Оберіть користувачів, яких ви хочете додати до групи."
     )
 
     def __init__(self, *args, **kwargs):
@@ -35,5 +35,5 @@ class GroupChatCreateForm(forms.Form):
             if self.request_user not in participants:
                 participants = list(participants) + [self.request_user]
         if len(participants) < 2:
-            raise forms.ValidationError("Для создания группового чата необходимо выбрать как минимум одного другого пользователя.")
+            raise forms.ValidationError("Для створення групового чату необхідно обрати щонайменше одного іншого користувача.")
         return participants

@@ -14,10 +14,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
             await self.accept()
-            print(f"WebSocket connected for user: {self.user.username}, group: {self.user_group_name}")
+            print(f"WebSocket підключено для користувача: {self.user.username}, група: {self.user_group_name}") # Translated
         else:
             await self.close()
-            print("WebSocket connection denied: User not authenticated")
+            print("Підключення WebSocket відхилено: Користувач не автентифікований") # Translated
 
     async def disconnect(self, close_code):
         if self.scope["user"].is_authenticated:
@@ -25,7 +25,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 self.user_group_name,
                 self.channel_name
             )
-            print(f"WebSocket disconnected for user: {self.user.username}")
+            print(f"WebSocket відключено для користувача: {self.user.username}") # Translated
 
     async def new_notification(self, event):
         notification_data = event
@@ -77,9 +77,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 'type': 'new_notification',
                 'notification': notification_data
             }))
-            print(f"Notification sent to {self.user.username}: {notification_data.get('content')}")
+            print(f"Сповіщення надіслано користувачу {self.user.username}: {notification_data.get('content')}") # Translated
         else:
-            print(f"Notification for {self.user.username} of type '{notification_type}' was blocked by user settings.")
+            print(f"Сповіщення для {self.user.username} типу '{notification_type}' було заблоковано налаштуваннями користувача.") # Translated
 
 
     @database_sync_to_async
@@ -87,5 +87,5 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             return UserNotificationSettings.objects.select_related('user').get(user=self.user)
         except UserNotificationSettings.DoesNotExist:
-            print(f"No notification settings found for user {self.user.username}. Returning default.")
+            print(f"Налаштування сповіщень для користувача {self.user.username} не знайдено. Повернення за замовчуванням.") # Translated
             return None

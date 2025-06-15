@@ -57,7 +57,7 @@ def send_notification_to_user(recipient, sender, notification_type, content, rel
                 content_type=content_type_instance,
                 object_id=object_id_instance,
             )
-            print(f"Notification object created in DB (ID: {notification.id}) for user {recipient.username}. Content: '{notification.content}' URL: '{notification.target_url}'")
+            print(f"Об'єкт сповіщення створено в БД (ID: {notification.id}) для користувача {recipient.username}. Зміст: '{notification.content}' URL: '{notification.target_url}'") # Translated
 
 
             sender_avatar_url = ''
@@ -72,7 +72,7 @@ def send_notification_to_user(recipient, sender, notification_type, content, rel
                 'notification': {
                     'id': str(notification.id),
                     'sender_id': sender.id if sender else None,
-                    'sender_username': sender.username if sender else 'System',
+                    'sender_username': sender.username if sender else 'Система', # Translated
                     'sender_avatar_url': sender_avatar_url,
                     'content': notification.content,
                     'timestamp': notification.timestamp.isoformat(),
@@ -87,7 +87,7 @@ def send_notification_to_user(recipient, sender, notification_type, content, rel
                 f'notifications_user_{recipient.id}',
                 message_to_channel
             )
-            print(f"Notification (ID: {notification.id}) successfully sent to Channel Layer group 'notifications_user_{recipient.id}'")
+            print(f"Сповіщення (ID: {notification.id}) успішно відправлено в групу Channel Layer 'notifications_user_{recipient.id}'") # Translated
 
     except Exception as e:
-        print(f"Error creating or sending notification: {e}")
+        print(f"Помилка створення або відправки сповіщення: {e}") # Translated

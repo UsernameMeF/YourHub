@@ -2,7 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Редактировать пост{% endblock %}
+{% block title %}Редагувати допис{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/core/create_post_form.css' %}">
@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="post-form-container">
-    <h1>Редактировать пост "{{ post.title }}"</h1>
+    <h1>Редагувати допис "{{ post.title }}"</h1>
     <form id="post-edit-form" method="post" action="{% url 'core:post_edit_submit' post.pk %}" enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-field-wrapper">
-            <label for="{{ form.content.id_for_label }}">Содержимое</label>
+            <label for="{{ form.content.id_for_label }}">Вміст</label>
             {{ form.content|add_class:"form-input-field" }}
             {% if form.content.errors %}
                 <p class="error-message">{{ form.content.errors|join:", " }}</p>
@@ -49,28 +49,28 @@
         </div>
 
         <div class="image-upload-section">
-            <h3>Изображения (до 5)</h3>
+            <h3>Зображення (до 5)</h3>
             
-            {# Существующие изображения #}
+            {# Існуючі зображення #}
             <div id="existing-images-preview" class="image-previews-grid">
-                {# JSON-данные для существующих изображений #}
+                {# JSON-дані для існуючих зображень #}
                 <script id="initial-images-data" type="application/json">
                     {{ post_images_json|safe }}
                 </script>
             </div>
-            {# Это скрытое поле будет содержать ID изображений, которые нужно удалить #}
+            {# Це приховане поле буде містити ID зображень, які потрібно видалити #}
             <input type="hidden" name="existing_image_ids_to_delete" id="existing-image-ids-to-delete" value="{{ existing_image_ids_to_delete_json|default:'[]' }}">
 
-            {# Контейнер для предпросмотров новых изображений #}
+            {# Контейнер для попереднього перегляду нових зображень #}
             <div id="image-inputs-wrapper" class="image-previews-grid">
-                {# Здесь будут динамически добавляться предпросмотры новых изображений #}
+                {# Тут будуть динамічно додаватися попередні перегляди нових зображень #}
             </div>
-            <button type="button" id="add-new-image-button" class="add-image-button">Добавить новое изображение</button>
+            <button type="button" id="add-new-image-button" class="add-image-button">Додати нове зображення</button>
         </div>
 
         <div class="form-actions">
-            <a href="{% url 'core:post_detail' post.pk %}" class="form-button cancel">Отмена</a>
-            <button type="submit" class="form-button primary">Сохранить изменения</button>
+            <a href="{% url 'core:post_detail' post.pk %}" class="form-button cancel">Скасувати</a>
+            <button type="submit" class="form-button primary">Зберегти зміни</button>
         </div>
     </form>
 </div>

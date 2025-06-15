@@ -10,7 +10,7 @@ class CommunityAdmin(admin.ModelAdmin):
     
     def members_count_display(self, obj):
         return obj.members.count()
-    members_count_display.short_description = "Кол-во участников"
+    members_count_display.short_description = "Кількість учасників" # Translated
 
 
 @admin.register(CommunityMembership)
@@ -32,7 +32,7 @@ class CommunityPostAdmin(admin.ModelAdmin):
     
     def content_snippet(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
-    content_snippet.short_description = "Содержимое (фрагмент)"
+    content_snippet.short_description = "Вміст (фрагмент)" # Translated
 
 
 @admin.register(CommunityComment)
@@ -45,4 +45,4 @@ class CommunityCommentAdmin(admin.ModelAdmin):
 
     def text_snippet(self, obj):
         return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
-    text_snippet.short_description = "Текст (фрагмент)"
+    text_snippet.short_description = "Текст (фрагмент)" # Translated

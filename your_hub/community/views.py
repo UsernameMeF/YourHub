@@ -79,15 +79,15 @@ def community_toggle_membership(request, pk):
     
     if membership_exists:
         if user == community.creator:
-            return JsonResponse({'success': False, 'message': 'Создатель не может отписаться от своего сообщества.'}, status=403)
+            return JsonResponse({'success': False, 'message': 'Творець не може відписатися від своєї спільноти.'}, status=403) # Translated
         
         CommunityMembership.objects.filter(user=user, community=community).delete()
         action = 'left'
-        message = 'Вы успешно отписались от сообщества.'
+        message = 'Ви успішно відписалися від спільноти.' # Translated
     else:
         CommunityMembership.objects.create(user=user, community=community)
         action = 'joined'
-        message = 'Вы успешно присоединились к сообществу!'
+        message = 'Ви успішно приєдналися до спільноти!' # Translated
     
     updated_members_count = community.members.count()
 
@@ -156,7 +156,7 @@ def community_post_create_view(request, pk):
     community = get_object_or_404(Community, pk=pk)
 
     if request.user != community.creator:
-        return HttpResponseForbidden("Только создатель сообщества может создавать публикации.")
+        return HttpResponseForbidden("Тільки творець спільноти може створювати публікації.") # Translated
 
     if request.method == 'POST':
         post_form = CommunityPostForm(request.POST)
@@ -308,24 +308,24 @@ def community_post_reposts_ajax(request, pk, post_pk):
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Вы', 
+                'relationship': 'Ви', # Translated
             })
         elif user in friends:
             repost_users_data.append({
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Друг',
+                'relationship': 'Друг', # Translated
             })
         elif user.id in following_ids:
             repost_users_data.append({
                 'id': user.id,
                 'username': user.username,
                 'avatar_url': avatar_url,
-                'relationship': 'Подписка',
+                'relationship': 'Підписка', # Translated
             })
 
-    repost_users_data.sort(key=lambda x: (x['relationship'] != 'Вы', x['relationship'] != 'Друг', x['relationship'] != 'Подписка', x['username']))
+    repost_users_data.sort(key=lambda x: (x['relationship'] != 'Ви', x['relationship'] != 'Друг', x['relationship'] != 'Підписка', x['username']))
 
     return JsonResponse({
         'success': True,
@@ -364,7 +364,7 @@ def community_add_comment(request, pk, post_pk):
         errors = form.errors.as_json()
         return JsonResponse({
             'success': False,
-            'message': 'Ошибка валидации комментария. Возможно, текст слишком короткий или длинный.',
+            'message': 'Помилка валідації коментаря. Можливо, текст занадто короткий або довгий.', # Translated
             'errors': json.loads(errors)
         }, status=400) 
 
@@ -381,9 +381,9 @@ def community_post_delete_ajax(request, pk, post_pk):
 
     if request.user == post.posted_by or is_community_admin:
         post.delete()
-        return JsonResponse({'success': True, 'message': 'Пост успешно удален.'})
+        return JsonResponse({'success': True, 'message': 'Пост успішно видалено.'}) # Translated
     else:
-        return JsonResponse({'success': False, 'message': 'У вас нет прав для удаления этого поста.'}, status=403) 
+        return JsonResponse({'success': False, 'message': 'У вас немає прав для видалення цього посту.'}, status=403) # Translated
 
 
 def community_search_view(request):
@@ -402,6 +402,6 @@ def community_search_view(request):
     context = {
         'communities': communities,
         'query': query if query else '',
-        'title': 'Поиск сообществ',
+        'title': 'Пошук спільнот', # Translated
     }
     return render(request, 'community/community_search.html', context)

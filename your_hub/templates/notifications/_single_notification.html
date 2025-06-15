@@ -5,7 +5,7 @@
 <li class="notification-item {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
     <a href="{{ notification.get_absolute_url|default:'#' }}" class="notification-link">
         <div class="notification-icon">
-            {# Иконки для разных типов уведомлений #}
+            {# Іконки для різних типів сповіщень #}
             {% if notification.notification_type == 'message' %}
                 <i class="fas fa-envelope"></i>
             {% elif notification.notification_type == 'group_message' %}

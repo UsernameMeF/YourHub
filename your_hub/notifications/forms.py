@@ -37,15 +37,15 @@ class UserNotificationSettingsForm(forms.ModelForm):
             'do_not_disturb': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
-            'notification_sound': 'Звук уведомления',
-            'volume': 'Громкость звука',
-            'receive_messages_notifications': 'Личные сообщения',
-            'receive_group_messages_notifications': 'Сообщения в группах',
-            'receive_friend_requests_notifications': 'Запросы в друзья',
-            'receive_approved_friend_requests_notifications': 'Одобренные запросы в друзья',
-            'receive_comments_notifications': 'Комментарии',
-            'receive_likes_notifications': 'Лайки',
-            'receive_reposts_notifications': 'Репосты',
-            'receive_follows_notifications': 'Подписки',
-            'do_not_disturb': 'Не беспокоить (отключить все звуки уведомлений)',
+            'notification_sound': 'Звук сповіщення', # Translated
+            'volume': 'Гучність звуку', # Translated
+            'receive_messages_notifications': 'Особисті повідомлення', # Translated
+            'receive_group_messages_notifications': 'Повідомлення в групах', # Translated
+            'receive_friend_requests_notifications': 'Запити в друзі', # Translated
+            'receive_approved_friend_requests_notifications': 'Схвалені запити в друзі', # Translated
+            'receive_comments_notifications': 'Коментарі', # Translated
+            'receive_likes_notifications': 'Вподобання', # Translated
+            'receive_reposts_notifications': 'Репости', # Translated
+            'receive_follows_notifications': 'Підписки', # Translated
+            'do_not_disturb': 'Не турбувати (вимкнути всі звуки сповіщень)', # Translated
         }

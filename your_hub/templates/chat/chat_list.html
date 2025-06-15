@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ваши Чаты{% endblock %}
+{% block title %}Ваші Чати{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/chat/_chat_list.css' %}">
@@ -11,13 +11,13 @@
 
 {% block content %}
 <div class="chat_list-container">
-    <h1>Ваши Чаты</h1>
+    <h1>Ваші Чати</h1>
 
     <div class="chat_category-buttons">
-        <button id="showPrivateChatsBtn" class="btn btn-primary active">Чаты</button>
-        <button id="showGroupChatsBtn" class="btn btn-secondary">Группы</button>
+        <button id="showPrivateChatsBtn" class="btn btn-primary active">Приватні чати</button> {# Translated #}
+        <button id="showGroupChatsBtn" class="btn btn-secondary">Групи</button> {# Translated #}
         <a href="{% url 'chat:create_group_chat' %}" class="btn btn-success create-group-btn">
-            <i class="fas fa-plus-circle"></i> Создать группу
+            <i class="fas fa-plus-circle"></i> Створити групу {# Translated #}
         </a>
     </div>
 
@@ -35,19 +35,19 @@
                                         <span class="chat_last-message">
                                             {% if chat_room.messages.last %}
                                                 {% if chat_room.messages.last.sender == request.user %}
-                                                    Вы:
+                                                    Ви: {# Translated #}
                                                 {% else %}
                                                     {{ chat_room.messages.last.sender.username }}:
                                                 {% endif %}
                                                 {% if chat_room.messages.last.content %}
                                                     {{ chat_room.messages.last.content|truncatechars:50 }}
                                                 {% elif chat_room.messages.last.attachments.exists %}
-                                                    [Вложение]
+                                                    [Вкладення] {# Translated #}
                                                 {% else %}
-                                                    Нет текста
+                                                    Немає тексту {# Translated #}
                                                 {% endif %}
                                             {% else %}
-                                                Начните общение...
+                                                Почніть спілкування... {# Translated #}
                                             {% endif %}
                                         </span>
                                     </div>
@@ -55,8 +55,8 @@
                             {% empty %}
                                 <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="chat_avatar">
                                 <div class="chat_info">
-                                    <span class="chat_name">Мои заметки</span>
-                                    <span class="chat_last-message">Начните общение...</span>
+                                    <span class="chat_name">Мої нотатки</span> {# Translated #}
+                                    <span class="chat_last-message">Почніть спілкування...</span> {# Translated #}
                                 </div>
                                 <span class="chat_timestamp">&nbsp;</span>
                             {% endfor %}
@@ -64,7 +64,7 @@
                     </li>
                 {% endfor %}
             {% else %}
-                <li class="no-chats-message">У вас пока нет личных чатов.</li>
+                <li class="no-chats-message">У вас поки немає приватних чатів.</li> {# Translated #}
             {% endif %}
         </ul>
 
@@ -73,7 +73,7 @@
                 {% for group_chat in group_chats %}
                     <li class="chat_list-item group-chat-item">
                         <a href="{% url 'chat:group_chat_room' group_chat_id=group_chat.id %}">
-                            <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар группы" class="chat_avatar">
+                            <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар групи" class="chat_avatar"> {# Translated #}
                             <div class="chat_info">
                                 <span class="chat_name">
                                     <i class="fas fa-users"></i> {{ group_chat.name }}
@@ -81,19 +81,19 @@
                                 <span class="chat_last-message">
                                     {% if group_chat.messages.last %}
                                         {% if group_chat.messages.last.sender == request.user %}
-                                            Вы:
+                                            Ви: {# Translated #}
                                         {% else %}
                                             {{ group_chat.messages.last.sender.username }}:
                                         {% endif %}
                                         {% if group_chat.messages.last.content %}
                                             {{ group_chat.messages.last.content|truncatechars:50 }}
                                         {% elif group_chat.messages.last.attachments.exists %}
-                                            [Вложение]
+                                            [Вкладення] {# Translated #}
                                         {% else %}
-                                            Нет текста
+                                            Немає тексту {# Translated #}
                                         {% endif %}
                                     {% else %}
-                                        Группа создана. Начните общение!
+                                        Група створена. Почніть спілкування! {# Translated #}
                                     {% endif %}
                                 </span>
                             </div>
@@ -116,12 +116,12 @@
                     </li>
                 {% endfor %}
             {% else %}
-                <li class="no-chats-message">У вас пока нет групповых чатов. Вы можете <a href="#" id="openCreateGroupChatModal">создать новую группу</a>.</li>
+                <li class="no-chats-message">У вас поки немає групових чатів. Ви можете <a href="#" id="openCreateGroupChatModal">створити нову групу</a>.</li> {# Translated #}
             {% endif %}
         </ul>
     {% else %}
-        <p>У вас пока нет активных личных или групповых чатов.</p>
-        <p>Вы можете начать чат с другом, перейдя на его профиль, или <a href="#" id="openCreateGroupChatModal">создать новую группу</a>.</p>
+        <p>У вас поки немає активних приватних або групових чатів.</p> {# Translated #}
+        <p>Ви можете розпочати чат з другом, перейшовши на його профіль, або <a href="#" id="openCreateGroupChatModal">створити нову групу</a>.</p> {# Translated #}
     {% endif %}
 </div>
 {% endblock %}

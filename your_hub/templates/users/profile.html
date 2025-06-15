@@ -2,56 +2,56 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ viewed_user.username }} Profile{% endblock %}
+{% block title %}Профіль {{ viewed_user.username }}{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/users/_profile.css' %}">
     <link rel="stylesheet" href="{% static 'css/users/_profile_dark.css' %}">
-    {# Убедитесь, что Font Awesome подключен в base.html или здесь #}
-    {# Пример подключения Font Awesome (если еще нет в base.html): #}
+    {# Переконайтеся, що Font Awesome підключено в base.html або тут #}
+    {# Приклад підключення Font Awesome (якщо ще немає в base.html): #}
     {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> #}
 {% endblock %}
 
 {% block content %}
     <div class="profile-container">
         <div class="profile-header-top">
-            <h2>Профиль</h2>
+            <h2>Профіль</h2>
             <div class="profile-actions-top">
                 {% if is_my_profile %}
-                    <a href="{% url 'users:edit_profile' %}" class="btn-primary">Редактировать профиль</a>
+                    <a href="{% url 'users:edit_profile' %}" class="btn-primary">Редагувати профіль</a>
                 {% else %}
-                    {# Проверяем статус дружбы для отображения кнопок #}
+                    {# Перевіряємо статус дружби для відображення кнопок #}
                     {% include 'profile_actions_snippet.html' %}
                 {% endif %}
             </div>
         </div>
 
         <div class="profile-header">
-            {# Контейнер для аватара и статуса #}
+            {# Контейнер для аватара та статусу #}
             <div class="profile-avatar-wrapper">
                 <img src="{{ user_profile.avatar.url }}" alt="Аватар {{ viewed_user.username }}" class="profile-avatar-large">
                 
-                {# Иконка статуса #}
+                {# Іконка статусу #}
                 <div class="status-indicator status-{{ actual_status }}" 
                      data-current-status="{{ user_profile.status }}" 
                      {% if is_my_profile %}id="my-status-indicator"{% endif %}>
                      <i class="status-icon"></i> 
                 </div>
 
-                {# Выпадающее меню статусов (видимо только для своего профиля) #}
+                {# Випадаюче меню статусів (видиме тільки для свого профілю) #}
                 {% if is_my_profile %}
                 <div class="status-dropdown" id="status-dropdown">
                     <div class="status-option" data-status="online">
-                        <i class="status-dot fas fa-circle status-online"></i> В сети
+                        <i class="status-dot fas fa-circle status-online"></i> В мережі
                     </div>
                     <div class="status-option" data-status="away">
-                        <i class="status-dot fas fa-moon status-away"></i> Неактивен
+                        <i class="status-dot fas fa-moon status-away"></i> Неактивний
                     </div>
                     <div class="status-option" data-status="dnd">
-                        <i class="status-dot fas fa-minus-circle status-dnd"></i> Не беспокоить
+                        <i class="status-dot fas fa-minus-circle status-dnd"></i> Не турбувати
                     </div>
                     <div class="status-option" data-status="invisible">
-                        <i class="status-dot fas fa-circle status-invisible"></i> Невидимый
+                        <i class="status-dot fas fa-circle status-invisible"></i> Невидимий
                     </div>
                 </div>
                 {% endif %}
@@ -59,16 +59,16 @@
 
             <div class="profile-info">
                 <h3>@{{ viewed_user.username }}</h3>
-                <p>Дата регистрации: {{ viewed_user.date_joined|date:"d.m.Y" }}</p>
+                <p>Дата реєстрації: {{ viewed_user.date_joined|date:"d.m.Y" }}</p>
                 {% if user_profile.bio %}
-                    <p>О себе: {{ user_profile.bio }}</p>
+                    <p>Про себе: {{ user_profile.bio }}</p>
                 {% endif %}
             </div>
         </div>
 
         <div class="profile-sections">
             <div class="profile-section">
-                <h3>Друзья ({{ user_friends.count }})</h3>
+                <h3>Друзі ({{ user_friends.count }})</h3>
                 {% if user_friends %}
                     <ul>
                         {% for friend in user_friends %}
@@ -76,36 +76,36 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p>{{ viewed_user.username }} пока не имеет друзей.</p>
+                    <p>{{ viewed_user.username }} поки не має друзів.</p>
                 {% endif %}
             </div>
 
             <div class="profile-section">
-                <h3>Последняя публикация</h3>
+                <h3>Остання публікація</h3>
                 {% if latest_post %}
                     <a href="{{ latest_post.get_absolute_url }}" class="latest-post-link">
                         <div class="latest-post-card">
                             <h4>{{ latest_post.title }}</h4>
-                            <p>{{ latest_post.content|truncatechars:200 }}</p> {# Отображаем часть контента #}
-                            <span class="post-date">Опубликовано: {{ latest_post.created_at|date:"d.m.Y H:i" }}</span>
+                            <p>{{ latest_post.content|truncatechars:200 }}</p> {# Відображаємо частину контенту #}
+                            <span class="post-date">Опубліковано: {{ latest_post.created_at|date:"d.m.Y H:i" }}</span>
                         </div>
                     </a>
                 {% else %}
-                    <p class="no-posts-message">У пользователя пока нет публикаций.</p>
+                    <p class="no-posts-message">У користувача поки немає публікацій.</p>
                 {% endif %}
             </div>
 
             {% comment %} <div class="profile-section">
-                <h3>Активность</h3>
+                <h3>Активність</h3>
                 {% if user_activity %}
-                    {# TODO: Отображение активности #}
+                    {# TODO: Відображення активності #}
                     <ul>
                         {% for activity in user_activity %}
                             <li>{{ activity.description }}</li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p>Последней активности нет.</p>
+                    <p>Останньої активності немає.</p>
                 {% endif %}
             </div> {% endcomment %}
         </div>
@@ -115,14 +115,14 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- НАЧАЛО: JavaScript для обновления СТАТУСА пользователя (ваш существующий код) ---
+    // --- ПОЧАТОК: JavaScript для оновлення СТАТУСУ користувача (ваш існуючий код) ---
     const statusIndicator = document.querySelector('.profile-avatar-wrapper .status-indicator');
     const statusIcon = statusIndicator ? statusIndicator.querySelector('.status-icon') : null;
     
     function updateStatusIcon(displayStatus) { 
         if (!statusIcon) return;
         statusIcon.className = 'status-icon fas'; 
-        if (!statusIndicator) return; // Добавлена проверка для statusIndicator
+        if (!statusIndicator) return; // Додана перевірка для statusIndicator
         statusIndicator.className = 'status-indicator status-' + displayStatus;
         if (displayStatus === 'online') {
             statusIcon.classList.add('fa-circle');
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (statusIndicator) { // Проверяем, что statusIndicator существует
+    if (statusIndicator) { // Перевіряємо, що statusIndicator існує
         const initialDisplayStatusClass = Array.from(statusIndicator.classList).find(cls => cls.startsWith('status-') && cls !== 'status-indicator');
         const initialDisplayStatus = initialDisplayStatusClass ? initialDisplayStatusClass.replace('status-', '') : '{{ actual_status }}';
         updateStatusIcon(initialDisplayStatus); 
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if is_my_profile %}
     const statusDropdown = document.getElementById('status-dropdown');
     const statusOptions = statusDropdown ? statusDropdown.querySelectorAll('.status-option') : null;
-    // CSRF токен для AJAX-запросов статуса (убедитесь, что он корректно передается, если не используется FormData)
+    // CSRF токен для AJAX-запитів статусу (переконайтеся, що він коректно передається, якщо не використовується FormData)
     const csrfTokenForStatus = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
 
 
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text || 'Ошибка ответа сервера при обновлении статуса') });
+                        return response.text().then(text => { throw new Error(text || 'Помилка відповіді сервера при оновленні статусу') });
                     }
                     return response.json();
                 })
@@ -182,118 +182,118 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateStatusIcon(data.new_status);
                         if(statusIndicator) statusIndicator.dataset.currentStatus = data.chosen_status;
                         if(statusDropdown) statusDropdown.classList.remove('active');
-                        console.log('Статус успешно обновлен до:', data.chosen_status, 'Отображаемый статус:', data.new_status);
+                        console.log('Статус успішно оновлено до:', data.chosen_status, 'Відображуваний статус:', data.new_status);
                     } else {
-                        console.error('Ошибка при обновлении статуса:', data.message);
-                         displayMessage(data.message || 'Не удалось обновить статус.', 'error'); // Отображение ошибки пользователю
+                        console.error('Помилка при оновленні статусу:', data.message);
+                        displayMessage(data.message || 'Не вдалося оновити статус.', 'error'); // Відображення помилки користувачу
                     }
                 })
                 .catch(error => {
-                    console.error('Ошибка AJAX запроса для статуса:', error);
-                    displayMessage(error.message || 'Сетевая ошибка при обновлении статуса.', 'error');
+                    console.error('Помилка AJAX запиту для статусу:', error);
+                    displayMessage(error.message || 'Мережева помилка при оновленні статусу.', 'error');
                 });
             });
         });
     }
     {% endif %} 
-    // --- КОНЕЦ: JavaScript для обновления СТАТУСА пользователя ---
+    // --- КІНЕЦЬ: JavaScript для оновлення СТАТУСУ користувача ---
 
 
-    // --- НАЧАЛО: JavaScript для AJAX-обработки ДЕЙСТВИЙ В ПРОФИЛЕ (из "старой версии", адаптированный) ---
-    const profileActionsDiv = document.querySelector('.profile-actions-top'); // Обновленный селектор
-    const ajaxMessagesDiv = document.getElementById('ajax-messages');     // Для отображения сообщений
+    // --- ПОЧАТОК: JavaScript для AJAX-обробки ДІЙ В ПРОФІЛІ (зі "старої версії", адаптований) ---
+    const profileActionsDiv = document.querySelector('.profile-actions-top'); // Оновлений селектор
+    const ajaxMessagesDiv = document.getElementById('ajax-messages');     // Для відображення повідомлень
 
-    // Функция для отображения сообщений (из "старой версии" с небольшими улучшениями)
+    // Функція для відображення повідомлень (зі "старої версії" з невеликими покращеннями)
     function displayMessage(message, type) {
         if (!ajaxMessagesDiv) {
-            console.warn("Элемент #ajax-messages не найден. Сообщение не будет отображено:", message);
+            console.warn("Елемент #ajax-messages не знайдено. Повідомлення не буде відображено:", message);
             return;
         }
         if (!message || message.trim() === '') {
-            ajaxMessagesDiv.innerHTML = ''; // Очищаем, если сообщение пустое
+            ajaxMessagesDiv.innerHTML = ''; // Очищаємо, якщо повідомлення порожнє
             return; 
         }
         const messageElement = document.createElement('div');
-        messageElement.classList.add('ajax-message'); // Базовый класс для стилизации
-        if (type) { // type это 'success', 'error', 'info' и т.д.
+        messageElement.classList.add('ajax-message'); // Базовий клас для стилізації
+        if (type) { // type це 'success', 'error', 'info' тощо
             messageElement.classList.add(`ajax-message-${type}`);
         } else {
-            messageElement.classList.add('ajax-message-info'); // По умолчанию info, если тип не указан
+            messageElement.classList.add('ajax-message-info'); // За замовчуванням info, якщо тип не вказано
         }
         messageElement.textContent = message;
         
-        ajaxMessagesDiv.innerHTML = ''; // Заменяем предыдущее сообщение новым
+        ajaxMessagesDiv.innerHTML = ''; // Замінюємо попереднє повідомлення новим
         ajaxMessagesDiv.appendChild(messageElement);
 
         setTimeout(() => {
             if (ajaxMessagesDiv.contains(messageElement)) {
                 messageElement.remove();
             }
-        }, 5000); // Сообщение видно 5 секунд
+        }, 5000); // Повідомлення видно 5 секунд
     }
     
     function handleProfileFormSubmit(event) {
-        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        event.preventDefault(); // Запобігаємо стандартній відправці форми
         const form = event.target;
         const actionUrl = form.action;
         const method = form.method;
-        const formData = new FormData(form); // FormData автоматически включает CSRF-токен из формы
+        const formData = new FormData(form); // FormData автоматично включає CSRF-токен з форми
 
         fetch(actionUrl, {
             method: method,
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest' // Для Django, чтобы идентифицировать AJAX-запрос
+                'X-Requested-With': 'XMLHttpRequest' // Для Django, щоб ідентифікувати AJAX-запит
             }
         })
         .then(response => {
-            // Пытаемся получить JSON в любом случае, чтобы обработать сообщения об ошибках от сервера
+            // Намагаємося отримати JSON у будь-якому випадку, щоб обробити повідомлення про помилки від сервера
             return response.json().then(data => ({
-                ok: response.ok,      // boolean: true если статус 200-299
-                data: data            // распарсенный JSON
+                ok: response.ok,       // boolean: true якщо статус 200-299
+                data: data             // розпарсений JSON
             }));
         })
         .then(result => {
-            const data = result.data; // JSON-ответ от сервера {status, message, new_button_html}
+            const data = result.data; // JSON-відповідь від сервера {status, message, new_button_html}
             
-            if (!result.ok) { // Если HTTP статус НЕ успешный (например, 400, 403, 500)
-                // Пытаемся использовать сообщение из JSON, если оно есть, иначе стандартное
-                throw new Error(data.message || `Ошибка сервера: ${result.status_code}. Попробуйте позже.`);
+            if (!result.ok) { // Якщо HTTP статус НЕ успішний (наприклад, 400, 403, 500)
+                // Намагаємося використовувати повідомлення з JSON, якщо воно є, інакше стандартне
+                throw new Error(data.message || `Помилка сервера: ${result.status_code}. Спробуйте пізніше.`);
             }
 
-            // HTTP статус успешный (2xx)
+            // HTTP статус успішний (2xx)
             if (data.new_button_html && profileActionsDiv) {
                 profileActionsDiv.innerHTML = data.new_button_html;
-                attachSubmitListenersToNewForms(); // Переназначаем обработчики на новые формы
+                attachSubmitListenersToNewForms(); // Перепризначаємо обробники на нові форми
             }
-            // Отображаем сообщение от сервера (если оно есть)
-            // data.status это поле из JSON ('success', 'error', 'info')
+            // Відображаємо повідомлення від сервера (якщо воно є)
+            // data.status це поле з JSON ('success', 'error', 'info')
             displayMessage(data.message, data.status); 
         })
         .catch(error => {
-            console.error('Ошибка AJAX запроса для действий профиля:', error);
-            displayMessage(error.message || 'Произошла ошибка. Пожалуйста, попробуйте еще раз.', 'error');
+            console.error('Помилка AJAX запиту для дій профілю:', error);
+            displayMessage(error.message || 'Сталася помилка. Будь ласка, спробуйте ще раз.', 'error');
         });
     }
 
     function attachSubmitListenersToNewForms() {
-        if (profileActionsDiv) { // Убедимся, что контейнер кнопок существует
+        if (profileActionsDiv) { // Переконаємося, що контейнер кнопок існує
             const newForms = profileActionsDiv.querySelectorAll('.ajax-profile-action-form');
             newForms.forEach(newForm => {
-                // Удаляем предыдущий обработчик (если был) перед добавлением нового,
-                // чтобы избежать многократного срабатывания на одной форме.
+                // Видаляємо попередній обробник (якщо був) перед додаванням нового,
+                // щоб уникнути багаторазового спрацьовування на одній формі.
                 newForm.removeEventListener('submit', handleProfileFormSubmit);
                 newForm.addEventListener('submit', handleProfileFormSubmit);
             });
         }
     }
 
-    // Первоначальное назначение обработчиков при загрузке страницы
-    // Эта проверка важна, если .profile-actions-top может отсутствовать или быть пустым
+    // Початкове призначення обробників при завантаженні сторінки
+    // Ця перевірка важлива, якщо .profile-actions-top може бути відсутнім або порожнім
     if (profileActionsDiv && profileActionsDiv.querySelector('.ajax-profile-action-form')) {
          attachSubmitListenersToNewForms();
     }
-    // --- КОНЕЦ: JavaScript для AJAX-обработки ДЕЙСТВИЙ В ПРОФИЛЕ ---
+    // --- КІНЕЦЬ: JavaScript для AJAX-обробки ДІЙ В ПРОФІЛІ ---
 
 });
 </script>

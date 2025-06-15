@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Редактировать сообщество: {{ community.name }}{% endblock %}
+{% block title %}Редагувати спільноту: {{ community.name }}{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/community/_community_form.css' %}">
@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="main-container form-container">
-    <h1 class="form-title">Редактировать сообщество: "{{ community.name }}"</h1>
+    <h1 class="form-title">Редагувати спільноту: "{{ community.name }}"</h1>
     <form method="post">
         {% csrf_token %}
         
@@ -27,8 +27,8 @@
             </div>
         {% endfor %}
 
-        <button type="submit" class="submit-button">Сохранить изменения</button>
-        <a href="{% url 'community:community_detail' community.pk %}" class="cancel-button">Отмена</a>
+        <button type="submit" class="submit-button">Зберегти зміни</button>
+        <a href="{% url 'community:community_detail' community.pk %}" class="cancel-button">Скасувати</a>
     </form>
 </div>
 {% endblock %}

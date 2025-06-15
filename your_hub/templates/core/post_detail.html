@@ -7,7 +7,7 @@
 <div class="post-detail-container">
     <div class="post-detail-card" id="post-{{ post.id }}">
         <div class="post-header">
-            <a href="{% url 'users:user_profile' post.author.id %}" class="author-info"> {# Исправил user.id на post.author.id #}
+            <a href="{% url 'users:user_profile' post.author.id %}" class="author-info"> {# Виправив user.id на post.author.id #}
                 <img src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" alt="Аватар" class="author-avatar">
                 <span class="author-username">{{ post.author.username }}</span>
             </a>
@@ -17,41 +17,41 @@
         <h1 class="post-title">{{ post.title }}</h1>
         <p class="post-content">{{ post.content|linebreaksbr }}</p>
 
-        {% if post.attachments.all %} {# Используем post.attachments.all для единообразия #}
+        {% if post.attachments.all %} {# Використовуємо post.attachments.all для одноманітності #}
             <div class="post-attachments-gallery" id="post-gallery-{{ post.id }}">
                 <div class="gallery-images-container">
-                    {% for attachment in post.attachments.all %} {# Используем post.attachments.all #}
-                        {# Изображения в галерее, только одно active, data-image-index для JS #}
+                    {% for attachment in post.attachments.all %} {# Використовуємо post.attachments.all #}
+                        {# Зображення в галереї, тільки одне active, data-image-index для JS #}
                         <img src="{{ attachment.image.url }}" 
-                             alt="Вложение к посту {{ forloop.counter }}" 
+                             alt="Вкладення до допису {{ forloop.counter }}" 
                              class="post-image {% if forloop.first %}active{% endif %}" 
                              data-image-index="{{ forloop.counter0 }}">
                     {% endfor %}
                 </div>
-                {% if post.attachments.all|length > 1 %} {# Показываем стрелки и кружки только если больше 1 вложения #}
-                    <button class="gallery-arrow prev-arrow" aria-label="Предыдущее изображение">
+                {% if post.attachments.all|length > 1 %} {# Показуємо стрілки та кружки лише якщо більше 1 вкладення #}
+                    <button class="gallery-arrow prev-arrow" aria-label="Попереднє зображення">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="gallery-arrow next-arrow" aria-label="Следующее изображение">
+                    <button class="gallery-arrow next-arrow" aria-label="Наступне зображення">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <div class="gallery-indicators">
-                        {% for attachment in post.attachments.all %} {# Используем post.attachments.all #}
-                            <span class="indicator-dot {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.counter0 }}" aria-label="Перейти к изображению {{ forloop.counter }}"></span>
+                        {% for attachment in post.attachments.all %} {# Використовуємо post.attachments.all #}
+                            <span class="indicator-dot {% if forloop.first %}active{% endif %}" data-image-index="{{ forloop.counter0 }}" aria-label="Перейти до зображення {{ forloop.counter }}"></span>
                         {% endfor %}
                     </div>
                 {% endif %}
             </div>
         {% endif %}
 
-        {# НОВОЕ: Отображение тегов #}
+        {# НОВЕ: Відображення тегів #}
         {% if post.tags.all %}
         <div class="post-tags">
             <i class="fas fa-tags"></i>
             {% for tag in post.tags.all %}
-                {% if tag.name|first == '@' %} {# Если тег начинается с @, это тег автора, не делаем его кликабельным #}
+                {% if tag.name|first == '@' %} {# Якщо тег починається з @, це тег автора, не робимо його клікабельним #}
                     <span class="post-tag author-tag">#{{ tag.name }}</span>
-                {% else %} {# Обычные теги делаем кликабельными #}
+                {% else %} {# Звичайні теги робимо клікабельними #}
                     <a href="{% url 'core:index' %}?tag={{ tag.slug }}" class="post-tag">#{{ tag.name }}</a>
                 {% endif %}
             {% endfor %}
@@ -59,41 +59,41 @@
         {% endif %}
 
         <div class="post-actions">
-            {# Добавим классы active и title для кнопок, чтобы handlePostAction работала корректно #}
+            {# Додамо класи active та title для кнопок, щоб handlePostAction працювала коректно #}
             <button class="action-button like-button {% if is_liked %}active{% endif %}"
                     onclick="handlePostAction({{ post.id }}, 'like')"
-                    title="{% if is_liked %}Убрать лайк{% else %}Поставить лайк{% endif %}">
+                    title="{% if is_liked %}Прибрати вподобайку{% else %}Поставити вподобайку{% endif %}">
                 <i class="fas fa-thumbs-up"></i> <span class="likes-count">{{ post.total_likes }}</span>
             </button>
             <button class="action-button dislike-button {% if is_disliked %}active{% endif %}"
                     onclick="handlePostAction({{ post.id }}, 'dislike')"
-                    title="{% if is_disliked %}Убрать дизлайк{% else %}Поставить дизлайк{% endif %}">
+                    title="{% if is_disliked %}Прибрати дизлайк{% else %}Поставити дизлайк{% endif %}">
                 <i class="fas fa-thumbs-down"></i> <span class="dislikes-count">{{ post.total_dislikes }}</span>
             </button>
             <button class="action-button comment-button">
-                <i class="fas fa-comment"></i> Комментарии (<span class="total-comments-{{ post.id }}">{{ post.total_comments }}</span>)
+                <i class="fas fa-comment"></i> Коментарі (<span class="total-comments-{{ post.id }}">{{ post.total_comments }}</span>)
             </button>
             <button class="action-button repost-button {% if is_reposted %}active{% endif %}"
                     onclick="handlePostAction({{ post.id }}, 'repost')"
-                    title="{% if is_reposted %}Отменить репост{% else %}Сделать репост{% endif %}">
+                    title="{% if is_reposted %}Скасувати репост{% else %}Зробити репост{% endif %}">
                 <i class="fas fa-retweet"></i> <span class="reposts-count">{{ post.total_reposts }}</span>
             </button>
-            {# НОВАЯ КНОПКА "СПИСОК РЕПОСТОВ" #}
+            {# НОВА КНОПКА "СПИСОК РЕПОСТІВ" #}
             {% if user.is_authenticated %}
                 <button class="action-button reposts-list-button" id="show-reposts-button" data-post-id="{{ post.id }}">
-                    <i class="fas fa-list-alt"></i> Репосты
+                    <i class="fas fa-list-alt"></i> Репости
                 </button>
             {% endif %}
             {% if user.is_authenticated and user == post.author %}
-                <a href="{% url 'core:edit_post_page' post.pk %}" class="action-button edit-post-button">Редактировать</a>
+                <a href="{% url 'core:edit_post_page' post.pk %}" class="action-button edit-post-button">Редагувати</a>
                 <button class="action-button delete-post-button" onclick="openDeletePostModal('{{ post.id }}')">
-                    <i class="fas fa-trash"></i> Удалить
+                    <i class="fas fa-trash"></i> Видалити
                 </button>
             {% endif %}
         </div>
-        {# Комментарии #}
+        {# Коментарі #}
         <div class="comments-section">
-            <h3>Комментарии</h3>
+            <h3>Коментарі</h3>
             <div id="comments-container-{{ post.id }}" class="comments-list">
                 {% for comment in post.comments.all %}
                 <div class="comment">
@@ -111,34 +111,34 @@
                     </div>          
                 </div>
                 {% empty %}
-                    <p class="no-comments">Пока нет комментариев. Будьте первым!</p>
+                    <p class="no-comments">Поки немає коментарів. Будьте першим!</p>
                 {% endfor %}
             </div>
             {% if user.is_authenticated %}
             <form class="comment-form" onsubmit="handleCommentSubmit(event, {{ post.id }})" action="{% url 'core:add_comment' post.id %}" method="post">
                 {% csrf_token %}
                 {{ comment_form.text }}
-                <button type="submit" class="btn-primary">Отправить комментарий</button>
+                <button type="submit" class="btn-primary">Надіслати коментар</button>
             </form>
             {% else %}
-            <p>Чтобы оставить комментарий, <a href="{% url 'users:login' %}">войдите</a> или <a href="{% url 'users:register' %}">зарегистрируйтесь</a>.</p>
+            <p>Щоб залишити коментар, <a href="{% url 'users:login' %}">увійдіть</a> або <a href="{% url 'users:register' %}">зареєструйтесь</a>.</p>
             {% endif %}
         </div>
 
     </div>
 </div>
 
-{# Модальное окно списка репостов #}
+{# Модальне вікно списку репостів #}
 <div id="repostsModal" class="reposts-modal">
     <div class="reposts-modal-content">
         <span class="reposts-close-button" onclick="closeModal(document.getElementById('repostsModal'))">&times;</span>
-        <h2>Список репостов</h2>
-        <div class="reposts-list-container"> {# Добавляем новый контейнер для списка #}
-            <p class="reposts-modal-loading">Загрузка списка репостов...</p>
+        <h2>Список репостів</h2>
+        <div class="reposts-list-container"> {# Додаємо новий контейнер для списку #}
+            <p class="reposts-modal-loading">Завантаження списку репостів...</p>
             <ul id="reposts-list" class="reposts-list">
-                {# Здесь будут отображаться пользователи, сделавшие репост #}
+                {# Тут будуть відображатися користувачі, які зробили репост #}
             </ul>
-            <p id="reposts-modal-empty" class="reposts-modal-empty" style="display: none;">Никто еще не репостнул этот пост.</p>
+            <p id="reposts-modal-empty" class="reposts-modal-empty" style="display: none;">Ніхто ще не репостнув цей допис.</p>
         </div>
     </div>
 </div>
@@ -148,9 +148,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        // --- НОВАЯ ФУНКЦИЯ: Загрузка и обновление счетчика репостов ---
+        // --- НОВА ФУНКЦІЯ: Завантаження та оновлення лічильника репостів ---
         async function updateRepostsCountAndModal() {
-            if (!showRepostsButton) return; // Выходим, если кнопки нет (например, пользователь не авторизован)
+            if (!showRepostsButton) return; // Виходимо, якщо кнопки немає (наприклад, користувач не авторизований)
 
             const postId = showRepostsButton.dataset.postId;
 
@@ -161,58 +161,58 @@
                 }
                 const data = await response.json();
 
-                // Обновляем счетчик на кнопке
+                // Оновлюємо лічильник на кнопці
                 if (buttonRepostsCountSpan) {
                     buttonRepostsCountSpan.textContent = data.filtered_count;
                 }
 
-                // Эта часть кода нужна, когда открывается модальное окно.
-                // Не будем заполнять список здесь, чтобы не делать лишнюю работу при загрузке страницы,
-                // только если модалка уже открыта или если мы ее открываем по клику.
-                // В данном случае, нам нужно только обновить счетчик на кнопке.
-                // Логику заполнения списка оставим внутри обработчика клика модалки.
+                // Ця частина коду потрібна, коли відкривається модальне вікно.
+                // Не будемо заповнювати список тут, щоб не робити зайву роботу при завантаженні сторінки,
+                // тільки якщо модалка вже відкрита або якщо ми її відкриваємо по кліку.
+                // В даному випадку, нам потрібно лише оновити лічильник на кнопці.
+                // Логіку заповнення списку залишимо всередині обробника кліку модалки.
 
             } catch (error) {
-                console.error('Ошибка при загрузке отфильтрованного списка репостов при инициализации:', error);
-                // Можно показать ошибку или оставить старое значение
+                console.error('Помилка під час завантаження відфільтрованого списку репостів при ініціалізації:', error);
+                // Можна показати помилку або залишити старе значення
                 if (buttonRepostsCountSpan) {
-                    // buttonRepostsCountSpan.textContent = 'Ошибка'; // Опционально: показать ошибку
+                    // buttonRepostsCountSpan.textContent = 'Помилка'; // Опціонально: показати помилку
                 }
             }
         }
 
-        // --- Вызываем функцию при загрузке страницы, если пользователь авторизован ---
+        // --- Викликаємо функцію при завантаженні сторінки, якщо користувач авторизований ---
         {% if user.is_authenticated %}
         updateRepostsCountAndModal();
         {% endif %}
 
 
-        // --- JavaScript для галереи вложений (только для post_detail.html) ---
-        // Ищем только галерею на этой конкретной странице
+        // --- JavaScript для галереї вкладень (тільки для post_detail.html) ---
+        // Шукаємо лише галерею на цій конкретній сторінці
         const gallery = document.querySelector('.post-attachments-gallery');
 
-        if (gallery) { // Проверяем, существует ли галерея на странице
+        if (gallery) { // Перевіряємо, чи існує галерея на сторінці
             const imagesContainer = gallery.querySelector('.gallery-images-container');
-            // Используем data-image-index для изображений
+            // Використовуємо data-image-index для зображень
             const images = Array.from(gallery.querySelectorAll('.post-image')); 
             const prevArrow = gallery.querySelector('.prev-arrow');
             const nextArrow = gallery.querySelector('.next-arrow');
             const indicatorsContainer = gallery.querySelector('.gallery-indicators');
-            // Используем data-image-index для точек
+            // Використовуємо data-image-index для точок
             const dots = Array.from(indicatorsContainer ? indicatorsContainer.querySelectorAll('.indicator-dot') : []);
 
             let currentIndex = 0;
 
-            // Если изображений нет или только одно, скрываем навигацию
+            // Якщо зображень немає або лише одне, приховуємо навігацію
             if (images.length <= 1) {
                 if (prevArrow) prevArrow.style.display = 'none';
                 if (nextArrow) nextArrow.style.display = 'none';
                 if (indicatorsContainer) indicatorsContainer.style.display = 'none';
-                // Если есть одно изображение, убедимся, что оно видно
+                // Якщо є одне зображення, переконаємося, що воно видно
                 if (images.length === 1) {
                     images[0].classList.add('active');
                 }
-                return; // Выходим, так как галерея не нужна
+                return; // Виходимо, оскільки галерея не потрібна
             }
 
             function updateGallery() {
@@ -230,7 +230,7 @@
                 });
             }
 
-            // Инициализация галереи при загрузке страницы, показываем первое изображение
+            // Ініціалізація галереї при завантаженні сторінки, показуємо перше зображення
             updateGallery(); 
 
             if (prevArrow) {
@@ -240,7 +240,7 @@
                 });
             }
 
-            if (nextArrow) { // Была опечатка nextImage, исправлено на nextArrow
+            if (nextArrow) { // Була друкарська помилка nextImage, виправлено на nextArrow
                 nextArrow.addEventListener('click', () => {
                     currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
                     updateGallery();
@@ -249,7 +249,7 @@
 
             dots.forEach(dot => {
                 dot.addEventListener('click', function() {
-                    // Используем dataset.imageIndex
+                    // Використовуємо dataset.imageIndex
                     currentIndex = parseInt(this.dataset.imageIndex); 
                     updateGallery();
                 });
@@ -264,17 +264,17 @@
         const buttonRepostsCountSpan = document.getElementById(`reposts-count-${showRepostsButton.dataset.postId}`);
 
 
-        // --- Обработчик клика для открытия модального окна (изменения здесь минимальны) ---
+        // --- Обробник кліка для відкриття модального вікна (зміни тут мінімальні) ---
         if (showRepostsButton && repostsModal) {
             showRepostsButton.addEventListener('click', async () => {
                 const postId = showRepostsButton.dataset.postId;
                 openModal(repostsModal);
 
-                repostsListUl.innerHTML = ''; // Очищаем предыдущие данные
-                repostsModalEmpty.style.display = 'none'; // Скрываем "пусто"
-                repostsModalLoading.style.display = 'block'; // Показываем "загрузка"
+                repostsListUl.innerHTML = ''; // Очищаємо попередні дані
+                repostsModalEmpty.style.display = 'none'; // Приховуємо "порожньо"
+                repostsModalLoading.style.display = 'block'; // Показуємо "завантаження"
 
-                // Загружаем данные для модального окна заново, чтобы быть уверенными, что список актуальный
+                // Завантажуємо дані для модального вікна заново, щоб бути впевненими, що список актуальний
                 try {
                     const response = await fetch(`/post/${postId}/reposts/ajax/`);
                     if (!response.ok) {
@@ -282,7 +282,7 @@
                     }
                     const data = await response.json();
 
-                    repostsModalLoading.style.display = 'none'; // Скрываем "загрузка"
+                    repostsModalLoading.style.display = 'none'; // Приховуємо "завантаження"
 
                     if (data.reposts && data.reposts.length > 0) {
                         data.reposts.forEach(user => {
@@ -300,15 +300,15 @@
                         repostsModalEmpty.style.display = 'block';
                     }
 
-                    // Обновление счетчика на кнопке уже произошло при загрузке страницы,
-                    // но можно обновить его еще раз, чтобы быть 100% уверенным, что он актуален после открытия модалки.
+                    // Оновлення лічильника на кнопці вже відбулося при завантаженні сторінки,
+                    // але можна оновити його ще раз, щоб бути 100% впевненим, що він актуальний після відкриття модалки.
                     if (buttonRepostsCountSpan) {
                         buttonRepostsCountSpan.textContent = data.filtered_count;
                     }
 
                 } catch (error) {
-                    console.error('Ошибка при загрузке списка репостов для модального окна:', error);
-                    repostsModalLoading.textContent = 'Не удалось загрузить список репостов.';
+                    console.error('Помилка під час завантаження списку репостів для модального вікна:', error);
+                    repostsModalLoading.textContent = 'Не вдалося завантажити список репостів.';
                     repostsModalLoading.style.color = 'red';
                     repostsModalLoading.style.display = 'block';
                 }
@@ -318,6 +318,6 @@
     });
 
     // openEditPostModal, openDeletePostModal, handlePostAction, handleCommentSubmit
-    // должны быть определены в base.html и доступны глобально.
+    // повинні бути визначені в base.html та доступні глобально.
 </script>
 {% endblock %}

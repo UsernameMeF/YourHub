@@ -19,7 +19,7 @@ class Tag(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^[a-zA-Z0-9_\u0400-\u04FF]+$',
-                message="Имя тега должно содержать только буквы (латинские/кириллица), цифры и нижнее подчеркивание."
+                message="Ім'я тегу повинно містити лише літери (латинські/кирилиця), цифри та нижнє підкреслення." # Translated
             )
         ]
     )
@@ -27,8 +27,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ['name']
-        verbose_name = "Тег"
-        verbose_name_plural = "Теги"
+        verbose_name = "Тег" # Translated
+        verbose_name_plural = "Теги" # Translated
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower()
@@ -49,27 +49,27 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts', verbose_name="Автор")
-    title = models.CharField(max_length=255, verbose_name="Заголовок")
-    content = models.TextField(verbose_name="Содержимое поста")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts', verbose_name="Автор") # Translated
+    title = models.CharField(max_length=255, verbose_name="Заголовок") # Translated
+    content = models.TextField(verbose_name="Вміст допису") # Translated
     
-    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True, verbose_name="Лайки")
-    dislikes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='disliked_posts', blank=True, verbose_name="Дизлайки")
-    reposts = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='reposted_posts', blank=True, verbose_name="Репосты")
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True, verbose_name="Вподобання") # Translated
+    dislikes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='disliked_posts', blank=True, verbose_name="Дизлайки") # Translated
+    reposts = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='reposted_posts', blank=True, verbose_name="Репости") # Translated
     
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення") # Translated
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата оновлення") # Translated
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     
-    views_count = models.PositiveIntegerField(default=0, verbose_name="Количество просмотров")
+    views_count = models.PositiveIntegerField(default=0, verbose_name="Кількість переглядів") # Translated
 
     class Meta:
-        verbose_name = "Пост"
-        verbose_name_plural = "Посты"
+        verbose_name = "Допис" # Translated
+        verbose_name_plural = "Дописи" # Translated
         ordering = ['-created_at'] 
 
     def __str__(self):
-        return f"{self.title} by {self.author.username}"
+        return f"{self.title} від {self.author.username}" # Translated
 
     def get_absolute_url(self):
         return reverse('core:post_detail', args=[str(self.id)])
@@ -92,27 +92,27 @@ class Post(models.Model):
 
 
 class PostAttachment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='attachments', verbose_name="Пост")
-    image = models.ImageField(upload_to=post_attachment_upload_to, verbose_name="Изображение")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='attachments', verbose_name="Допис") # Translated
+    image = models.ImageField(upload_to=post_attachment_upload_to, verbose_name="Зображення") # Translated
 
     class Meta:
-        verbose_name = "Вложение к посту"
-        verbose_name_plural = "Вложения к постам"
+        verbose_name = "Вкладення до допису" # Translated
+        verbose_name_plural = "Вкладення до дописів" # Translated
 
     def __str__(self):
-        return f"Attachment for Post {self.post.id}"
+        return f"Вкладення для допису {self.post.id}" # Translated
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name="Пост")
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments', verbose_name="Автор")
-    text = models.TextField(verbose_name="Текст комментария")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name="Допис") # Translated
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comments', verbose_name="Автор") # Translated
+    text = models.TextField(verbose_name="Текст коментаря") # Translated
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення") # Translated
 
     class Meta:
-        verbose_name = "Комментарий"
-        verbose_name_plural = "Комментарии"
+        verbose_name = "Коментар" # Translated
+        verbose_name_plural = "Коментарі" # Translated
         ordering = ['created_at'] 
 
     def __str__(self):
-        return f"Comment by {self.author.username} on Post {self.post.id}"
+        return f"Коментар від {self.author.username} до допису {self.post.id}" # Translated

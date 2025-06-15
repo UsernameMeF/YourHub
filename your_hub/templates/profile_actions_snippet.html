@@ -1,66 +1,66 @@
-{# Этот шаблон содержит кнопки действий на странице профиля (Дружба/Подписка) #}
-{# Он предназначен для включения в profile.html и обновления через AJAX #}
+{# Цей шаблон містить кнопки дій на сторінці профілю (Дружба/Підписка) #}
+{# Він призначений для включення в profile.html та оновлення через AJAX #}
 
-{# Отображается только если это НЕ свой профиль и пользователь АВТОРИЗОВАН #}
+{# Відображається тільки якщо це НЕ свій профіль і користувач АВТОРИЗОВАНИЙ #}
 {% if user.is_authenticated and not is_my_profile %}
-    {# Добавляем ID для удобства поиска в JS #}
-    {# Добавляем класс для стилизации позиционирования #}
-    <div class="profile-actions-buttons-wrapper"> {# Используйте этот класс для горизонтального расположения #}
-        {# --- Кнопка "Написать сообщение" --- #}
-        {# Показываем кнопку чата, если это не свой профиль #}
-        <a href="{% url 'chat:start_private_chat' other_user_id=viewed_user.id %}" class="header-icon-button" title="Написать сообщение">
+    {# Додаємо ID для зручності пошуку в JS #}
+    {# Додаємо клас для стилізації позиціонування #}
+    <div class="profile-actions-buttons-wrapper"> {# Використовуйте цей клас для горизонтального розташування #}
+        {# --- Кнопка "Написати повідомлення" --- #}
+        {# Показуємо кнопку чату, якщо це не свій профіль #}
+        <a href="{% url 'chat:start_private_chat' other_user_id=viewed_user.id %}" class="header-icon-button" title="Написати повідомлення">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         </a>
-        {# Логика для кнопок дружбы #}
+        {# Логіка для кнопок дружби #}
         {% if friendship_status == 'not_friends' %}
-            {# Форма для отправки запроса на дружбу - добавляем класс для AJAX #}
+            {# Форма для відправки запиту на дружбу - додаємо клас для AJAX #}
             <form method="post" action="{% url 'users:send_friend_request' to_user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Добавить в друзья</button>
+                <button type="submit" class="btn btn-primary">Додати в друзі</button>
             </form>
         {% elif friendship_status == 'pending_sent' and sent_request %}
-            {# Статус: запрос отправлен текущим пользователем. Кнопка "Отменить запрос" #}
+            {# Статус: запит відправлено поточним користувачем. Кнопка "Скасувати запит" #}
             <form method="post" action="{% url 'users:cancel_friend_request' friendship_id=sent_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Отменить запрос</button>
+                <button type="submit" class="btn btn-secondary">Скасувати запит</button>
             </form>
         {% elif friendship_status == 'pending_received' and received_request %}
-            {# Статус: текущий пользователь получил запрос от просматриваемого. Кнопки "Принять" / "Отклонить" #}
+            {# Статус: поточний користувач отримав запит від переглянутого. Кнопки "Прийняти" / "Відхилити" #}
             <form method="post" action="{% url 'users:accept_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success">Принять</button>
+                <button type="submit" class="btn btn-success">Прийняти</button>
             </form>
             <form method="post" action="{% url 'users:decline_friend_request' friendship_id=received_request.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Отклонить</button>
+                <button type="submit" class="btn btn-danger">Відхилити</button>
             </form>
         {% elif friendship_status == 'friends' %}
-            {# Статус: текущий пользователь и просматриваемый - друзья. Кнопка "Удалить из друзей" #}
+            {# Статус: поточний користувач і переглянутий - друзі. Кнопка "Видалити з друзів" #}
             <form method="post" action="{% url 'users:remove_friend' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Удалить из друзей</button>
+                <button type="submit" class="btn btn-danger">Видалити з друзів</button>
             </form>
         {% endif %}
 
-        {# Логика для кнопки подписки. Показываем кнопку "Подписаться" или "Отписаться" #}
-        {# Она может быть видна независимо от статуса дружбы, если это ваша логика #}
+        {# Логіка для кнопки підписки. Показуємо кнопку "Підписатися" або "Відписатися" #}
+        {# Вона може бути видима незалежно від статусу дружби, якщо це ваша логіка #}
         {% if follow_status %}
-            {# Статус: текущий пользователь подписан на просматриваемого - форма для отписки #}
+            {# Статус: поточний користувач підписаний на переглянутого - форма для відписки #}
             <form method="post" action="{% url 'users:unfollow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Отписаться</button>
+                <button type="submit" class="btn btn-secondary">Відписатися</button>
             </form>
         {% else %}
-            {# Статус: текущий пользователь НЕ подписан на просматриваемого - форма для подписки #}
+            {# Статус: поточний користувач НЕ підписаний на переглянутого - форма для підписки #}
             <form method="post" action="{% url 'users:follow_user' user_id=viewed_user.id %}" class="ajax-profile-action-form">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Подписаться</button>
+                <button type="submit" class="btn btn-primary">Підписатися</button>
             </form>
         {% endif %}
     </div>
 {% endif %}
 
-{# Ссылка на редактирование профиля (отображается только если это СВОЙ профиль) #}
+{# Посилання на редагування профілю (відображається тільки якщо це СВІЙ профіль) #}
 {% if is_my_profile %}
-    <p><a href="{% url 'users:edit_profile' %}" class="btn-primary">Редактировать профиль</a></p>
+    <p><a href="{% url 'users:edit_profile' %}" class="btn-primary">Редагувати профіль</a></p>
 {% endif %}

@@ -3,18 +3,18 @@ from .models import Community, CommunityPost, CommunityComment
 
 class CommunityCreationForm(forms.ModelForm):
     """
-    Форма для создания нового сообщества.
-    """
+    Форма для створення нового співтовариства.
+    """ # Translated
     class Meta:
         model = Community
         fields = ['name', 'description']
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Название сообщества'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Краткое описание сообщества (необязательно)', 'rows': 4}),
+            'name': forms.TextInput(attrs={'placeholder': 'Назва спільноти'}), # Translated
+            'description': forms.Textarea(attrs={'placeholder': 'Короткий опис спільноти (необов\'язково)', 'rows': 4}), # Translated
         }
         labels = {
-            'name': 'Название сообщества',
-            'description': 'Описание сообщества (необязательно)',
+            'name': 'Назва спільноти', # Translated
+            'description': 'Опис спільноти (необов\'язково)', # Translated
         }
 
     def clean_name(self):
@@ -26,56 +26,56 @@ class CommunityUpdateForm(forms.ModelForm):
         model = Community
         fields = ['name', 'description'] 
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Название сообщества', 'readonly': 'readonly'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Краткое описание вашего сообщества'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Назва спільноти', 'readonly': 'readonly'}), # Translated
+            'description': forms.Textarea(attrs={'placeholder': 'Короткий опис вашої спільноти'}), # Translated
         }
         labels = {
-            'name': 'Название',
-            'description': 'Описание',
+            'name': 'Назва', # Translated
+            'description': 'Опис', # Translated
         }
         help_texts = {
-            'name': 'Название сообщества нельзя изменить после создания.',
-            'description': 'Обновите описание вашего сообщества.',
+            'name': 'Назву спільноти не можна змінити після створення.', # Translated
+            'description': 'Оновіть опис вашої спільноти.', # Translated
         }
 
 
 class CommunityPostForm(forms.ModelForm):
     """
-    Форма для создания новой публикации в сообществе.
-    """
+    Форма для створення нової публікації у співтоваристві.
+    """ # Translated
     class Meta:
         model = CommunityPost
         fields = ['title', 'content'] 
         widgets = {
             'title': forms.TextInput(attrs={
-                'placeholder': 'Заголовок публикации',
+                'placeholder': 'Заголовок публікації', # Translated
                 'class': 'community-post-title-input'
             }),
             'content': forms.Textarea(attrs={
-                'placeholder': 'Что нового в сообществе?',
+                'placeholder': 'Що нового у спільноті?', # Translated
                 'rows': 7, 
                 'class': 'community-post-content-input' 
             }),
         }
         labels = {
-            'content': 'Текст публикации',
+            'content': 'Текст публікації', # Translated
         }
 
 
 class CommunityCommentForm(forms.ModelForm):
     """
-    Форма для добавления комментария к посту сообщества.
-    """
+    Форма для додавання коментаря до допису спільноти.
+    """ # Translated
     class Meta:
         model = CommunityComment
         fields = ['text']
         widgets = {
             'text': forms.Textarea(attrs={
-                'placeholder': 'Напишите комментарий...',
+                'placeholder': 'Напишіть коментар...', # Translated
                 'rows': 3,
                 'class': 'community-comment-text-input'
             }),
         }
         labels = {
-            'text': 'Ваш комментарий',
+            'text': 'Ваш коментар', # Translated
         }

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Чат с {% for participant in chat_room.participants.all %}{% if participant != request.user %}{{ participant.username }}{% endif %}{% endfor %}{% endblock %}
+{% block title %}Чат з {% for participant in chat_room.participants.all %}{% if participant != request.user %}{{ participant.username }}{% endif %}{% endfor %}{% endblock %} {# Translated #}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/chat/_chat_room.css' %}">
@@ -13,7 +13,7 @@
 <div class="chat_room-container">
     <h1>
         <div class="chat_header-left-elements">
-            <a href="{% url 'chat:chat_list' %}" class="chat_back-button" title="Назад к чатам"><i class="fas fa-arrow-left"></i></a>
+            <a href="{% url 'chat:chat_list' %}" class="chat_back-button" title="Назад до чатів"><i class="fas fa-arrow-left"></i></a> {# Translated #}
             {% for participant in chat_room.participants.all %}
                 {% if participant != request.user %}
                     <img src="{{ participant.profile.avatar.url }}" alt="{{ participant.username }}" class="chat_partner-avatar">
@@ -34,10 +34,10 @@
                  data-message-id="{{ message.id }}"
                  data-read-by-current="{% if message.sender == request.user or request.user in message.read_by.all %}true{% else %}false{% endif %}">
                 <div class="chat_message-header">
-                    <span class="chat_sender-username">{% if message.sender == request.user %}Вы{% else %}{{ message.sender.username }}{% endif %}</span>
+                    <span class="chat_sender-username">{% if message.sender == request.user %}Ви{% else %}{{ message.sender.username }}{% endif %}</span> {# Translated #}
                     <span class="chat_message-timestamp">{{ message.timestamp|date:"d.m.Y H:i" }}</span>
                     {% if message.is_edited %}
-                        <span class="chat_edited-status">(отредактировано)</span>
+                        <span class="chat_edited-status">(відредаговано)</span> {# Translated #}
                     {% endif %}
                 </div>
                 <div class="chat_message-content-wrapper">
@@ -49,7 +49,7 @@
                                 {% elif attachment.file_type == 'video' %}
                                     <video controls class="chat_video">
                                         <source src="{{ attachment.file.url }}" type="video/mp4">
-                                        Ваш браузер не поддерживает видео тег.
+                                        Ваш браузер не підтримує відео тег. {# Translated #}
                                     </video>
                                 {% elif attachment.file_type == 'document' %}
                                     <a href="{{ attachment.file.url }}" target="_blank" class="chat_document-link">
@@ -79,25 +79,25 @@
                 </div>
                 {% if message.sender == request.user %}
                 <div class="chat_message-actions">
-                    <button class="chat_edit-button btn btn-sm btn-info" data-message-id="{{ message.id }}"><i class="fas fa-edit"></i> Редактировать</button>
-                    <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="{{ message.id }}"><i class="fas fa-trash"></i> Удалить</button>
+                    <button class="chat_edit-button btn btn-sm btn-info" data-message-id="{{ message.id }}"><i class="fas fa-edit"></i> Редагувати</button> {# Translated #}
+                    <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="{{ message.id }}"><i class="fas fa-trash"></i> Видалити</button> {# Translated #}
                 </div>
                 {% endif %}
             </div>
         {% empty %}
-            <p class="chat_no-messages">Пока нет сообщений в этом чате. Начните общение!</p>
+            <p class="chat_no-messages">Поки немає повідомлень у цьому чаті. Почніть спілкування!</p> {# Translated #}
         {% endfor %}
     </div>
 
     <div class="chat_input-area">
-        <textarea id="chat_message-input" placeholder="Введите ваше сообщение..." rows="3"></textarea>
+        <textarea id="chat_message-input" placeholder="Введіть ваше повідомлення..." rows="3"></textarea> {# Translated #}
         <div class="chat_attachments-preview" id="chat_attachments-preview">
         </div>
         <div class="chat_actions">
             <input type="file" id="chat_file-input" multiple hidden accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
-            <button id="chat_attach-file-button" class="btn btn-secondary"><i class="fas fa-paperclip"></i> Прикрепить</button>
-            <button id="chat_message-submit" class="btn btn-primary">Отправить</button>
-            <button id="chat_cancel-edit-button" class="btn btn-warning" style="display: none;">Отмена</button>
+            <button id="chat_attach-file-button" class="btn btn-secondary"><i class="fas fa-paperclip"></i> Прикріпити</button> {# Translated #}
+            <button id="chat_message-submit" class="btn btn-primary">Надіслати</button> {# Translated #}
+            <button id="chat_cancel-edit-button" class="btn btn-warning" style="display: none;">Скасувати</button> {# Translated #}
         </div>
     </div>
 </div>
@@ -159,7 +159,7 @@
                 const messageElement = entry.target;
                 const messageId = messageElement.dataset.messageId;
                 if (messageElement.classList.contains('other_message') && !readMessagesCache.has(messageId) && chatSocket.readyState === WebSocket.OPEN) {
-                    console.log(`Message ${messageId} is visible and not read by current user. Sending read_receipt.`);
+                    console.log(`Повідомлення ${messageId} видно і не прочитано поточним користувачем. Надсилаємо підтвердження про прочитання.`); {# Translated #}
                     chatSocket.send(JSON.stringify({
                         'type': 'read_receipt',
                         'message_id': messageId
@@ -187,19 +187,19 @@
     }
 
     chatSocket.onopen = function(e) {
-        console.log('WebSocket connected');
+        console.log('WebSocket підключено'); {# Translated #}
         scrollToBottom();
         observeMessagesForReadReceipts();
     };
 
     chatSocket.onclose = function(e) {
-        console.error('WebSocket closed unexpectedly:', e);
+        console.error('WebSocket неочікувано закрито:', e); {# Translated #}
         messageObserver.disconnect();
     };
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        console.log('Received message:', data);
+        console.log('Отримано повідомлення:', data); {# Translated #}
 
         if (data.type === 'chat_message') {
             const newMessageElement = createMessageElement({
@@ -222,14 +222,14 @@
         } else if (data.type === 'read_receipt_notification') {
             handleReadReceiptNotification(data.message_id, data.reader_id, data.read_count);
         } else if (data.type === 'message_edited') {
-            handleMessageEdited(data.message_id, data.new_content);
+            handleMessageEdited(data.message_id, data.new_content, data.attachments); {# Added data.attachments #}
         } else if (data.type === 'message_deleted') {
             handleMessageDeleted(data.message_id);
         }
     };
 
     chatSocket.onerror = function(e) {
-        console.error('WebSocket error:', e);
+        console.error('Помилка WebSocket:', e); {# Translated #}
     };
 
     function createMessageElement(message) {
@@ -253,9 +253,9 @@
                 });
 
                 if (attachment.file_type === 'image') {
-                    attachmentsHtml += `<a href="${attachment.file_url}" target="_blank"><img src="${attachment.file_url}" alt="Вложение" class="chat_image" onclick="window.open(this.src)"></a>`;
+                    attachmentsHtml += `<a href="${attachment.file_url}" target="_blank"><img src="${attachment.file_url}" alt="Вкладення" class="chat_image" onclick="window.open(this.src)"></a>`; {# Translated #}
                 } else if (attachment.file_type === 'video') {
-                    attachmentsHtml += `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браумер не поддерживает видео тег.</video>`;
+                    attachmentsHtml += `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не підтримує відео тег.</video>`; {# Translated #}
                 } else {
                     attachmentsHtml += `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachmentFileName}</a>`;
                 }
@@ -264,7 +264,7 @@
         }
         messageElement.dataset.attachments = JSON.stringify(attachmentsData);
 
-        const senderDisplayName = message.sender_id == currentUserId ? 'Вы' : message.sender_username;
+        const senderDisplayName = message.sender_id == currentUserId ? 'Ви' : message.sender_username; {# Translated #}
         const isMyMessage = message.sender_id == currentUserId;
 
         let readStatusHtml = '';
@@ -291,7 +291,7 @@
                 </div>`;
         }
 
-        const editedStatusHtml = message.is_edited ? '<span class="chat_edited-status">(отредактировано)</span>' : '';
+        const editedStatusHtml = message.is_edited ? '<span class="chat_edited-status">відредаговано</span>' : ''; {# Translated #}
 
         messageElement.innerHTML = `
             <div class="chat_message-header">
@@ -306,8 +306,8 @@
             </div>
             ${isMyMessage ? `
             <div class="chat_message-actions">
-                <button class="chat_edit-button btn btn-sm btn-info" data-message-id="${message.id}"><i class="fas fa-edit"></i> Редактировать</button>
-                <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="${message.id}"><i class="fas fa-trash"></i> Удалить</button>
+                <button class="chat_edit-button btn btn-sm btn-info" data-message-id="${message.id}"><i class="fas fa-edit"></i> Редагувати</button> {# Translated #}
+                <button class="chat_delete-button btn btn-sm btn-danger" data-message-id="${message.id}"><i class="fas fa-trash"></i> Видалити</button> {# Translated #}
             </div>` : ''}
         `;
         return messageElement;
@@ -373,7 +373,7 @@
             typingStatusContainer.style.display = 'none';
         } else {
             const usersList = Array.from(typingUsers).join(', ');
-            typingStatusContainer.textContent = `${usersList} печатает...`;
+            typingStatusContainer.textContent = `${usersList} друкує...`; {# Translated #}
             typingStatusContainer.style.display = 'block';
         }
     }
@@ -424,7 +424,6 @@
         }
     }
 
-
     function handleMessageEdited(messageId, newContent, attachments) {
         const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
         if (messageElement) {
@@ -438,7 +437,7 @@
                     editedStatus.classList.add('chat_edited-status');
                     messageElement.querySelector('.chat_message-header').appendChild(editedStatus);
                 }
-                editedStatus.textContent = '(отредактировано)';
+                editedStatus.textContent = '(відредаговано)'; {# Translated #}
             }
 
             const messageContentWrapper = messageElement.querySelector('.chat_message-content-wrapper');
@@ -466,9 +465,9 @@
 
                     let innerHtml = '';
                     if (attachment.file_type === 'image') {
-                        innerHtml = `<img src="${attachment.file_url}" alt="${attachment.original_filename}" class="chat_image" onclick="window.open(this.src)">`;
+                        innerHtml = `<img src="${attachment.file_url}" alt="Вкладення" class="chat_image" onclick="window.open(this.src)">`; {# Translated #}
                     } else if (attachment.file_type === 'video') {
-                        innerHtml = `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не поддерживает видео тег.</video>`;
+                        innerHtml = `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не підтримує відео тег.</video>`; {# Translated #}
                     } else if (attachment.file_type === 'document') {
                         innerHtml = `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachment.original_filename}</a>`;
                     }
@@ -491,7 +490,7 @@
         if (chatLog.children.length === 0) {
             const noMessagesP = document.createElement('p');
             noMessagesP.classList.add('chat_no-messages');
-            noMessagesP.textContent = 'Пока нет сообщений в этом чате. Начните общение!';
+            noMessagesP.textContent = 'Поки немає повідомлень у цьому чаті. Почніть спілкування!'; {# Translated #}
             chatLog.appendChild(noMessagesP);
         }
     }
@@ -519,7 +518,7 @@
         if (!messageElement) return;
 
         editingMessageId = messageId;
-        messageSubmit.textContent = 'Сохранить';
+        messageSubmit.textContent = 'Зберегти'; {# Translated #}
         cancelEditButton.style.display = 'inline-block';
         attachFileButton.style.display = 'inline-block';
 
@@ -548,12 +547,12 @@
         selectedFiles = [];
         currentAttachments = [];
         updateAttachmentsPreview();
-        messageSubmit.textContent = 'Отправить';
+        messageSubmit.textContent = 'Надіслати'; {# Translated #}
         cancelEditButton.style.display = 'none';
     };
 
     async function deleteMessage(messageId) {
-        if (!confirm('Вы уверены, что хотите удалить это сообщение?')) {
+        if (!confirm('Ви впевнені, що хочете видалити це повідомлення?')) { {# Translated #}
             return;
         }
 
@@ -569,26 +568,26 @@
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); {# Translated #}
             }
 
-            console.log(`Message ${messageId} deleted successfully.`);
+            console.log(`Повідомлення ${messageId} успішно видалено.`); {# Translated #}
         } catch (error) {
-            console.error('Error deleting message:', error);
-            alert('Ошибка при удалении сообщения: ' + error.message);
+            console.error('Помилка видалення повідомлення:', error); {# Translated #}
+            alert('Помилка при видаленні повідомлення: ' + error.message); {# Translated #}
         }
     }
 
     messageSubmit.onclick = async function(e) {
         if (chatSocket.readyState !== WebSocket.OPEN) {
-            console.error('WebSocket is not open. Cannot send message.');
-            alert('Соединение с чатом не установлено. Пожалуйста, обновите страницу.');
+            console.error('WebSocket не відкритий. Неможливо відправити повідомлення.'); {# Translated #}
+            alert('З\'єднання з чатом не встановлено. Будь ласка, оновіть сторінку.'); {# Translated #}
             return;
         }
 
         const message = messageInput.value.trim();
         if (message === '' && selectedFiles.length === 0) {
-            alert('Сообщение не может быть пустым и без вложений!');
+            alert('Повідомлення не може бути пустим і без вкладень!'); {# Translated #}
             return;
         }
 
@@ -618,11 +617,11 @@
     };
 
     async function sendEditMessage(newContent, messageId) {
-        console.log('sendEditMessage called with:');
-        console.log('roomType:', roomType);
-        console.log('roomId:', roomId);
-        console.log('messageId:', messageId);
-        console.log('newContent:', newContent);
+        console.log('Викликано sendEditMessage з параметрами:'); // Translated
+        console.log('Тип кімнати:', roomType); // Translated
+        console.log('ID кімнати:', roomId); // Translated
+        console.log('ID повідомлення:', messageId); // Translated
+        console.log('Новий вміст:', newContent); // Translated
 
         const formData = new FormData();
         formData.append('message_content', newContent);
@@ -647,22 +646,22 @@
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); // Translated
             }
 
             const result = await response.json();
-            console.log('Message edited successfully:', result);
+            console.log('Повідомлення успішно відредаговано:', result); // Translated
 
             editingMessageId = null;
             messageInput.value = '';
             selectedFiles = [];
             currentAttachments = [];
             updateAttachmentsPreview();
-            messageSubmit.textContent = 'Отправить';
+            messageSubmit.textContent = 'Надіслати'; // Translated
             cancelEditButton.style.display = 'none';
         } catch (error) {
-            console.error('Error editing message:', error);
-            alert('Ошибка при редактировании сообщения: ' + error.message);
+            console.error('Помилка редагування повідомлення:', error); // Translated
+            alert('Помилка при редагуванні повідомлення: ' + error.message); // Translated
         }
     }
 
@@ -727,7 +726,6 @@
         });
     }
 
-
     function getFileIconClass(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         switch (ext) {
@@ -742,7 +740,6 @@
             default: return 'fas fa-file';
         }
     }
-
 
     async function uploadFiles(messageText) {
         const formData = new FormData();
@@ -764,18 +761,18 @@
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                throw new Error(errorData.error || `HTTP помилка! статус: ${response.status}`); // Translated
             }
 
             const result = await response.json();
-            console.log('Files upload successful:', result);
+            console.log('Файли успішно завантажено:', result); // Translated
 
             selectedFiles = [];
             updateAttachmentsPreview();
             messageInput.value = '';
         } catch (error) {
-            console.error('Error uploading files:', error);
-            alert('Ошибка при загрузке файлов: ' + error.message);
+            console.error('Помилка завантаження файлів:', error); // Translated
+            alert('Помилка при завантаженні файлів: ' + error.message); // Translated
         } finally {
             resetTypingStatus();
         }
@@ -811,7 +808,7 @@
 
         const loadingIndicator = document.createElement('div');
         loadingIndicator.id = 'loading-indicator';
-        loadingIndicator.textContent = 'Загрузка старых сообщений...';
+        loadingIndicator.textContent = 'Завантаження старих повідомлень...'; // Translated
         loadingIndicator.style.textAlign = 'center';
         loadingIndicator.style.padding = '10px 0';
         loadingIndicator.style.color = '#888';
@@ -823,7 +820,7 @@
         try {
             const response = await fetch(`/chat/${roomType}/${roomId}/load_more_messages/?before_message_id=${beforeMessageId}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP помилка! статус: ${response.status}`); // Translated
             }
             const data = await response.json();
 
@@ -858,14 +855,14 @@
             } else {
                 hasMoreMessages = false;
                 const endOfHistoryIndicator = document.createElement('div');
-                endOfHistoryIndicator.textContent = 'Начало истории чата.';
+                endOfHistoryIndicator.textContent = 'Початок історії чату.'; // Translated
                 endOfHistoryIndicator.style.textAlign = 'center';
                 endOfHistoryIndicator.style.padding = '10px 0';
                 endOfHistoryIndicator.style.color = '#888';
                 chatLog.prepend(endOfHistoryIndicator);
             }
         } catch (error) {
-            console.error('Ошибка при загрузке старых сообщений:', error);
+            console.error('Помилка завантаження старих повідомлень:', error); // Translated
         } finally {
             if (loadingIndicator.parentNode) {
                 loadingIndicator.parentNode.removeChild(loadingIndicator);

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 existingImages = JSON.parse(postImagesJsonElement.textContent || '[]');
             } catch (e) {
-                console.error("Error parsing existing images JSON:", e);
+                console.error("Помилка при парсингу JSON наявних зображень:", e); // Translated
             }
         }
 
@@ -104,11 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     files.forEach(file => {
                         const fileSizeMB = file.size / (1024 * 1024);
                         if (fileSizeMB > 5) {
-                            alert('Файл ' + file.name + ' слишком большой (макс. 5 МБ).');
+                            alert('Файл ' + file.name + ' занадто великий (макс. 5 МБ).'); // Translated
                             return;
                         }
                         if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
-                            alert('Файл ' + file.name + ' имеет неподдерживаемый тип.');
+                            alert('Файл ' + file.name + ' має непідтримуваний тип.'); // Translated
                             return;
                         }
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             };
                             reader.readAsDataURL(file);
                         } else {
-                            alert(`Достигнут лимит в ${MAX_TOTAL_IMAGES} изображений.`);
+                            alert(`Досягнуто ліміту в ${MAX_TOTAL_IMAGES} зображень.`); // Translated
                         }
                     });
                     event.target.value = '';
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 fileInput.click();
             } else {
-                alert(`Достигнут лимит в ${MAX_TOTAL_IMAGES} изображений.`);
+                alert(`Досягнуто ліміту в ${MAX_TOTAL_IMAGES} зображень.`); // Translated
             }
         });
     }

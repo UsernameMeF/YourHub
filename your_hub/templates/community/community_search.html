@@ -17,17 +17,17 @@
 
     <div class="search-bar-container">
         <form action="{% url 'community:community_search' %}" method="GET" class="community-search-form">
-            <div class="search-input-and-button-row"> {# Новый контейнер для поля ввода и кнопки Поиск #}
-                <input type="text" name="q" placeholder="Найти сообщество по названию..." value="{{ query }}" class="search-input">
-                <button type="submit" class="search-button compact-button"> {# Добавляем класс compact-button #}
+            <div class="search-input-and-button-row"> {# Новий контейнер для поля введення та кнопки Пошук #}
+                <input type="text" name="q" placeholder="Знайти спільноту за назвою..." value="{{ query }}" class="search-input">
+                <button type="submit" class="search-button compact-button"> {# Додаємо клас compact-button #}
                     <i class="fas fa-search"></i>
                 </button>
             </div>
             
             {% if query %}
-                <div class="reset-button-row"> {# Контейнер для кнопки Сбросить #}
+                <div class="reset-button-row"> {# Контейнер для кнопки Скинути #}
                     <a href="{% url 'community:community_search' %}" class="reset-search-button">
-                        <i class="fas fa-times"></i> Сбросить
+                        <i class="fas fa-times"></i> Скинути
                     </a>
                 </div>
             {% endif %}
@@ -39,7 +39,7 @@
             {% for community in communities %}
                 <li class="chat_list-item community-list-item">
                     <a href="{% url 'community:community_detail' pk=community.pk %}">
-                        <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар сообщества" class="chat_avatar">
+                        <img src="{% static 'images/default_group_avatar.png' %}" alt="Аватар спільноти" class="chat_avatar">
                         <div class="chat_info">
                             <span class="chat_name">
                                 <i class="fas fa-users"></i> {{ community.name }}
@@ -48,12 +48,12 @@
                                 {% if community.description %}
                                     {{ community.description|truncatechars:70 }}
                                 {% else %}
-                                    Нет описания.
+                                    Немає опису.
                                 {% endif %}
                             </span>
                         </div>
                         <span class="chat_timestamp">
-                            <i class="fas fa-users"></i> {{ community.members_count }} участ.
+                            <i class="fas fa-users"></i> {{ community.members_count }} учасн.
                         </span>
                     </a>
                 </li>
@@ -62,10 +62,10 @@
     {% else %}
         <li class="no-chats-message">
             {% if query %}
-                <p>Сообщества по запросу "{{ query }}" не найдены.</p>
-                <p><a href="{% url 'community:community_search' %}">Показать все сообщества</a> или попробуйте другой запрос.</p>
+                <p>Спільнот за запитом "{{ query }}" не знайдено.</p>
+                <p><a href="{% url 'community:community_search' %}">Показати всі спільноти</a> або спробуйте інший запит.</p>
             {% else %}
-                <p>Сообществ пока нет. Вы можете <a href="{% url 'community:community_create' %}">создать первое</a>!</p>
+                <p>Спільнот поки немає. Ви можете <a href="{% url 'community:community_create' %}">створити першу</a>!</p>
             {% endif %}
         </li>
     {% endif %}

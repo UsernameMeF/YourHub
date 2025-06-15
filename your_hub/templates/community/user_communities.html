@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Мои сообщества{% endblock %}
+{% block title %}Мої спільноти{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/community/_community_list.css' %}">
@@ -11,15 +11,15 @@
 
 {% block content %}
 <div class="main-container community-list-container">
-    <h1 class="community-list-title">Мои сообщества</h1>
+    <h1 class="community-list-title">Мої спільноти</h1>
 
-    {# --- КОНТЕЙНЕР ДЛЯ НОВЫХ КНОПОК ВВЕРХУ СПРАВА --- #}
+    {# --- КОНТЕЙНЕР ДЛЯ НОВИХ КНОПОК ВГОРІ ПРАВОРУЧ --- #}
     <div class="top-right-actions">
         <a href="{% url 'community:community_create' %}" class="btn create-community-btn">
-            <i class="fas fa-plus"></i> Создать сообщество
+            <i class="fas fa-plus"></i> Створити спільноту
         </a>
         <a href="{% url 'community:community_search' %}" class="btn find-community-btn">
-            <i class="fas fa-search"></i> Найти сообщество
+            <i class="fas fa-search"></i> Знайти спільноту
         </a>
     </div>
 
@@ -30,15 +30,15 @@
                     <div class="community-info">
                         <span class="community-name">{{ community.name }}</span>
                         <span class="community-member-count">
-                            <i class="fas fa-users"></i> {{ community.members_count }} участников
+                            <i class="fas fa-users"></i> {{ community.members_count }} учасників
                         </span>
                     </div>
                 </a>
             </li>
         {% empty %}
-            <p class="no-communities-message">Вы пока не состоите ни в одном сообществе.</p>
+            <p class="no-communities-message">Ви поки що не є членом жодної спільноти.</p>
             <p class="no-communities-message">
-                <a href="{% url 'community:community_create' %}" class="create-community-link">Создайте новое сообщество</a> или найдите существующие.
+                <a href="{% url 'community:community_create' %}" class="create-community-link">Створіть нову спільноту</a> або знайдіть існуючі.
             </p>
         {% endfor %}
     </ul>

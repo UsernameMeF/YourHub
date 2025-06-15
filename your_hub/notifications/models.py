@@ -16,30 +16,30 @@ try:
     _PROFILE_MODEL_AVAILABLE = True
 except ImportError:
     _PROFILE_MODEL_AVAILABLE = False
-    print("Warning: Profile model not found in users.models. DND sync from UserNotificationSettings will be skipped.")
+    print("Попередження: Модель профілю не знайдена в users.models. Синхронізація 'Не турбувати' з UserNotificationSettings буде пропущена.") # Translated
 
 
 class Notification(models.Model):
     NOTIFICATION_TYPES = (
-        ('message', 'Новое личное сообщение'),
-        ('group_message', 'Новое сообщение в группе'),
-        ('friend_request', 'Запрос в друзья'),
-        ('approved_friend_request', 'Запрос в друзья одобрен'),
-        ('comment', 'Новый комментарий'),
-        ('like', 'Новый лайк'),
-        ('repost', 'Новый репост'),
-        ('follow', 'Новая подписка'),
-        ('system', 'Системное уведомление'),
+        ('message', 'Нове особисте повідомлення'), # Translated
+        ('group_message', 'Нове повідомлення в групі'), # Translated
+        ('friend_request', 'Запит у друзі'), # Translated
+        ('approved_friend_request', 'Запит у друзі схвалено'), # Translated
+        ('comment', 'Новий коментар'), # Translated
+        ('like', 'Новий лайк'), # Translated
+        ('repost', 'Новий репост'), # Translated
+        ('follow', 'Нова підписка'), # Translated
+        ('system', 'Системне сповіщення'), # Translated
     )
 
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications', verbose_name='Получатель')
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications', verbose_name='Отправитель')
-    notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES, verbose_name='Тип уведомления')
-    content = models.TextField(blank=True, verbose_name='Содержание')
-    is_read = models.BooleanField(default=False, verbose_name='Прочитано')
-    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications', verbose_name='Отримувач') # Translated
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications', verbose_name='Відправник') # Translated
+    notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES, verbose_name='Тип сповіщення') # Translated
+    content = models.TextField(blank=True, verbose_name='Зміст') # Translated
+    is_read = models.BooleanField(default=False, verbose_name='Прочитано') # Translated
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Час створення') # Translated
 
-    target_url = models.CharField(max_length=255, blank=True, null=True, verbose_name='Целевой URL')
+    target_url = models.CharField(max_length=255, blank=True, null=True, verbose_name='Цільовий URL') # Translated
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
     object_id = models.PositiveIntegerField(null=True, blank=True)
@@ -47,17 +47,17 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
-        verbose_name = 'Уведомление'
-        verbose_name_plural = 'Уведомления'
+        verbose_name = 'Сповіщення' # Translated
+        verbose_name_plural = 'Сповіщення' # Translated
 
     def __str__(self):
-        return f"Уведомление для {self.recipient.username} о {self.get_notification_type_display()}"
+        return f"Сповіщення для {self.recipient.username} про {self.get_notification_type_display()}" # Translated
 
     def get_absolute_url(self):
         """
-        Возвращает URL для перехода по уведомлению.
-        Предпочитает сохраненный target_url, если он есть.
-        Иначе пытается построить URL из связанного объекта.
+        Повертає URL для переходу за сповіщенням. # Translated
+        Віддає перевагу збереженому target_url, якщо він є. # Translated
+        Інакше намагається побудувати URL зі зв'язаного об'єкта. # Translated
         """
         if self.target_url:
             return self.target_url
@@ -93,36 +93,36 @@ class Notification(models.Model):
         return '#'
 
 class UserNotificationSettings(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notification_settings', verbose_name='Пользователь')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notification_settings', verbose_name='Користувач') # Translated
 
     NOTIFICATION_SOUND_CHOICES = (
-        ('sound_1.mp3', 'Звук 1'),
-        ('sound_2.mp3', 'Звук 2'),
-        ('sound_3.mp3', 'Звук 3'),
+        ('sound_1.mp3', 'Звук 1'), # Translated
+        ('sound_2.mp3', 'Звук 2'), # Translated
+        ('sound_3.mp3', 'Звук 3'), # Translated
     )
-    notification_sound = models.CharField(max_length=100, choices=NOTIFICATION_SOUND_CHOICES, default='sound1.mp3', verbose_name='Звук уведомления')
+    notification_sound = models.CharField(max_length=100, choices=NOTIFICATION_SOUND_CHOICES, default='sound1.mp3', verbose_name='Звук сповіщення') # Translated
 
     volume = models.DecimalField(
         max_digits=3, decimal_places=2,
         default=0.7,
         validators=[MinValueValidator(0.00), MaxValueValidator(1.00)],
-        verbose_name='Громкость уведомлений'
+        verbose_name='Гучність сповіщень' # Translated
     )
 
-    receive_messages_notifications = models.BooleanField(default=True, verbose_name='Личные сообщения')
-    receive_group_messages_notifications = models.BooleanField(default=True, verbose_name='Сообщения в группах')
-    receive_friend_requests_notifications = models.BooleanField(default=True, verbose_name='Запросы в друзья')
-    receive_approved_friend_requests_notifications = models.BooleanField(default=True, verbose_name='Одобренные запросы в друзья')
-    receive_comments_notifications = models.BooleanField(default=True, verbose_name='Комментарии')
-    receive_likes_notifications = models.BooleanField(default=True, verbose_name='Лайки')
-    receive_reposts_notifications = models.BooleanField(default=True, verbose_name='Репосты')
-    receive_follows_notifications = models.BooleanField(default=True, verbose_name='Подписки')
+    receive_messages_notifications = models.BooleanField(default=True, verbose_name='Особисті повідомлення') # Translated
+    receive_group_messages_notifications = models.BooleanField(default=True, verbose_name='Повідомлення в групах') # Translated
+    receive_friend_requests_notifications = models.BooleanField(default=True, verbose_name='Запити в друзі') # Translated
+    receive_approved_friend_requests_notifications = models.BooleanField(default=True, verbose_name='Схвалені запити в друзі') # Translated
+    receive_comments_notifications = models.BooleanField(default=True, verbose_name='Коментарі') # Translated
+    receive_likes_notifications = models.BooleanField(default=True, verbose_name='Вподобання') # Translated
+    receive_reposts_notifications = models.BooleanField(default=True, verbose_name='Репости') # Translated
+    receive_follows_notifications = models.BooleanField(default=True, verbose_name='Підписки') # Translated
 
-    do_not_disturb = models.BooleanField(default=False, verbose_name='Не беспокоить (отключить все звуки уведомлений)')
+    do_not_disturb = models.BooleanField(default=False, verbose_name='Не турбувати (вимкнути всі звуки сповіщень)') # Translated
 
     class Meta:
-        verbose_name = 'Настройки уведомлений пользователя'
-        verbose_name_plural = 'Настройки уведомлений пользователей'
+        verbose_name = 'Налаштування сповіщень користувача' # Translated
+        verbose_name_plural = 'Налаштування сповіщень користувачів' # Translated
 
     def __str__(self):
-        return f"Настройки уведомлений для {self.user.username}"
+        return f"Налаштування сповіщень для {self.user.username}" # Translated

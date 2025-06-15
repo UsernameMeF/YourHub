@@ -26,7 +26,7 @@ class PostAdmin(admin.ModelAdmin):
 
     def display_tags(self, obj):
         return ", ".join([tag.name for tag in obj.tags.all()])
-    display_tags.short_description = 'Теги'
+    display_tags.short_description = 'Теги' # Translated
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -41,22 +41,22 @@ class PostAdmin(admin.ModelAdmin):
     def total_likes(self, obj):
         return obj._total_likes
     total_likes.admin_order_field = '_total_likes'
-    total_likes.short_description = 'Лайки'
+    total_likes.short_description = 'Лайки' # Translated
 
     def total_dislikes(self, obj):
         return obj._total_dislikes
     total_dislikes.admin_order_field = '_total_dislikes'
-    total_dislikes.short_description = 'Дизлайки'
+    total_dislikes.short_description = 'Дизлайки' # Translated
 
     def total_reposts(self, obj):
         return obj._total_reposts
     total_reposts.admin_order_field = '_total_reposts'
-    total_reposts.short_description = 'Репосты'
+    total_reposts.short_description = 'Репости' # Translated
 
     def total_comments(self, obj):
         return obj._total_comments
     total_comments.admin_order_field = '_total_comments'
-    total_comments.short_description = 'Комментарии'
+    total_comments.short_description = 'Коментарі' # Translated
 
 
 @admin.register(Tag)

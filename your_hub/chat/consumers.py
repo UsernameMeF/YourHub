@@ -122,7 +122,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     traceback.print_exc()
                     await self.send(text_data=json.dumps({
                         'type': 'error',
-                        'message': 'Ошибка при отправке сообщения: ' + str(e)
+                        'message': 'Помилка при надсиланні повідомлення: ' + str(e) # Translated
                     }))
 
         elif message_type == 'typing_status':
@@ -218,7 +218,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     is_edited=False
                 )
             else:
-                raise ValueError("Неизвестный тип чата для сохранения сообщения.")
+                raise ValueError("Невідомий тип чату для збереження повідомлення.") # Translated
 
             recipients = []
             if room_type == 'private':
@@ -230,9 +230,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if len(display_content) > 50:
                 display_content = display_content[:47] + '...'
             elif not display_content and attachments_data:
-                display_content = "Новые вложения"
+                display_content = "Нові вкладення" # Translated
             elif not display_content:
-                display_content = "Пустое сообщение"
+                display_content = "Порожнє повідомлення" # Translated
 
             notification_url = '#'
             if room_type == 'private':
@@ -242,9 +242,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             for recipient in recipients:
                 notification_type_str = 'message' if room_type == 'private' else 'group_message'
-                notification_content_text = f"{sender.username} написал вам: \"{display_content}\""
+                notification_content_text = f"{sender.username} написав вам: \"{display_content}\"" # Translated
                 if room_type == 'group':
-                    notification_content_text = f"{sender.username} в группе \"{chat_instance.name}\": \"{display_content}\""
+                    notification_content_text = f"{sender.username} у групі \"{chat_instance.name}\": \"{display_content}\"" # Translated
                 
                 print(f"DEBUG (Consumer - Notification Call): Sending notification. Recipient: {recipient.username}, Sender: {sender.username}, Type: {notification_type_str}, Content: {notification_content_text}, URL: {notification_url}")
                 send_notification_to_user(
@@ -277,7 +277,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     is_edited=False
                 )
             else:
-                raise ValueError("Неизвестный тип чата для сохранения сообщения.")
+                raise ValueError("Невідомий тип чату для збереження повідомлення.") # Translated
 
             return message
 

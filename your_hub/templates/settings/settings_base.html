@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Настройки{% endblock %}
+{% block title %}Налаштування{% endblock %}
 
 {% block extra_head %}
     {{ block.super }}
@@ -13,13 +13,13 @@
 
 {% block content %}
 <div class="main-container settings-main-container">
-    <h1>Настройки</h1>
+    <h1>Налаштування</h1>
 
     <div class="settings-nav">
-        <a href="#" class="settings-nav-item {% if active_tab == 'chats' %}active{% endif %}">Чаты</a>
-        <a href="#" class="settings-nav-item {% if active_tab == 'posts' %}active{% endif %}">Публикации</a>
-        <a href="#" class="settings-nav-item {% if active_tab == 'communities' %}active{% endif %}">Сообщества</a>
-        <a href="{% url 'notifications:settings' %}" class="settings-nav-item {% if active_tab == 'notifications' %}active{% endif %}">Уведомления</a>
+        <a href="#" class="settings-nav-item {% if active_tab == 'chats' %}active{% endif %}">Чати</a>
+        <a href="#" class="settings-nav-item {% if active_tab == 'posts' %}active{% endif %}">Публікації</a>
+        <a href="#" class="settings-nav-item {% if active_tab == 'communities' %}active{% endif %}">Спільноти</a>
+        <a href="{% url 'notifications:settings' %}" class="settings-nav-item {% if active_tab == 'notifications' %}active{% endif %}">Сповіщення</a>
     </div>
 
     <div class="settings-content">

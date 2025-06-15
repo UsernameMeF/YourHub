@@ -5,7 +5,7 @@ from .models import Profile
 
 
 class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(label='Email', required=True)
+    email = forms.EmailField(label='Електронна пошта', required=True)
 
     class Meta(UserCreationForm.Meta): 
         model = User
@@ -14,7 +14,7 @@ class UserRegisterForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Пользователь с таким Email уже существует.")
+            raise forms.ValidationError("Користувач з такою електронною поштою вже існує.")
         return email
 
 class UserUpdateForm(UserChangeForm):
