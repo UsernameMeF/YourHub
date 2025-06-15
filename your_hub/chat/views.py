@@ -159,32 +159,25 @@ def get_or_create_private_chat(request, other_user_id):
 
 @login_required
 @require_POST
-def upload_attachment(request, room_type, room_id): # <--- ИЗМЕНЕНО: теперь принимает room_type и room_id
-    # room_id = request.POST.get('chat_room_id') # Эту строку можно удалить, т.к. room_id теперь из URL
-    # room_type = request.POST.get('room_type') # Эту строку можно удалить, т.к. room_type теперь из URL
+def upload_attachment(request, room_type, room_id):
     message_content = request.POST.get('message_content', '').strip()
     uploaded_files = request.FILES.getlist('files')
 
-    # ... (проверки пустоты и аутентификации - оставьте их)
 
-    # ИЗМЕНЕНО ВЫЗОВ ФУНКЦИИ
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
         return JsonResponse({'error': 'Чат не найден.'}, status=404)
 
-    # Проверка, что тип чата из URL совпадает с найденным типом (на случай коллизий ID)
     if actual_room_type != room_type:
         return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
 
 
     try:
-        # Проверка безопасности: убеждаемся, что пользователь является участником чата
         if not chat_instance.participants.filter(id=request.user.id).exists():
             return JsonResponse({'error': 'Вы не являетесь участником этого чата.'}, status=403)
 
         with transaction.atomic():
-            # Создаем объект сообщения в зависимости от типа чата (логика остаётся)
             if room_type == 'private':
                 chat_message = MessageModel.objects.create(
                     chat_room=chat_instance,
@@ -197,7 +190,6 @@ def upload_attachment(request, room_type, room_id): # <--- ИЗМЕНЕНО: т�
                     sender=request.user,
                     content=message_content
                 )
-            # ... (логика сохранения вложений)
             attachments_data = []
             for uploaded_file in uploaded_files:
                 file_type = 'document'
@@ -218,9 +210,8 @@ def upload_attachment(request, room_type, room_id): # <--- ИЗМЕНЕНО: т�
                     'original_filename': attachment_instance.original_filename,
                 })
 
-        # Уведомляем Channel Layer о новом сообщении (логика остаётся)
         channel_layer = get_channel_layer()
-        room_group_name = f'{room_type}_chat_{room_id}' # Теперь room_type и room_id приходят из URL
+        room_group_name = f'{room_type}_chat_{room_id}'
 
         message_data = {
             'type': 'chat_message',
@@ -247,7 +238,7 @@ def upload_attachment(request, room_type, room_id): # <--- ИЗМЕНЕНО: т�
 
 
 @login_required
-def load_more_messages(request, room_type, room_id): # <--- ИЗМЕНЕНО: теперь принимает room_type и room_id
+def load_more_messages(request, room_type, room_id):
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
@@ -257,15 +248,12 @@ def load_more_messages(request, room_type, room_id): # <--- ИЗМЕНЕНО: т
         return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
 
     try:
-        # ... (остальная логика остаётся)
-        # Проверка безопасности: убеждаемся, что пользователь является участником чата
         if not chat_instance.participants.filter(id=request.user.id).exists():
             return JsonResponse({'error': 'Вы не являетесь участником этого чата.'}, status=403)
 
         before_message_id = request.GET.get('before_message_id')
         messages_per_load = 50
 
-        # Формируем запрос в зависимости от типа чата (логика остаётся)
         if room_type == 'private':
             messages_query = MessageModel.objects.filter(chat_room=chat_instance).order_by('-timestamp').select_related('sender').prefetch_related('attachments')
         elif room_type == 'group':
@@ -301,11 +289,11 @@ def load_more_messages(request, room_type, room_id): # <--- ИЗМЕНЕНО: т
                 'is_current_user': message.sender == request.user
             })
 
-        # Определяем, есть ли еще более старые сообщения
+
         if room_type == 'private':
-            has_more = MessageModel.objects.filter(chat_room=chat_instance, id__lt=before_message_id).exists() # .count() > messages_per_load
+            has_more = MessageModel.objects.filter(chat_room=chat_instance, id__lt=before_message_id).exists() 
         elif room_type == 'group':
-            has_more = MessageModel.objects.filter(group_chat=chat_instance, id__lt=before_message_id).exists() # .count() > messages_per_load
+            has_more = MessageModel.objects.filter(group_chat=chat_instance, id__lt=before_message_id).exists() 
         else:
             has_more = False
 
@@ -329,19 +317,15 @@ def edit_message(request, room_type, room_id, message_id):
     
     print(f"DEBUG: From get_chat_models_and_instance: ChatModel={ChatModel.__name__ if ChatModel else None}, MessageModel={MessageModel.__name__ if MessageModel else None}, actual_room_type={actual_room_type}, chat_instance={chat_instance}")
 
-    # Проверяем, что ChatModel и chat_instance были получены
     if not ChatModel or not chat_instance:
         print("DEBUG: ChatModel or chat_instance is None. Returning 404 (Чат не найден).")
         return JsonResponse({'error': 'Чат не найден.'}, status=404)
 
-    # Проверяем на несоответствие типа чата
     if actual_room_type != room_type:
         print(f"DEBUG: Room type mismatch: actual={actual_room_type}, expected={room_type}. Returning 400.")
         return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
 
     try:
-        # Получаем сообщение, проверяя, что отправитель - текущий пользователь
-        # и что сообщение принадлежит правильному типу чата
         if room_type == 'private':
             print(f"DEBUG: Attempting to get private message {message_id} from chat {chat_instance.id} for user {request.user.id}.")
             message = get_object_or_404(MessageModel, id=message_id, sender=request.user, chat_room=chat_instance)
@@ -430,7 +414,7 @@ def edit_message(request, room_type, room_id, message_id):
 
 @login_required
 @require_POST
-def delete_message(request, room_type, room_id, message_id): # <--- ИЗМЕНЕНО: теперь принимает room_type и room_id
+def delete_message(request, room_type, room_id, message_id): 
     ChatModel, MessageModel, AttachmentModel, actual_room_type, chat_instance = get_chat_models_and_instance(room_type, room_id)
 
     if not ChatModel:
@@ -440,8 +424,6 @@ def delete_message(request, room_type, room_id, message_id): # <--- ИЗМЕНЕ
         return JsonResponse({'error': 'Несоответствие типа чата.'}, status=400)
 
     try:
-        # Получаем сообщение, проверяя, что отправитель - текущий пользователь
-        # и что сообщение принадлежит правильному типу чата
         if room_type == 'private':
             message = get_object_or_404(MessageModel, id=message_id, sender=request.user, chat_room=chat_instance)
         elif room_type == 'group':
@@ -451,7 +433,7 @@ def delete_message(request, room_type, room_id, message_id): # <--- ИЗМЕНЕ
 
         with transaction.atomic():
             message_id_str = str(message.id)
-            room_id_for_ws = chat_instance.id # Использовать room_id из URL
+            room_id_for_ws = chat_instance.id 
             message.delete()
 
             channel_layer = get_channel_layer()
@@ -483,21 +465,17 @@ def create_group_chat_ajax(request):
 
     if form.is_valid():
         name = form.cleaned_data['name']
-        # participants уже включает request.user благодаря логике clean_participants в форме
         participants_to_add = form.cleaned_data['participants']
 
         try:
             with transaction.atomic():
-                # Создаем новую GroupChat
                 group_chat = GroupChat.objects.create(
                     name=name,
-                    owner=request.user # Текущий пользователь становится владельцем группы
+                    owner=request.user
                 )
-                # Добавляем всех выбранных участников и создателя в группу
                 group_chat.participants.set(participants_to_add)
                 group_chat.save()
 
-            # Возвращаем успешный ответ с ID и названием созданной группы
             return JsonResponse({
                 'status': 'success',
                 'group_chat_id': group_chat.id,
@@ -505,11 +483,8 @@ def create_group_chat_ajax(request):
             })
 
         except Exception as e:
-            # Логируем ошибку для отладки
-            print(f"Ошибка при создании группового чата: {e}")
             return JsonResponse({'error': 'Произошла ошибка при создании группового чата.'}, status=500)
     else:
-        # Если форма невалидна, возвращаем JSON с ошибками валидации
         errors = {field: [str(err) for err in form.errors[field]] for field in form.errors}
         return JsonResponse({'error': 'Некорректные данные формы.', 'details': errors}, status=400)
 
@@ -520,27 +495,23 @@ def create_group_chat_view(request):
         form = GroupChatCreateForm(request.POST, request_user=request.user)
         if form.is_valid():
             name = form.cleaned_data['name']
-            description = form.cleaned_data['description'] # Получаем описание
+            description = form.cleaned_data['description']
             participants = form.cleaned_data['participants']
 
             with transaction.atomic():
                 # Создаем групповой чат
                 group_chat = GroupChat.objects.create(
                     name=name,
-                    description=description, # Сохраняем описание
-                    owner=request.user # Создатель чата
+                    description=description, 
+                    owner=request.user 
                 )
-                
-                # Добавляем участников, включая создателя
-                group_chat.participants.set(participants) # .set() добавляет всех, кто в queryset
 
-            # Перенаправляем на страницу созданного группового чата
+                group_chat.participants.set(participants) 
+
             return redirect('chat:group_chat_room', group_chat_id=group_chat.id)
         else:
-            # Если форма невалидна, она будет отображена снова с ошибками
-            pass # Form will be rendered with errors
+            pass 
     else:
-        # Для GET-запроса отображаем пустую форму
         form = GroupChatCreateForm(request_user=request.user)
-    print("DEBUG: Rendering create_group_chat.html") # ДОБАВЬТЕ ЭТУ СТРОКУ
+    print("DEBUG: Rendering create_group_chat.html") 
     return render(request, 'chat/create_group_chat.html', {'form': form})

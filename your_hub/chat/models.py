@@ -8,7 +8,6 @@ import os
 
 def group_chat_attachment_path(instance, filename):
     """Определяет путь для загрузки вложений группового чата."""
-    # instance.message здесь будет GroupChatMessage
     group_chat_id = instance.message.group_chat.id
     name, ext = os.path.splitext(filename)
     unique_filename = f"{uuid.uuid4().hex}_{slugify(name)}{ext}"
@@ -17,7 +16,6 @@ def group_chat_attachment_path(instance, filename):
 
 def group_chat_thumbnail_path(instance, filename):
     """Определяет путь для загрузки миниатюр вложений группового чата."""
-    # instance.message здесь будет GroupChatMessage
     group_chat_id = instance.message.group_chat.id
     name, ext = os.path.splitext(filename)
     unique_filename = f"{uuid.uuid4().hex}_thumbnail_{slugify(name)}{ext}"
@@ -30,7 +28,7 @@ def chat_attachment_path(instance, filename):
     name, ext = os.path.splitext(filename)
     unique_filename = f"{uuid.uuid4().hex}_{slugify(name)}{ext}"
     
-    return f"chats/{chat_room_id}/{unique_filename}"
+    return f"chat_attachments/{chat_room_id}/{unique_filename}"
 
 
 def chat_thumbnail_path(instance, filename):
@@ -39,7 +37,7 @@ def chat_thumbnail_path(instance, filename):
     name, ext = os.path.splitext(filename)
     unique_filename = f"{uuid.uuid4().hex}_thumbnail_{slugify(name)}{ext}"
 
-    return f"chats/{chat_room_id}/thumbnails/{unique_filename}"
+    return f"chat_attachments/{chat_room_id}/thumbnails/{unique_filename}"
 
 
 class ChatRoom(models.Model):
@@ -49,7 +47,7 @@ class ChatRoom(models.Model):
     def __str__(self):
         if self.pk:
             return f"Чат между {', '.join(str(user) for user in self.participants.all())}"
-        return "Новый чат" # Если ещё не существует
+        return "Новый чат"
 
 
 class ChatMessage(models.Model):
@@ -69,7 +67,7 @@ class ChatMessage(models.Model):
 
 class ChatAttachment(models.Model):
     message = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, related_name='attachments')
-    file = models.FileField(upload_to='chat_attachments/')
+    file = models.FileField(upload_to=chat_attachment_path)
     file_type = models.CharField(max_length=10, choices=[
         ('image', 'Изображение'),
         ('video', 'Видео'),
@@ -92,18 +90,15 @@ class ChatAttachment(models.Model):
         super().delete(*args, **kwargs)
 
 
-# --- Новые Модели для Групповых Чатов ---
 
 class GroupChat(models.Model):
     """Модель для представления группового чата."""
     name = models.CharField(max_length=255, verbose_name="Название группы")
     # Участники группового чата
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='group_chats_participated')
-    # Владелец группы (тот, кто ее создал), может быть null, если пользователь удален
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='owned_group_chats')
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, verbose_name="Описание группы")
-    # Можно добавить поле для аватара группы и т.п.
 
     class Meta:
         verbose_name = "Групповой чат"

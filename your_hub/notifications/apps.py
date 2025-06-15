@@ -1,4 +1,3 @@
-# notifications/apps.py
 from django.apps import AppConfig
 
 
@@ -8,5 +7,4 @@ class NotificationsConfig(AppConfig):
     verbose_name = 'Уведомления'
 
     def ready(self):
-        # Импортируем сигналы здесь, когда Django полностью загружен
         import notifications.signals

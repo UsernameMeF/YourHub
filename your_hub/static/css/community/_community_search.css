@@ -11,25 +11,22 @@
     gap: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     max-width: 750px;
-    width: 95%; /* Позволяет форме быть адаптивной на меньших экранах */
-    box-sizing: border-box; /* ГЛАВНОЕ ИЗМЕНЕНИЕ: Учитывать padding и border в общей ширине */
+    width: 95%;
+    box-sizing: border-box;
 }
 
 .community-search-form {
     display: flex;
     flex-direction: column;
-    /* width: 100%; <--- УБИРАЕМ ЭТОТ АТРИБУТ! */
     gap: 15px;
-    /* Так как родитель (search-bar-container) flex-контейнер с column-direction,
-       дочерние элементы по умолчанию будут растягиваться на всю ширину. */
 }
 
 .search-input-and-button-row {
     display: flex;
     gap: 10px;
-    width: 100%; /* оставляем, чтобы поле ввода и кнопка корректно распределяли пространство */
+    width: 100%;
     align-items: center;
-    box-sizing: border-box; /* Для надёжности */
+    box-sizing: border-box;
 }
 
 .search-input {
@@ -43,7 +40,7 @@
     min-width: 150px;
     background-color: #f8f9fa;
     color: #333;
-    box-sizing: border-box; /* Для надёжности */
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -62,7 +59,7 @@
     justify-content: center;
     gap: 5px;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    color: white; 
+    color: white;
     white-space: nowrap;
     flex-shrink: 0;
     min-width: 40px;
@@ -110,7 +107,7 @@
     gap: 5px;
     transition: background-color 0.2s ease, transform 0.1s ease;
     text-decoration: none;
-    color: white; 
+    color: white;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -138,9 +135,9 @@
     text-align: center;
     color: #555;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    box-sizing: border-box; /* Для надёжности */
-    max-width: 600px; /* Чтобы не выходила за рамки, как форма */
-    margin: 0 auto; /* Центрируем */
+    box-sizing: border-box;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .no-chats-message p {

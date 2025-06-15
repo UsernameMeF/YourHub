@@ -1,27 +1,24 @@
-{% extends 'base.html' %} {# Убедитесь, что ваш base.html правильно определен #}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Создать групповой чат{% endblock %}
 
 {% block extra_css %}
-    {# Подключаем общий CSS-файл, если у вас есть #}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="main-container"> {# Используем аналогичный контейнер, как и для списков чатов #}
-    <div class="form-card"> {# Новая карточка для формы #}
+<div class="main-container">
+    <div class="form-card">
         <h2 class="form-title">Создать новый групповой чат</h2>
         
         <form method="post">
             {% csrf_token %}
             
-            {# Отображение полей формы #}
             {% for field in form %}
-                <div class="form-field-wrapper"> {# Обертка для каждого поля #}
+                <div class="form-field-wrapper">
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                     
-                    {# Проверяем тип поля для стилизации #}
                     {% if field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
                         <div class="checkbox-group">
                             {% for choice in field %}
@@ -51,5 +48,4 @@
 {% endblock %}
 
 {% block extra_js %}
-{# Тут может быть JS для динамического выбора участников, если потребуется #}
 {% endblock %}

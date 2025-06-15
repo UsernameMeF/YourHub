@@ -48,29 +48,29 @@ class ChatAttachmentAdmin(admin.ModelAdmin):
     thumbnail_link.short_description = "Миниатюра"
 
 
-# Регистрация модели GroupChat
+
 @admin.register(GroupChat)
 class GroupChatAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'created_at')
     search_fields = ('name', 'owner__username')
-    filter_horizontal = ('participants',) # Позволяет удобно выбирать участников через мультиселект
+    filter_horizontal = ('participants',) 
 
-# Регистрация модели GroupChatMessage
+
 @admin.register(GroupChatMessage)
 class GroupChatMessageAdmin(admin.ModelAdmin):
     list_display = ('group_chat', 'sender', 'timestamp', 'content_preview')
     search_fields = ('group_chat__name', 'sender__username', 'content')
     list_filter = ('timestamp', 'group_chat')
-    raw_id_fields = ('sender', 'group_chat') # Удобно для выбора связанных объектов по ID
+    raw_id_fields = ('sender', 'group_chat') 
 
     def content_preview(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
     content_preview.short_description = 'Сообщение'
 
-# Регистрация модели GroupChatAttachment
+
 @admin.register(GroupChatAttachment)
 class GroupChatAttachmentAdmin(admin.ModelAdmin):
     list_display = ('message', 'file_type', 'original_filename')
     search_fields = ('original_filename', 'message__group_chat__name', 'message__sender__username')
     list_filter = ('file_type',)
-    raw_id_fields = ('message',) # Удобно для выбора связанного сообщения по ID
+    raw_id_fields = ('message',) 

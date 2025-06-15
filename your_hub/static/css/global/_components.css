@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_components.css */
 
-/* ==== Стили Светлой Темы (Общие компоненты) ==== */
 .search-bar input {
     grid-column: 2;
     justify-self: center;
@@ -50,8 +49,8 @@
 }
 
 .auth-buttons .btn-primary {
-     border-color: #23e2dd;
-     color: #23e2dd;
+    border-color: #23e2dd;
+    color: #23e2dd;
 }
 .auth-buttons .btn-primary:hover {
     background-color: #e9fcfb;
@@ -149,7 +148,6 @@
     margin-top: 5px;
 }
 
-/* Кнопка смены темы в выпадающем меню */
 .theme-switch-button-dropdown {
     display: block;
     width: 100%;

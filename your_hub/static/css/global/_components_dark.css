@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_components_dark.css */
 
-/* ==== Темная тема для общих компонентов ==== */
 html.dark-theme .search-bar input {
     background-color: #333;
     color: #f0f0f0;
@@ -30,7 +29,7 @@ html.dark-theme .auth-buttons .btn-primary:hover {
     background-color: rgba(0, 230, 0, 0.1);
 }
 
-html.dark-theme .btn-secondary { /* Применяем к кнопке входа */
+html.dark-theme .btn-secondary {
     background-color: #00e600;
     color: #1a1a1a;
     border-color: #00e600;
@@ -49,7 +48,7 @@ html.dark-theme .header-button-create {
 html.dark-theme .header-icon-button:hover,
 html.dark-theme .header-button-create:hover {
     background-color: #3a3a3a;
-    color: #00e600; /* Или другой акцентный цвет */
+    color: #00e600;
 }
 
 html.dark-theme .profile-avatar-button:hover .profile-avatar-img,

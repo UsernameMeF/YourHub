@@ -1,7 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/users/_profile_dark.css */
 
-/* ==== Темная тема для страницы профиля ==== */
-
 html.dark-theme .profile-container {
     background-color: #252526;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -12,7 +10,7 @@ html.dark-theme .profile-info h3,
 html.dark-theme .profile-section h3,
 html.dark-theme .profile-actions-top p,
 html.dark-theme .profile-info p,
-html.dark-theme .profile-section ul li 
+html.dark-theme .profile-section ul li
 html.dark-theme .status-option {
     color: #f0f0f0;
 }
@@ -25,21 +23,19 @@ html.dark-theme .profile-actions-top p a:hover {
 }
 
 html.dark-theme .profile-avatar-large {
-    border-color: #00e600; /* Акцентная рамка в темной теме */
+    border-color: #00e600;
 }
 
-/* Стиль иконки статуса в темной теме */
 html.dark-theme .status-indicator {
-    border: 2px solid #252526; /* Обводка под цвет фона контейнера */
-    box-shadow: 0 0 5px rgba(0,0,0,0.5); /* Более темная тень */
+    border: 2px solid #252526;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 
 html.dark-theme .status-indicator .status-icon {
-    color: #f0f0f0; /* Цвет иконки в темной теме */
+    color: #f0f0f0;
 }
 
 
-/* Выпадающее меню статусов в темной теме */
 html.dark-theme .status-dropdown {
     background-color: #333;
     border: 1px solid #444;
@@ -47,23 +43,21 @@ html.dark-theme .status-dropdown {
 }
 
 html.dark-theme .status-option {
-    color: #f0f0f0; /* Цвет текста опций */
+    color: #f0f0f0;
 }
 
 
 html.dark-theme .status-option:hover {
-    background-color: #444; /* Темнее при наведении */
+    background-color: #444;
 }
 
-/* Стили для маленьких иконок в выпадающем меню (темная тема) */
 html.dark-theme .status-option .status-dot {
-    /* Цвет иконки внутри кружка (можно оставить #fff или изменить) */
-    color: #f0f0f0; 
+    color: #f0f0f0;
 }
 
 
 html.dark-theme .profile-section {
-    border-bottom-color: #3a3a3a; /* Разделитель в темной теме */
+    border-bottom-color: #3a3a3a;
 }
 
 html.dark-theme .profile-section ul li a {
@@ -75,34 +69,34 @@ html.dark-theme .profile-section ul li a:hover {
 
 
 html.dark-theme .latest-post-card {
-    background-color: #333333; /* Темный фон для карточки поста */
-    border-color: #4a4a4a; /* Темная граница */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Тень */
+    background-color: #333333;
+    border-color: #4a4a4a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 html.dark-theme .latest-post-card:hover {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Усиленная тень при наведении */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     transform: translateY(-2px);
 }
 
 html.dark-theme .latest-post-card h4 {
-    color: #00e600; /* Яркий зеленый цвет заголовка поста */
+    color: #00e600;
 }
 
 html.dark-theme .latest-post-card p {
-    color: #cccccc; /* Светлый текст содержимого */
+    color: #cccccc;
 }
 
 html.dark-theme .latest-post-card .post-date {
-    color: #aaaaaa; /* Светлый, приглушенный цвет для даты */
+    color: #aaaaaa;
 }
 
 html.dark-theme .latest-post-link {
-    color: inherit; /* Наследуем цвет в темной теме */
+    color: inherit;
 }
 
 html.dark-theme .no-posts-message {
-    color: #aaaaaa; /* Светлый текст сообщения об отсутствии постов */
-    border-color: #4a4a4a; /* Темная пунктирная граница */
-    background-color: #333333; /* Темный фон сообщения */
+    color: #aaaaaa;
+    border-color: #4a4a4a;
+    background-color: #333333;
 }

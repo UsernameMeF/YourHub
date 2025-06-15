@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.db.models import Count
 from .models import Post, PostAttachment, Comment, Tag 
 
-# Inline для PostAttachment
 class PostAttachmentInline(admin.TabularInline):
     model = PostAttachment
     extra = 1
@@ -11,22 +10,20 @@ class PostAttachmentInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'author', 'display_tags', 'created_at', 'views_count', 'total_likes', 'total_dislikes', 'total_reposts', 'total_comments') # <--- Добавили 'display_tags'
-    list_filter = ('created_at', 'author', 'tags') # <--- Добавили 'tags' в фильтр
-    search_fields = ('title', 'content', 'author__username', 'tags__name') # <--- Добавили 'tags__name' в поиск
+    list_display = ('id', 'title', 'author', 'display_tags', 'created_at', 'views_count', 'total_likes', 'total_dislikes', 'total_reposts', 'total_comments')
+    list_filter = ('created_at', 'author', 'tags')
+    search_fields = ('title', 'content', 'author__username', 'tags__name')
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
 
-    # Добавляем PostAttachmentInline к модели Post
     inlines = [PostAttachmentInline]
 
     fieldsets = (
         (None, {
-            'fields': ('author', 'title', 'content', 'views_count', 'tags') # <--- Добавили 'tags' в fieldsets
+            'fields': ('author', 'title', 'content', 'views_count', 'tags')
         }),
     )
 
-    # Метод для отображения тегов в list_display
     def display_tags(self, obj):
         return ", ".join([tag.name for tag in obj.tags.all()])
     display_tags.short_description = 'Теги'
@@ -38,7 +35,7 @@ class PostAdmin(admin.ModelAdmin):
             _total_dislikes=Count('dislikes', distinct=True),
             _total_reposts=Count('reposts', distinct=True),
             _total_comments=Count('comments', distinct=True)
-        ).prefetch_related('tags') # <--- Добавили prefetch_related('tags') для оптимизации запросов
+        ).prefetch_related('tags')
         return queryset
 
     def total_likes(self, obj):
@@ -62,12 +59,11 @@ class PostAdmin(admin.ModelAdmin):
     total_comments.short_description = 'Комментарии'
 
 
-# Регистрируем модель Tag в админке
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     search_fields = ('name',)
-    prepopulated_fields = {'slug': ('name',)} # Автоматическое заполнение slug на основе name
+    prepopulated_fields = {'slug': ('name',)}
     ordering = ('name',)
 
 

@@ -39,7 +39,7 @@
     border-radius: 6px;
     font-size: 1em;
     color: #333;
-    box-sizing: border-box; /* Учитывает padding и border в ширине */
+    box-sizing: border-box;
     transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
@@ -79,7 +79,7 @@
     cursor: pointer;
     text-align: center;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    margin-right: 15px; /* Отступ от кнопки отмены */
+    margin-right: 15px;
 }
 
 .submit-button:hover {
@@ -96,7 +96,7 @@
     border-radius: 6px;
     font-size: 1.1em;
     cursor: pointer;
-    text-decoration: none; /* Убрать подчеркивание для ссылок-кнопок */
+    text-decoration: none;
     text-align: center;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -106,7 +106,6 @@
     box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
 }
 
-/* Стили для страницы подтверждения удаления */
 .delete-confirm-container {
     text-align: center;
 }
@@ -127,7 +126,7 @@
 }
 
 .delete-button {
-    background-color: #dc3545; /* Красный для кнопки удаления */
+    background-color: #dc3545;
 }
 
 .delete-button:hover {

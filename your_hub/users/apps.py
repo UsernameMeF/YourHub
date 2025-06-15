@@ -8,5 +8,4 @@ class UsersConfig(AppConfig):
     verbose_name = 'Пользователи'
 
     def ready(self):
-        # Импортируем сигналы здесь, когда Django полностью загружен
         import users.signals

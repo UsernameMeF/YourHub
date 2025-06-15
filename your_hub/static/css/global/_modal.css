@@ -1,30 +1,29 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_modals.css */
 
-/* ==== Стили для модальных окон ==== */
 .modal {
-    display: none; /* Скрыто по умолчанию */
-    position: fixed; /* Оставаться на месте */
-    z-index: 1000; /* Сильнее, чем шапка */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Полная ширина */
-    height: 100%; /* Полная высота */
-    overflow: auto; /* Включить прокрутку, если содержимое слишком большое */
-    background-color: rgba(0,0,0,0.6); /* Черный фон с прозрачностью */
-    backdrop-filter: blur(5px); /* Эффект размытия */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 8% auto; /* 8% сверху и снизу, центрировать по горизонтали */
+    margin: 8% auto;
     padding: 25px;
     border: 1px solid #888;
-    width: 60%; /* Ширина модального окна */
-    max-width: 700px; /* Максимальная ширина */
+    width: 60%;
+    max-width: 700px;
     border-radius: 8px;
     position: relative;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    animation: fadeIn 0.3s ease-out; /* Анимация появления */
+    animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content.small-modal {
@@ -57,7 +56,6 @@
     color: #333;
 }
 
-/* Стили для формы внутри модалки */
 .modal form {
     display: flex;
     flex-direction: column;
@@ -76,11 +74,11 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1em;
-    width: calc(100% - 22px); /* Учитываем padding и border */
+    width: calc(100% - 22px);
 }
 
 .modal form textarea {
-    resize: vertical; /* Разрешить вертикальное изменение размера */
+    resize: vertical;
     min-height: 80px;
 }
 
@@ -118,7 +116,6 @@
     background-color: #c82333;
 }
 
-/* Стили для предпросмотра изображений */
 .image-preview-container {
     display: flex;
     flex-wrap: wrap;
@@ -135,38 +132,35 @@
     border-radius: 4px;
 }
 
-/* Запрет прокрутки body при открытом модальном окне */
 body.modal-open {
     overflow: hidden;
 }
 
-/* Анимация появления модального окна */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Основные стили для модального окна */
 .reposts-modal {
-    display: none; /* Скрыто по умолчанию */
-    position: fixed; /* Оставаться на месте */
-    z-index: 1000; /* Сидеть поверх всего */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Полная ширина */
-    height: 100%; /* Полная высота */
-    overflow: auto; /* Включить прокрутку, если содержимое слишком большое */
-    background-color: rgba(0,0,0,0.6); /* Черный с прозрачностью */
-    backdrop-filter: blur(5px); /* Эффект размытия фона */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
 }
 
 .reposts-modal-content {
     background-color: #fefefe;
-    margin: 10% auto; /* 10% сверху и по центру */
+    margin: 10% auto;
     padding: 25px;
     border: 1px solid #888;
-    width: 80%; /* Могло быть 50-80% в зависимости от содержимого */
-    max-width: 500px; /* Максимальная ширина для больших экранов */
+    width: 80%;
+    max-width: 500px;
     border-radius: 10px;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -201,7 +195,6 @@ body.modal-open {
     font-size: 1.8em;
 }
 
-/* Стили для списка пользователей в модальном окне репостов */
 .reposts-list {
     list-style: none;
     padding: 0;
@@ -210,10 +203,10 @@ body.modal-open {
 
 .reposts-user-item {
     display: flex;
-    align-items: center; /* Выравнивает элементы по центру вертикали */
-    padding: 8px 10px; /* Уменьшаем вертикальные отступы */
+    align-items: center;
+    padding: 8px 10px;
     border-bottom: 1px solid #eee;
-    transition: background-color 0.2s ease; /* Плавный переход при наведении */
+    transition: background-color 0.2s ease;
 }
 
 .reposts-user-item:last-child {
@@ -221,45 +214,39 @@ body.modal-open {
 }
 
 .reposts-user-item:hover {
-    background-color: #f5f5f5; /* Легкое затемнение при наведении */
+    background-color: #f5f5f5;
 }
 
 .reposts-user-link {
     display: flex;
-    align-items: center; /* Выравнивает аватар и имя по центру */
+    align-items: center;
     text-decoration: none;
-    color: #333; /* Цвет имени пользователя */
-    font-weight: 500; /* Немного жирнее */
-    font-size: 1.05em; /* Чуть крупнее */
+    color: #333;
+    font-weight: 500;
+    font-size: 1.05em;
     flex-grow: 1;
 }
 
 .reposts-user-link:hover {
-    color: #007bff; /* Цвет при наведении на всю ссылку */
-    text-decoration: underline; /* Подчеркивание при наведении */
+    color: #007bff;
+    text-decoration: underline;
 }
 
 .reposts-user-avatar {
-    width: 36px; /* Уменьшаем размер аватара */
+    width: 36px;
     height: 36px;
-    border-radius: 50%; /* Делаем круглым */
-    margin-right: 12px; /* Отступ справа от аватара до имени */
+    border-radius: 50%;
+    margin-right: 12px;
     object-fit: cover;
     border: 1px solid #ddd;
     flex-shrink: 0;
 }
 
 .reposts-username {
-    /* Удаляем font-weight, color, font-size, так как они теперь у .reposts-user-link */
-    white-space: nowrap; 
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-/* Удаляем .reposts-relationship, так как по условию нужно только имя пользователя */
-/* .reposts-relationship {
-    display: none;
-} */ /* Или полностью удалите этот блок, если он не нужен совсем */
 
 .reposts-modal-empty,
 .reposts-modal-loading {

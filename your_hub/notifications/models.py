@@ -9,10 +9,10 @@ from django.contrib.auth import get_user_model
 from django.apps import apps
 from django.urls import reverse
 
-User = get_user_model() # Получаем текущую модель пользователя
+User = get_user_model()
 
 try:
-    from users.models import Profile # ПРОВЕРЬТЕ, что это правильный путь к вашей модели Profile
+    from users.models import Profile
     _PROFILE_MODEL_AVAILABLE = True
 except ImportError:
     _PROFILE_MODEL_AVAILABLE = False
@@ -29,13 +29,13 @@ class Notification(models.Model):
         ('like', 'Новый лайк'),
         ('repost', 'Новый репост'),
         ('follow', 'Новая подписка'),
-        ('system', 'Системное уведомление'), # Общий тип для системных сообщений
+        ('system', 'Системное уведомление'),
     )
 
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications', verbose_name='Получатель')
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications', verbose_name='Отправитель')
     notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES, verbose_name='Тип уведомления')
-    content = models.TextField(blank=True, verbose_name='Содержание') # Например, "Пользователь X отправил вам сообщение"
+    content = models.TextField(blank=True, verbose_name='Содержание')
     is_read = models.BooleanField(default=False, verbose_name='Прочитано')
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
 
@@ -62,25 +62,19 @@ class Notification(models.Model):
         if self.target_url:
             return self.target_url
 
-        # Если target_url нет, пытаемся построить из related_object
         if self.related_object:
-            # Если связанный объект имеет метод get_absolute_url (например, Post)
             if hasattr(self.related_object, 'get_absolute_url'):
                 return self.related_object.get_absolute_url()
 
-            # Специальные случаи для URL, если related_object не имеет get_absolute_url
-            # или его get_absolute_url не подходит для уведомлений
             if self.notification_type == 'message':
-                # Для личных сообщений, связанный объект - это ChatMessage
-                # Нам нужен URL чата, а не сообщения
-                from chat.models import ChatRoom # Импортируем здесь, чтобы избежать циклических импортов
-                if isinstance(self.related_object, ChatRoom): # Если related_object это сам ChatRoom (несообщение)
+                from chat.models import ChatRoom
+                if isinstance(self.related_object, ChatRoom):
                     return reverse('chat:chat_room', args=[self.related_object.id])
                 elif hasattr(self.related_object, 'chat_room') and isinstance(self.related_object.chat_room, ChatRoom):
                     return reverse('chat:chat_room', args=[self.related_object.chat_room.id])
 
             elif self.notification_type == 'group_message':
-                from chat.models import GroupChat # Импортируем здесь
+                from chat.models import GroupChat
                 if isinstance(self.related_object, GroupChat):
                     return reverse('chat:group_chat_room', args=[self.related_object.id])
                 elif hasattr(self.related_object, 'group_chat') and isinstance(self.related_object.group_chat, GroupChat):
@@ -90,9 +84,7 @@ class Notification(models.Model):
                 return reverse('users:profile', args=[self.sender.id])
 
             elif self.notification_type in ['comment', 'like', 'repost']:
-                # Предполагаем, что связанный объект - это Comment, Like или Repost,
-                # и у них есть поле 'post'
-                from core.models import Post # Пример импорта вашей модели Post
+                from core.models import Post
                 if isinstance(self.related_object, Post):
                     return reverse('core:post_detail', args=[self.related_object.id])
                 elif hasattr(self.related_object, 'post') and isinstance(self.related_object.post, Post):
@@ -112,7 +104,7 @@ class UserNotificationSettings(models.Model):
 
     volume = models.DecimalField(
         max_digits=3, decimal_places=2,
-        default=0.7, # Значение по умолчанию 70%
+        default=0.7,
         validators=[MinValueValidator(0.00), MaxValueValidator(1.00)],
         verbose_name='Громкость уведомлений'
     )
@@ -134,4 +126,3 @@ class UserNotificationSettings(models.Model):
 
     def __str__(self):
         return f"Настройки уведомлений для {self.user.username}"
-

@@ -1,4 +1,3 @@
-# community/models.py
 from django.db import models
 from django.conf import settings 
 import os 
@@ -10,24 +9,23 @@ class Community(models.Model):
     """
     name = models.CharField(
         max_length=100,
-        unique=True, # Название сообщества должно быть уникальным
+        unique=True,
         verbose_name="Название сообщества"
     )
     description = models.TextField(
-        blank=True, # Описание может быть необязательным
+        blank=True,
         verbose_name="Описание сообщества"
     )
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL, # Если создатель удален, сообщество остается, но creator становится NULL
-        null=True, # Разрешаем NULL для creator
+        on_delete=models.SET_NULL,
+        null=True,
         related_name='created_communities',
         verbose_name="Создатель сообщества"
     )
-    # Используем ManyToManyField для участников, через CommunityMembership для гибкости
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        through='CommunityMembership', # Указываем промежуточную модель
+        through='CommunityMembership',
         related_name='joined_communities',
         verbose_name="Участники сообщества"
     )
@@ -36,11 +34,10 @@ class Community(models.Model):
         verbose_name="Дата создания"
     )
     
-
     class Meta:
         verbose_name = "Сообщество"
         verbose_name_plural = "Сообщества"
-        ordering = ['-created_at'] # Сортировка по дате создания по умолчанию
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -67,10 +64,10 @@ class CommunityMembership(models.Model):
     is_admin = models.BooleanField(
         default=False,
         verbose_name="Администратор сообщества"
-    ) # Для будущей реализации модерации
+    )
 
     class Meta:
-        unique_together = ('user', 'community') # Пользователь может быть участником сообщества только один раз
+        unique_together = ('user', 'community')
         verbose_name = "Членство в сообществе"
         verbose_name_plural = "Членства в сообществах"
         ordering = ['date_joined']
@@ -89,16 +86,14 @@ class CommunityPost(models.Model):
         related_name='posts',
         verbose_name="Сообщество"
     )
-    # Это поле будет хранить того, кто физически опубликовал пост из администраторов.
-    # Но "автором" поста будет считаться само сообщество.
     posted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL, # Если пользователь удален, пост остается, но posted_by становится NULL
+        on_delete=models.SET_NULL,
         null=True,
         related_name='community_posts_published',
         verbose_name="Опубликовано пользователем"
     )
-    title = models.CharField( # <-- ДОБАВЛЯЕМ ЭТО ПОЛЕ
+    title = models.CharField(
         max_length=200, 
         blank=True, 
         verbose_name="Заголовок поста"
@@ -140,12 +135,11 @@ class CommunityPost(models.Model):
     class Meta:
         verbose_name = "Пост сообщества"
         verbose_name_plural = "Посты сообществ"
-        ordering = ['-created_at'] # Сортировка по дате создания по умолчанию
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"Пост от {self.community.name} ({self.id})"
 
-    # --- ДОБАВЛЕНЫ СВОЙСТВА ---
     @property
     def total_likes(self):
         return self.likes.count()
@@ -160,14 +154,14 @@ class CommunityPost(models.Model):
 
     @property
     def total_comments(self):
-        return self.comments.count() # Ссылка на related_name в CommunityComment
+        return self.comments.count()
 
 class CommunityComment(models.Model):
     """
     Модель для комментариев к постам сообществ.
     """
     post = models.ForeignKey(
-        'CommunityPost', # Ссылка на CommunityPost
+        'CommunityPost',
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name="Пост сообщества"

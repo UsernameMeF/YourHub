@@ -1,5 +1,3 @@
-# SOCIAL_NETWORK/your_hub/core/forms.py
-
 from django import forms
 from .models import Post, Comment, Tag
 import re
@@ -27,10 +25,7 @@ class PostForm(forms.ModelForm):
         if tags_string:
             raw_tags = re.split(r'\s+', tags_string.strip())
             
-            # Обновлено: регулярное выражение проверяет формат, но без #
-            # Мы будем удалять # перед передачей в валидатор модели
-            # и потом добавлять обратно для отображения
-            tag_input_pattern = re.compile(r'^#[\w]+$') # Это для валидации ввода пользователя
+            tag_input_pattern = re.compile(r'^#[\w]+$')
 
             for tag_with_hash in raw_tags:
                 if not tag_with_hash:
@@ -39,16 +34,14 @@ class PostForm(forms.ModelForm):
                     raise forms.ValidationError(
                         f"Тег '{tag_with_hash}' имеет некорректный формат. Каждый тег должен начинаться с '#' и содержать только буквы, цифры и нижнее подчеркивание, без пробелов внутри."
                     )
-                # Удаляем '#' перед добавлением в cleaned_tags для дальнейшей обработки
                 clean_tag_name = tag_with_hash[1:]
-                # Добавляем тег в список без дубликатов (без учета регистра)
                 if clean_tag_name.lower() not in [t.lower() for t in cleaned_tags]:
                     cleaned_tags.append(clean_tag_name)
             
-            if len(cleaned_tags) > 10: # Ограничение на количество ПОЛЬЗОВАТЕЛЬСКИХ тегов
+            if len(cleaned_tags) > 10:
                 raise forms.ValidationError("Вы можете добавить не более 10 пользовательских тегов.")
         
-        return ' '.join(cleaned_tags) # Возвращаем очищенные теги (без #) обратно в строку, разделенные пробелами
+        return ' '.join(cleaned_tags)
 
 
 class PostAttachmentForm(forms.Form):

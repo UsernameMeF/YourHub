@@ -2,21 +2,19 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.conf import settings
-from django.db import transaction # Для атомарности операций в асинхронном контексте
+from django.db import transaction
 
 from .models import ChatRoom, ChatMessage, ChatAttachment, GroupChat, GroupChatMessage, GroupChatAttachment
 from django.contrib.auth import get_user_model
 
-# Импортируем утилиту для отправки уведомлений
 from notifications.utils import send_notification_to_user
 from django.urls import reverse
 
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    # --- Вспомогательная функция для определения типа чата и получения моделей ---
     @database_sync_to_async
-    def _get_chat_models_and_instance(self, room_id, room_type): # Добавили room_type
+    def _get_chat_models_and_instance(self, room_id, room_type):
         if room_type == 'private':
             try:
                 chat_instance = ChatRoom.objects.get(id=room_id)
@@ -32,7 +30,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             return None, None, None, None, None
 
-
     async def connect(self):
         self.room_type = self.scope['url_route']['kwargs']['room_type']
         self.room_id = self.scope['url_route']['kwargs']['room_id']
@@ -42,7 +39,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        # Определяем тип чата и получаем соответствующие модели и экземпляр
         ChatModel, MessageModel, AttachmentModel, room_type, chat_instance = await self._get_chat_models_and_instance(self.room_id, self.room_type)
 
         if not chat_instance or not await self.is_user_in_chat(self.user, chat_instance):
@@ -53,7 +49,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.MessageModel = MessageModel
         self.AttachmentModel = AttachmentModel
         self.room_type = room_type
-        # Определяем имя группы на основе типа чата
         self.room_group_name = f'{room_type}_chat_{self.room_id}'
 
         await self.channel_layer.group_add(
@@ -62,9 +57,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
 
-        # При подключении пользователя, помечаем все сообщения, предназначенные ему, как прочитанные
         await self.mark_and_notify_messages_as_read(self.user, self.chat_instance, self.MessageModel, self.room_group_name)
-
 
     async def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
@@ -88,17 +81,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if message_type == 'chat_message':
             message_content = data.get('message', '').strip()
-            attachments_data = data.get('attachments', []) # Для сообщений, отправленных через AJAX views.py
+            attachments_data = data.get('attachments', [])
 
             if message_content or attachments_data:
                 try:
-                    # Вызываем новый асинхронный метод для сохранения и отправки уведомлений
                     chat_message = await self._save_message_and_send_notifications(
                         self.user,
                         self.chat_instance,
                         self.MessageModel,
                         message_content,
-                        attachments_data, 
+                        attachments_data,
                         self.room_type,
                         self.room_id
                     )
@@ -128,7 +120,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     print(f"ERROR (ChatConsumer): Failed to save message or send notifications: {e}")
                     import traceback
                     traceback.print_exc()
-                    # Здесь можно отправить ошибку обратно клиенту, если нужно
                     await self.send(text_data=json.dumps({
                         'type': 'error',
                         'message': 'Ошибка при отправке сообщения: ' + str(e)
@@ -196,7 +187,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'message_edited',
             'message_id': event['message_id'],
             'new_content': event['new_content'],
-            'attachments': event.get('attachments', []), # Добавлено для обновления вложений
+            'attachments': event.get('attachments', []),
         }))
 
     async def message_deleted(self, event):
@@ -205,19 +196,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'message_id': event['message_id']
         }))
 
-    # --- Database Sync to Async Helpers (updated) ---
-
     @database_sync_to_async
     def is_user_in_chat(self, user, chat_instance):
         return chat_instance.participants.filter(id=user.id).exists()
 
-    # НОВЫЙ ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ СОХРАНЕНИЯ СООБЩЕНИЙ И ОТПРАВКИ УВЕДОМЛЕНИЙ
     @database_sync_to_async
     def _save_message_and_send_notifications(self, sender, chat_instance, MessageModel, content, attachments_data, room_type, room_id):
-        """
-        Сохраняет сообщение в БД, добавляет отправителя как прочитавшего,
-        и вызывает send_notification_to_user для других участников чата.
-        """
         with transaction.atomic():
             if isinstance(chat_instance, ChatRoom):
                 chat_message = MessageModel.objects.create(
@@ -236,30 +220,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             else:
                 raise ValueError("Неизвестный тип чата для сохранения сообщения.")
 
-
             recipients = []
             if room_type == 'private':
                 recipients = list(chat_instance.participants.exclude(id=sender.id))
             elif room_type == 'group':
                 recipients = list(chat_instance.participants.exclude(id=sender.id))
             
-            # Обрезаем контент сообщения для уведомления
             display_content = content
             if len(display_content) > 50:
                 display_content = display_content[:47] + '...'
-            elif not display_content and attachments_data: # Если только вложения
+            elif not display_content and attachments_data:
                 display_content = "Новые вложения"
             elif not display_content:
                 display_content = "Пустое сообщение"
 
-            # Формируем URL для уведомления
             notification_url = '#'
             if room_type == 'private':
                 notification_url = reverse('chat:chat_room', args=[chat_instance.id])
             elif room_type == 'group':
                 notification_url = reverse('chat:group_chat_room', args=[chat_instance.id])
 
-            # Отправляем уведомления каждому получателю
             for recipient in recipients:
                 notification_type_str = 'message' if room_type == 'private' else 'group_message'
                 notification_content_text = f"{sender.username} написал вам: \"{display_content}\""
@@ -272,12 +252,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     sender=sender,
                     notification_type=notification_type_str,
                     content=notification_content_text,
-                    related_object=chat_message, # Передаем объект ChatMessage
+                    related_object=chat_message,
                     custom_url=notification_url
                 )
                 print(f"DEBUG (Consumer - Notification Call): Notification request sent for {recipient.username}.")
 
-            # Теперь возвращаем объект сообщения, чтобы его можно было использовать для group_send в receive
             return chat_message
 
     @database_sync_to_async
@@ -299,12 +278,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
             else:
                 raise ValueError("Неизвестный тип чата для сохранения сообщения.")
-
-            # Если attachments_data переданы, значит, сообщение было отправлено через AJAX/HTTP POST
-            # и вложения уже сохранены в views.py. Нам их повторно сохранять тут не нужно.
-            # Если же message_type == 'chat_message' в receive, и attachments_data пуст,
-            # но мы захотим отправлять вложения через WS, то логика здесь будет другая.
-            # Пока предполагаем, что вложения всегда через HTTP POST.
 
             return message
 
@@ -354,7 +327,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 group_chat=chat_instance
             ).exclude(sender=user).exclude(read_by=user).select_related('sender')
         else:
-            return # Неизвестный тип чата
+            return
 
         notifications_to_send = []
         for msg in list(messages_to_mark):
@@ -370,10 +343,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             })
 
         channel_layer = self.channel_layer
-        # Имя группы здесь также должно быть определено на основе self.room_type и self.room_id
-        # Это должно быть `self.room_group_name` из connect()
         for notification in notifications_to_send:
             async_to_sync(channel_layer.group_send)(
-                room_group_name, # Используем уже определенное имя группы
+                room_group_name,
                 notification
             )

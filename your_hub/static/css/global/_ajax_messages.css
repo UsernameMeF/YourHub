@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_ajax_messages.css */
 
-/* ==== Стили Светлой Темы (AJAX Сообщения) ==== */
 .ajax-messages-container:not(.hidden) {
     display: block;
     opacity: 1;
@@ -27,11 +26,10 @@
     border-color: #bee5eb;
 }
 .ajax-friend-request-form {
-    margin: 0;           /* Убираем любые внешние отступы, которые могут влиять на расположение */
-    padding: 0;          /* Убираем внутренние отступы */
-    background: transparent; /* Делаем фон полностью прозрачным */
-    border: none;        /* Убираем все границы */
-    box-shadow: none;    /* Убираем тени */
-    /* Дополнительно: убедитесь, что она не display: block; если это мешает flexbox родителя */
-    display: inline-block; /* Или просто оставьте, если не мешает. Если родитель flex, то это не так важно */
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    display: inline-block;
 }

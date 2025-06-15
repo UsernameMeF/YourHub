@@ -1,22 +1,20 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_base.css */
 
-/* ==== Стили Светлой Темы (Базовые элементы сайта) ==== */
 body {
     margin: 0;
     font-family: sans-serif;
     min-height: 100vh;
-    background-color: #f0f2f5; /* Светлый фон */
-    color: #333; /* Темный текст */
+    background-color: #f0f2f5;
+    color: #333;
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* Добавляем переходы к основным элементам, где цвета меняются */
 .header, .navbar, .dropdown-menu,
 .search-bar input, .auth-buttons a, .user-menu-button,
 .dropdown-menu a, form, form label,
 form input[type="text"], form input[type="password"], form input[type="email"],
 form button[type="submit"], form textarea {
-     transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
 
 .header {
@@ -161,6 +159,5 @@ form button[type="submit"], form textarea {
     height: 24px;
 }
 
-/* Скрываем одну иконку в зависимости от темы */
 .sun-icon { display: block; }
 .moon-icon { display: none; }

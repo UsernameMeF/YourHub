@@ -26,7 +26,7 @@ html.dark-theme .community-member-count {
 }
 
 html.dark-theme .community-member-count i {
-    color: #00e600; /* Зеленый акцент */
+    color: #00e600;
 }
 
 html.dark-theme .no-communities-message {
@@ -48,9 +48,8 @@ html.dark-theme .btn i {
     color: inherit;
 }
 
-/* Стили для кнопки "Создать сообщество" */
 html.dark-theme .create-community-btn {
-    background-color: #00e600; /* Акцентный зеленый */
+    background-color: #00e600;
     border-color: #00e600;
 }
 
@@ -65,20 +64,20 @@ html.dark-theme .create-community-btn:active {
 }
 
 html.dark-theme .find-community-btn {
-    border: 1px solid #00e600; /* Рамка в акцентный цвет */
-    background-color: #00e600; /* Акцентный зеленый */
-    color: #fff; /* Белый текст */
+    border: 1px solid #00e600;
+    background-color: #00e600;
+    color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 html.dark-theme .find-community-btn:hover {
-    background-color: #00ff00; /* Светлее при наведении */
+    background-color: #00ff00;
     border-color: #00ff00;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 html.dark-theme .find-community-btn:active {
-    background-color: #00b300; /* Темнее при нажатии */
+    background-color: #00b300;
     border-color: #00b300;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }

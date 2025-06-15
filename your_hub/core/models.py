@@ -1,11 +1,10 @@
-# SOCIAL_NETWORK/your_hub/core/models.py
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
 import os
 from django.utils import timezone
-from django.utils.text import slugify # Импортируем slugify
-from django.core.validators import RegexValidator # Импортируем RegexValidator
+from django.utils.text import slugify
+from django.core.validators import RegexValidator
 
 def post_attachment_upload_to(instance, filename):
     user_id = instance.post.author.id if instance.post.pk else 'temp'
@@ -13,22 +12,17 @@ def post_attachment_upload_to(instance, filename):
     return os.path.join('posts_attachments', str(user_id), str(post_id), filename)
 
 class Tag(models.Model):
-    # Имя тега хранится БЕЗ префикса '#'
     name = models.CharField(
         max_length=50,
         unique=True,
         db_index=True,
         validators=[
-            # Валидатор: только буквы (любого алфавита), цифры, нижнее подчеркивание.
-            # Должно начинаться с буквы/цифры/подчеркивания и содержать только их.
-            # models.py, в классе Tag, в validators для поля name
             RegexValidator(
-                regex=r'^[a-zA-Z0-9_\u0400-\u04FF]+$', # Добавляем диапазон для кириллицы
+                regex=r'^[a-zA-Z0-9_\u0400-\u04FF]+$',
                 message="Имя тега должно содержать только буквы (латинские/кириллица), цифры и нижнее подчеркивание."
             )
         ]
     )
-    # Slug для формирования чистых URL
     slug = models.SlugField(max_length=60, unique=True, blank=True)
 
     class Meta:
@@ -37,26 +31,20 @@ class Tag(models.Model):
         verbose_name_plural = "Теги"
 
     def save(self, *args, **kwargs):
-        # Приводим имя тега к нижнему регистру перед сохранением для унификации
         self.name = self.name.lower()
         if not self.slug:
-            # Создаем slug из имени тега. allow_unicode=True для поддержки кириллицы в slug
             self.slug = slugify(self.name, allow_unicode=True)
             original_slug = self.slug
             count = 1
-            # Убеждаемся, что slug уникален
             while Tag.objects.filter(slug=self.slug).exists():
                 self.slug = f"{original_slug}-{count}"
                 count += 1
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name # Возвращаем имя тега без #
+        return self.name
 
     def get_absolute_url(self):
-        # URL для поиска постов по этому тегу. Передаем slug, а не name.
-        # В URL параметр 'tag' будет использовать чистое имя/slug,
-        # а на фронте при отображении будем добавлять #
         return reverse('core:index') + f'?tag={self.slug}'
 
 
@@ -71,7 +59,7 @@ class Post(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
-    tags = models.ManyToManyField(Tag, related_name='posts', blank=True) # M2M связь с Tag
+    tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     
     views_count = models.PositiveIntegerField(default=0, verbose_name="Количество просмотров")
 

@@ -1,8 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/users/_auth.css */
 
-/* ==== Стили Светлой Темы (Авторизация/Регистрация) ==== */
-
-/* Стиль для формы логина/регистрации */
 form {
     background-color: #fff;
     padding: 20px;
@@ -49,8 +46,8 @@ form input[type="email"]:focus {
 }
 
 form textarea {
-    min-height: 100px; /* Минимальная высота, можно настроить */
-    resize: none; /* Разрешить изменение размера только по вертикали */
+    min-height: 100px;
+    resize: none;
 }
 
 form button[type="submit"] {
@@ -69,7 +66,6 @@ form button[type="submit"]:hover {
     background-color: #1bcabc;
 }
 
-/* Стиль для ссылок под формой */
 form p a {
     color: #23e2dd;
 }

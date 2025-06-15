@@ -4,14 +4,14 @@ html.dark-theme .search-bar-container {
     background-color: #252526;
     border: 1px solid #3a3a3a;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    box-sizing: border-box; /* ГЛАВНОЕ ИЗМЕНЕНИЕ: Учитывать padding и border в общей ширине */
+    box-sizing: border-box;
 }
 
 html.dark-theme .search-input {
     background-color: #383838;
     border: 1px solid #555;
     color: #e0e0e0;
-    box-sizing: border-box; /* Для надёжности */
+    box-sizing: border-box;
 }
 
 html.dark-theme .search-input::placeholder {
@@ -58,5 +58,5 @@ html.dark-theme .no-chats-message {
     border: 1px solid #3a3a3a;
     color: #ccc;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    box-sizing: border-box; /* Для надёжности */
+    box-sizing: border-box;
 }

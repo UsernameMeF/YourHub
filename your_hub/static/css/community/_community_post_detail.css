@@ -41,7 +41,7 @@
 }
 
 .post-content p {
-    margin-bottom: 1em; 
+    margin-bottom: 1em;
 }
 
 .post-attachments {
@@ -59,14 +59,14 @@
 
 .attachments-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
 }
 
 .attachment-image {
     width: 100%;
-    height: 200px; 
-    object-fit: cover; 
+    height: 200px;
+    object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -80,7 +80,7 @@
     border-top: 1px solid #eee;
 }
 
-.post-actions .action-button { /* Общие стили для кнопок лайков/дизлайков/репостов */
+.post-actions .action-button {
     background: none;
     border: none;
     color: #666;
@@ -105,10 +105,10 @@
 }
 
 .post-actions .action-button i.active {
-    color: #007bff; /* Цвет для активного лайка/дизлайка/репоста */
+    color: #007bff;
 }
 
-.post-actions .action-item { /* Для элементов, которые не кнопки (например, счетчик комментариев) */
+.post-actions .action-item {
     font-size: 1.1em;
     color: #666;
     display: flex;

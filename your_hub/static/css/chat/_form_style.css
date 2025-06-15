@@ -10,29 +10,28 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 20px 30px; /* Увеличенные внутренние отступы */
+    padding: 20px 30px;
 }
 
 .form-title {
     font-size: 1.8em;
     color: #333;
-    margin-bottom: 25px; /* Увеличенный отступ */
-    text-align: center; /* Центрируем заголовок */
+    margin-bottom: 25px;
+    text-align: center;
 }
 
 .form-field-wrapper {
-    margin-bottom: 20px; /* Отступ между полями формы */
+    margin-bottom: 20px;
 }
 
 .form-label {
-    display: block; /* Каждая метка на новой строке */
+    display: block;
     font-weight: 600;
     color: #555;
-    margin-bottom: 8px; /* Отступ между меткой и полем */
+    margin-bottom: 8px;
     font-size: 0.95em;
 }
 
-/* Стилизация текстовых полей и textarea */
 .form-card input[type="text"],
 .form-card textarea {
     width: 100%;
@@ -41,20 +40,20 @@
     border-radius: 5px;
     font-size: 1em;
     color: #333;
-    box-sizing: border-box; /* Учитываем padding и border в общей ширине */
+    box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-card input[type="text"]:focus,
 .form-card textarea:focus {
-    border-color: #007bff; /* Акцентный цвет при фокусе */
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Легкая тень при фокусе */
-    outline: none; /* Убираем стандартный outline браузера */
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
 }
 
 .form-card textarea {
-    min-height: 100px; /* Минимальная высота для textarea */
-    resize: vertical; /* Разрешаем изменение размера только по вертикали */
+    min-height: 100px;
+    resize: vertical;
 }
 
 .form-help-text {
@@ -65,45 +64,42 @@
 
 .form-error-message {
     font-size: 0.85em;
-    color: #dc3545; /* Красный цвет для ошибок */
+    color: #dc3545;
     margin-top: 5px;
     font-weight: 500;
 }
 
-/* Стили для чекбоксов (участников) */
 .checkbox-group {
     border: 1px solid #eee;
     border-radius: 5px;
     padding: 10px;
-    max-height: 250px; /* Ограничиваем высоту, чтобы был скролл */
-    overflow-y: auto; /* Позволяем скролл, если участников много */
+    max-height: 250px;
+    overflow-y: auto;
     background-color: #f9f9f9;
 }
 
 .checkbox-item {
     display: flex;
     align-items: center;
-    margin-bottom: 8px; /* Отступ между элементами списка участников */
+    margin-bottom: 8px;
 }
 
 .checkbox-item input[type="checkbox"] {
     margin-right: 10px;
-    /* Можно добавить свои стили для чекбокса, если стандартный не подходит */
 }
 
 .checkbox-item label {
-    margin-bottom: 0; /* Убираем нижний отступ у метки чекбокса */
+    margin-bottom: 0;
     color: #333;
-    font-weight: normal; /* Обычный шрифт для меток чекбоксов */
+    font-weight: normal;
     cursor: pointer;
 }
 
-/* Стили для кнопки отправки */
 .submit-button {
     display: block;
-    width: 100%; /* Кнопка на всю ширину */
+    width: 100%;
     padding: 12px 20px;
-    background-color: #007bff; /* Основной синий цвет */
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -111,10 +107,10 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    margin-top: 30px; /* Отступ сверху */
+    margin-top: 30px;
 }
 
 .submit-button:hover {
-    background-color: #0056b3; /* Темнее при наведении */
+    background-color: #0056b3;
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
 }

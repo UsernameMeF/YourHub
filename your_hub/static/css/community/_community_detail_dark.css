@@ -16,7 +16,7 @@ html.dark-theme .community-meta {
 }
 
 html.dark-theme .community-meta-item i {
-    color: #00e600; /* Зеленый акцент */
+    color: #00e600;
 }
 
 html.dark-theme .community-action-buttons .btn-join {
@@ -29,7 +29,7 @@ html.dark-theme .community-action-buttons .btn-join:hover {
 }
 
 html.dark-theme .community-action-buttons .btn-leave {
-    background-color: #ff6b6b; /* Темно-красный */
+    background-color: #ff6b6b;
     color: white;
 }
 html.dark-theme .community-action-buttons .btn-leave:hover {
@@ -38,7 +38,7 @@ html.dark-theme .community-action-buttons .btn-leave:hover {
 }
 
 html.dark-theme .community-action-buttons .btn-create-post {
-    background-color: #3cb371; /* Чуть темнее зеленый */
+    background-color: #3cb371;
     color: white;
 }
 
@@ -69,10 +69,8 @@ html.dark-theme .community-posts-section p {
     color: #aaa;
 }
 
-/* ... (существующие стили) ... */
-
 html.dark-theme .btn-create-post {
-    background-color: #00b000; 
+    background-color: #00b000;
     color: #fff;
 }
 

@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/core/_index.css */
 
-/* ==== Стили Светлой Темы (Главная страница - Заглушки постов) ==== */
 .post-placeholder {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -22,12 +21,11 @@
     font-size: 0.9em;
 }
 
-/* ==== Стили для элементов управления лентой (сортировка, вид) ==== */
 .feed-controls {
     display: flex;
-    justify-content: space-between; /* Распределяем элементы по краям */
+    justify-content: space-between;
     align-items: center;
-    margin: 20px auto 30px auto; /* Отступ снизу */
+    margin: 20px auto 30px auto;
     max-width: 700px;
     padding: 10px 20px;
     background-color: #f8f8f8;
@@ -65,21 +63,21 @@
 }
 
 .sort-dropdown-menu {
-    display: none; /* Скрыто по умолчанию */
+    display: none;
     position: absolute;
-    top: 100%; /* Под кнопкой */
+    top: 100%;
     left: 0;
     background-color: #fff;
     min-width: 160px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     border-radius: 4px;
     overflow: hidden;
-    z-index: 10; /* Выше других элементов */
+    z-index: 10;
     margin-top: 5px;
 }
 
 .sort-dropdown-container:hover .sort-dropdown-menu,
-.sort-dropdown-button:focus + .sort-dropdown-menu { /* Показать при фокусе кнопки или наведении на контейнер */
+.sort-dropdown-button:focus + .sort-dropdown-menu {
     display: block;
 }
 
@@ -98,7 +96,7 @@
 }
 
 .sort-option.active {
-    background-color: #e9fcfb; /* Более светлый акцентный цвет */
+    background-color: #e9fcfb;
     color: #23e2dd;
     font-weight: bold;
 }
@@ -135,7 +133,7 @@
 .view-toggle-button.active {
     background-color: #23e2dd;
     color: white;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1); /* Внутренняя тень для активного */
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .view-toggle-button.active:hover {
@@ -143,26 +141,22 @@
     color: white;
 }
 
-/* ==================================== */
-/* Стили для КОМПАКТНОГО вида поста (inspiration: Reddit) */
-/* ==================================== */
-
 .posts-container.compact-view .post-card {
     display: grid;
-    grid-template-columns: 80px 1fr; /* Фиксированная ширина для картинки/иконки, остальное для контента */
+    grid-template-columns: 80px 1fr;
     gap: 15px;
-    padding: 8px 15px; /* Меньший padding */
-    box-shadow: none; /* Убираем тень */
-    border-bottom: 1px solid #eee; /* Разделитель между постами */
-    border-radius: 0; /* Убираем скругление */
-    margin-bottom: 0; /* Убираем отступ, чтобы border-bottom работал */
+    padding: 8px 15px;
+    box-shadow: none;
+    border-bottom: 1px solid #eee;
+    border-radius: 0;
+    margin-bottom: 0;
     align-items: center;
 }
 
 .posts-container.compact-view .post-card:first-child {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    border-top: 1px solid #eee; /* Граница сверху для первого элемента */
+    border-top: 1px solid #eee;
 }
 .posts-container.compact-view .post-card:last-child {
     border-bottom-left-radius: 8px;
@@ -170,7 +164,7 @@
 }
 
 .posts-container.compact-view .post-header {
-    grid-column: 2 / 3; /* Размещаем за изображением */
+    grid-column: 2 / 3;
     margin-bottom: 2px;
     font-size: 0.85em;
     display: flex;
@@ -180,27 +174,27 @@
 
 .posts-container.compact-view .post-author-username,
 .posts-container.compact-view .post-date {
-    white-space: nowrap; /* Не переносить текст */
-    overflow: hidden; /* Обрезать, если не помещается */
-    text-overflow: ellipsis; /* Добавить троеточие */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
 .posts-container.compact-view .post-author-avatar {
-    display: none; /* Скрываем аватар в компактном режиме */
+    display: none;
 }
 
 .posts-container.compact-view .post-info {
-    flex-direction: row; /* Автор и дата в одну строку */
+    flex-direction: row;
     gap: 8px;
 }
 .posts-container.compact-view .post-date {
-    font-size: 1em; /* Размер шрифта даты как у автора */
+    font-size: 1em;
 }
 
 .posts-container.compact-view .post-title {
     grid-column: 2 / 3;
-    font-size: 1.1em; /* Меньший заголовок */
+    font-size: 1.1em;
     margin-bottom: 0px;
     line-height: 1.3;
     overflow: hidden;
@@ -209,7 +203,7 @@
 }
 
 .posts-container.compact-view .post-title a {
-    color: #333; /* Более нейтральный цвет */
+    color: #333;
 }
 .posts-container.compact-view .post-title a:hover {
     color: #23e2dd;
@@ -220,43 +214,42 @@
     font-size: 0.9em;
     line-height: 1.4;
     margin-bottom: 10px;
-    max-height: 4em; /* Ограничиваем высоту для обрезки текста */
+    max-height: 4em;
     overflow: hidden;
-    text-overflow: ellipsis; /* Добавляем троеточие */
+    text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Обрезаем до 3 строк */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 }
 
-/* Иконка-заглушка или первое изображение в компактном виде */
 .posts-container.compact-view .post-image-thumbnail {
-    grid-column: 1 / 2; /* Помещаем в первую колонку */
-    grid-row: 1 / span 3; /* Растягиваем на несколько строк */
-    width: 70px; /* Фиксированная ширина */
-    height: 70px; /* Фиксированная высота */
+    grid-column: 1 / 2;
+    grid-row: 1 / span 3;
+    width: 70px;
+    height: 70px;
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid #eee;
-    justify-self: center; /* Центрируем по горизонтали */
-    align-self: center; /* Прижимаем кверху */
+    justify-self: center;
+    align-self: center;
     margin-top: 0px;
 }
 
 .posts-container.compact-view .post-images {
-    display: none; /* Скрываем контейнер с картинками в компактном виде, показываем только одну */
+    display: none;
 }
 
 .posts-container.compact-view .post-actions {
     grid-column: 2 / 3;
-    border-top: none; /* Убираем разделитель внизу */
+    border-top: none;
     padding-top: 0;
-    justify-content: flex-start; /* Смещаем кнопки влево */
-    gap: 10px; /* Уменьшаем отступ */
+    justify-content: flex-start;
+    gap: 10px;
     margin-top: 5px;
 }
 
 .posts-container.compact-view .action-button {
-    padding: 5px 8px; /* Меньший padding для кнопок */
+    padding: 5px 8px;
     font-size: 0.9em;
 }
 
@@ -265,45 +258,44 @@
 }
 
 .posts-container.compact-view .post-actions-dropdown {
-    grid-column: 2 / 3; /* Располагаем справа от контента */
+    grid-column: 2 / 3;
     align-self: flex-start;
-    position: static; /* Убираем абсолютное позиционирование */
-    margin-left: auto; /* Прижимаем к правому краю */
+    position: static;
+    margin-left: auto;
     margin-top: 5px;
 }
 
 .posts-container.compact-view .post-actions-button {
-    font-size: 1.2em; /* Чуть меньше */
+    font-size: 1.2em;
     padding: 3px;
 }
 
 .posts-container.compact-view .dropdown-menu {
-    position: absolute; /* Возвращаем абсолютное позиционирование для выпадающего меню */
+    position: absolute;
     top: auto;
     right: 0;
     margin-top: 0;
 }
 
 .page-title {
-    text-align: center; /* Центрирует текст */
-    margin-top: 30px;   /* Добавляет отступ сверху */
-    margin-bottom: 30px; /* Добавляет отступ снизу */
-    font-size: 2.8em;    /* Можно настроить размер шрифта */
-    color: #2c3e50;      /* Цвет текста (темный, но не чисто черный) */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Легкая тень для объема */
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-size: 2.8em;
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
-/* --- tag-search-bar Styles (Modernized) --- */
 .tag-search-bar-container {
     margin: 25px auto;
-    padding: 20px; /* Увеличим отступы для более современного вида */
-    background-color: var(--card-bg-color); /* Используем переменную для фона, чтобы соответствовать карточкам */
+    padding: 20px;
+    background-color: var(--card-bg-color);
     border: 1px solid var(--border-color);
-    border-radius: 12px; /* Более мягкие углы */
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Увеличим промежуток */
-    box-shadow: var(--shadow-small); /* Легкая тень */
+    gap: 15px;
+    box-shadow: var(--shadow-small);
     max-width: 750px;
     width: 95%;
     box-sizing: border-box;
@@ -325,9 +317,9 @@
 
 .tag-search-bar-input {
     flex-grow: 1;
-    padding: 12px 18px; /* Увеличим padding */
-    border: 1px solid var(--input-border-color); /* Отдельная переменная для границы инпута */
-    border-radius: 8px; /* Меньше, чем у контейнера */
+    padding: 12px 18px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
     font-size: 1rem;
     outline: none;
     background-color: var(--input-bg-color);
@@ -343,11 +335,11 @@
 
 .tag-search-bar-input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); /* Эффект свечения */
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
 }
 
 .tag-search-bar-button {
-    padding: 12px 25px; /* Увеличим padding */
+    padding: 12px 25px;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
@@ -356,43 +348,43 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Немного больше отступ для иконки/текста */
+    gap: 8px;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    color: var(--button-text-color); /* Белый текст на кнопке */
+    color: var(--button-text-color);
     white-space: nowrap;
     flex-shrink: 0;
     min-width: 40px;
-    height: 44px; /* Фиксированная высота для согласованности */
+    height: 44px;
     background-color: var(--primary-color);
-    box-shadow: var(--shadow-button); /* Легкая тень для кнопки */
+    box-shadow: var(--shadow-button);
 }
 
 .tag-search-bar-button:hover {
     background-color: var(--primary-hover-color);
-    transform: translateY(-2px); /* Легкий подъем */
-    box-shadow: var(--shadow-button-hover); /* Усилим тень при наведении */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-button-hover);
 }
 
 .tag-search-bar-button:active {
     background-color: var(--primary-active-color);
     transform: translateY(0);
-    box-shadow: none; /* Убираем тень при клике */
+    box-shadow: none;
 }
 
 .tag-search-bar-clear-button-row {
     display: flex;
     justify-content: flex-end;
     width: 100%;
-    margin-top: -5px; /* Сдвинем чуть выше, чтобы уменьшить общий зазор, если он большой */
+    margin-top: -5px;
 }
 
 .tag-search-bar-clear-button {
-    background-color: var(--secondary-button-bg); /* Более нейтральный фон */
-    color: var(--secondary-button-text); /* Цвет текста */
+    background-color: var(--secondary-button-bg);
+    color: var(--secondary-button-text);
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 0.95rem; /* Чуть меньше шрифт */
+    font-size: 0.95rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -416,18 +408,17 @@
     box-shadow: none;
 }
 
-/* Responsive adjustments for tag search bar */
 @media (max-width: 600px) {
     .tag-search-input-and-button-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 15px; /* Увеличим отступ между инпутом и кнопкой на мобильных */
+        gap: 15px;
     }
 
     .tag-search-bar-input,
     .tag-search-bar-button {
         width: 100%;
-        margin-bottom: 0; /* Убрали старый margin-bottom */
+        margin-bottom: 0;
     }
 
     .tag-search-bar-clear-button-row {
@@ -435,14 +426,13 @@
     }
 }
 
-/* Общие переменные, если их нет (обычно в base.css или отдельном файле variables.css) */
 :root {
-    --primary-color: #23e2dd; /* Бирюзовый акцент */
+    --primary-color: #23e2dd;
     --primary-hover-color: #1bcabc;
     --primary-active-color: #1a9e9a;
     --button-text-color: #ffffff;
 
-    --secondary-button-bg: #e0e0e0; /* Светло-серый */
+    --secondary-button-bg: #e0e0e0;
     --secondary-button-text: #555555;
     --secondary-button-hover-bg: #d0d0d0;
     --secondary-button-active-bg: #c0c0c0;

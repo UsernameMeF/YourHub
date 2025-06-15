@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/users/_friends_dark.css */
 
-/* ==== Темная тема для страницы друзей ==== */
 html.dark-theme .friends-list-container {
     background-color: #252526;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -56,7 +55,6 @@ html.dark-theme .request-item a:hover .request-avatar {
     border-color: #00e600;
 }
 
-/* Темная тема для кнопок действий */
 html.dark-theme .request-actions .btn-success {
     background-color: #00e600;
     color: #1a1a1a;

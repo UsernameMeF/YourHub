@@ -34,9 +34,9 @@ textarea.community-post-content-input {
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 1em;
-    box-sizing: border-box; 
-    resize: vertical; 
-    min-height: 120px; 
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 120px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -89,7 +89,7 @@ textarea.community-post-content-input:focus {
 }
 
 .file-input {
-    display: none; 
+    display: none;
 }
 
 .file-input-display {
@@ -128,7 +128,7 @@ textarea.community-post-content-input:focus {
     font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    width: auto; 
+    width: auto;
     display: inline-block;
     margin-right: 15px;
 }
@@ -145,7 +145,7 @@ textarea.community-post-content-input:focus {
     border: none;
     border-radius: 6px;
     font-size: 1.1em;
-    text-decoration: none; 
+    text-decoration: none;
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     width: auto;

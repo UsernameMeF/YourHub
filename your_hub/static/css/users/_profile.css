@@ -1,8 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/users/_profile.css */
 
-/* ==== Стили Светлой Темы (Страница профиля) ==== */
-
-/* Контейнер для всей страницы профиля */
 .profile-container {
     max-width: 800px;
     margin: 20px auto;
@@ -11,10 +8,9 @@
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: background-color 0.5s ease, box-shadow 0.5s ease;
-    overflow: hidden; /* Важно, чтобы баннер и аватар не выходили за границы */
+    overflow: hidden;
 }
 
-/* Контейнер для заголовка профиля и кнопок действий */
 .profile-header-top {
     display: flex;
     justify-content: space-between;
@@ -31,7 +27,6 @@
     transition: color 0.5s ease;
 }
 
-/* Контейнер для кнопок действий (Дружба, Подписка) */
 .profile-actions-top {
     display: flex;
     align-items: center;
@@ -67,7 +62,6 @@
 }
 
 
-/* Основной блок заголовка профиля (аватар + инфо) */
 .profile-header {
     display: flex;
     align-items: flex-start;
@@ -76,13 +70,11 @@
     flex-wrap: wrap;
 }
 
-/* Оболочка для аватара и индикатора статуса */
 .profile-avatar-wrapper {
     position: relative;
-    display: inline-block; /* Чтобы div занимал только необходимое пространство */
+    display: inline-block;
 }
 
-/* Большой аватар на странице профиля */
 .profile-avatar-large {
     width: 150px;
     height: 150px;
@@ -93,52 +85,48 @@
     transition: border-color 0.3s ease;
 }
 
-/* Иконка статуса */
 .status-indicator {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     position: absolute;
-    bottom: 5px; /* Отступ от нижней границы аватара */
-    right: 5px; /* Отступ от правой границы аватара */
-    border: 2px solid #fff; /* Белая обводка, чтобы выделить на темном фоне аватара */
+    bottom: 5px;
+    right: 5px;
+    border: 2px solid #fff;
     cursor: pointer;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    display: flex; /* Используем flexbox для центрирования иконки */
+    display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .status-indicator .status-icon {
-    font-size: 14px; /* Размер иконки внутри кружка */
-    color: #fff; /* Цвет самой иконки по умолчанию - белый */
-    line-height: 1; /* Убрать лишний отступ */
+    font-size: 14px;
+    color: #fff;
+    line-height: 1;
 }
 
-/* Цвета для статусов */
 .status-online {
-    background-color: #28a745; /* Зеленый */
+    background-color: #28a745;
 }
 
 .status-away {
-    background-color: #ffc107; /* Желтый */
+    background-color: #ffc107;
 }
 
 .status-dnd {
-    background-color: #dc3545; /* Красный */
+    background-color: #dc3545;
 }
 
-/* "Невидимый" и "Не в сети" выглядят одинаково */
 .status-invisible,
 .status-offline {
-    background-color: #6c757d; /* Серый */
+    background-color: #6c757d;
 }
 
-/* Выпадающее меню статусов */
 .status-dropdown {
     position: absolute;
-    top: calc(100% + 10px); 
+    top: calc(100% + 10px);
     right: 0;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -148,7 +136,7 @@
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px); 
+    transform: translateY(-10px);
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     padding: 5px 0;
 }
@@ -171,19 +159,18 @@
     background-color: #f0f0f0;
 }
 
-/* Стили для маленьких иконок в выпадающем меню */
-.status-option .status-dot { /* Теперь это иконка, а не просто точка */
-    width: 20px; /* Увеличиваем размер для иконок */
+.status-option .status-dot {
+    width: 20px;
     height: 20px;
-    border-radius: 50%; /* Чтобы круги были кругами */
+    border-radius: 50%;
     margin-right: 10px;
-    display: flex; /* Flexbox для центрирования иконки */
+    display: flex;
     justify-content: center;
     align-items: center;
-    color: #fff; /* Цвет иконки внутри кружка */
-    font-size: 12px; /* Размер иконки */
-    box-sizing: border-box; /* Важно для box-model */
-    border: none; /* Убираем бордер, если был */
+    color: #fff;
+    font-size: 12px;
+    box-sizing: border-box;
+    border: none;
 }
 
 .status-dot {
@@ -191,10 +178,9 @@
     height: 15px;
     border-radius: 50%;
     margin-right: 10px;
-    border: 1px solid #ccc; /* Легкая обводка для точек */
+    border: 1px solid #ccc;
 }
 
-/* Цвета точек в выпадающем меню */
 .status-option .status-online {
     background-color: #28a745;
 }
@@ -209,7 +195,6 @@
 }
 
 
-/* Контейнер для основной информации профиля */
 .profile-info {
     flex-grow: 1;
     min-width: 200px;
@@ -231,12 +216,10 @@
     transition: color 0.5s ease;
 }
 
-/* Контейнер для разделов с публикациями, друзьями и т.д. */
 .profile-sections {
     margin-top: 30px;
 }
 
-/* Каждый отдельный раздел в профиле */
 .profile-section {
     margin-bottom: 20px;
     padding-bottom: 20px;
@@ -258,7 +241,6 @@
     transition: color 0.5s ease;
 }
 
-/* Стили для списков (например, друзей, активности) внутри секций профиля */
 .profile-section ul {
     list-style: disc;
     padding-left: 20px;
@@ -280,23 +262,18 @@
     color: #1bcabc;
     text-decoration: underline;
 }
-/* Контейнер, который оборачивает все кнопки (формы) в сниппете */
 .profile-actions-buttons-wrapper {
-    display: flex; /* Делаем этот контейнер флекс-контейнером */
-    gap: 10px;    /* Отступ между кнопками */
-    align-items: center; /* Выравнивание кнопок по центру по вертикали */
-    flex-wrap: wrap; /* Чтобы кнопки переносились на новую строку, если не хватает места */
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-/* Убедитесь, что формы внутри profile-actions-buttons-wrapper не мешают flexbox */
-/* Обычно достаточно, что они display: block, но если у них есть свои display: flex, это может конфликтовать */
 .profile-actions-buttons-wrapper form {
-    margin: 0; /* Убрать внешние отступы форм, которые могут ломать gap */
-    /* display: block; */ /* Убедиться, что форма не ломает flexbox */
+    margin: 0;
 }
 
 
-/* Стили для карточки последнего поста */
 .latest-post-card {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -313,7 +290,7 @@
 }
 
 .latest-post-card h4 {
-    color: #007bff; /* Примерный синий цвет */
+    color: #007bff;
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.2em;
@@ -334,12 +311,11 @@
 }
 
 .latest-post-link {
-    text-decoration: none; /* Убираем подчеркивание у ссылки */
-    color: inherit; /* Наследуем цвет текста от родителя */
-    display: block; /* Делаем ссылку блочным элементом, чтобы она занимала всю карточку */
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
-/* Стили для сообщения об отсутствии публикаций */
 .no-posts-message {
     color: #777;
     font-style: italic;

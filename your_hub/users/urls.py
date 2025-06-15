@@ -13,7 +13,6 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
 
 
-    # --- URL для Друзей и Подписок ---
 
     path('friends/', views.friends_list_view, name='friends_list'),
     path('send_friend_request/<int:to_user_id>/', views.send_friend_request, name='send_friend_request'),

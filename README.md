@@ -115,6 +115,6 @@ daphne your\_hub.asgi:application \-p 8001
 
 The Daphne server will listen for WebSockets on port 8001\.
 
-## **👨‍💻 Developer**
+## **👨‍💻 Developers**
 
 **UsernameMeF** \- [GitHub Profile](https://github.com/UsernameMeF)

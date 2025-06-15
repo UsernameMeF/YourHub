@@ -158,6 +158,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REDIRECT
-LOGIN_REDIRECT_URL = '/' # <-- URL для перенаправления после успешного входа (например, на главную)
-LOGIN_URL = '/users/login/' # <-- URL страницы входа (куда перенаправлять неавторизованных пользователей)
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/users/login/' 
 LOGOUT_REDIRECT_URL = '/'

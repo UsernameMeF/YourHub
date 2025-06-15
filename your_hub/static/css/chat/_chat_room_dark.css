@@ -1,165 +1,163 @@
 /* social_network/your_hub/static/css/chat/chat_room_dark.css */
 
-html.dark-theme .chat_room-container { /* Изменено */
-    background-color: #1a1a1a; /* Из _base_dark.css */
+html.dark-theme .chat_room-container {
+    background-color: #1a1a1a;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-html.dark-theme .chat_room-container h1 { /* Изменено */
-    background-color: #252526; /* Из _base_dark.css */
-    color: #f0f0f0; /* Из _base_dark.css */
-    border-bottom-color: #3a3a3a; /* Из _base_dark.css */
+html.dark-theme .chat_room-container h1 {
+    background-color: #252526;
+    color: #f0f0f0;
+    border-bottom-color: #3a3a3a;
 }
 
-html.dark-theme .chat_room-container h1 a { /* Изменено */
+html.dark-theme .chat_room-container h1 a {
     color: #f0f0f0;
 }
 
-html.dark-theme .chat_back-button { /* Добавлено */
-    color: #00e600; /* Акцентный цвет для темной темы */
+html.dark-theme .chat_back-button {
+    color: #00e600;
 }
 
-html.dark-theme .chat_back-button:hover { /* Добавлено */
+html.dark-theme .chat_back-button:hover {
     color: #00cc00;
 }
 
-html.dark-theme .chat_partner-avatar { /* Добавлено */
-    border: 1px solid #5a5a5a; /* Более темная рамка для аватарки */
+html.dark-theme .chat_partner-avatar {
+    border: 1px solid #5a5a5a;
 }
 
 html.dark-theme #typing-indicator {
-    color: #b0b0b0; /* Более светлый серый для темной темы */
+    color: #b0b0b0;
 }
 
-html.dark-theme .chat_log { /* Изменено */
-    scrollbar-color: #555 #2a2a2a; /* Темные аналоги */
+html.dark-theme .chat_log {
+    scrollbar-color: #555 #2a2a2a;
 }
 
-html.dark-theme .chat_log::-webkit-scrollbar-track { /* Изменено */
+html.dark-theme .chat_log::-webkit-scrollbar-track {
     background: #2a2a2a;
 }
 
-html.dark-theme .chat_log::-webkit-scrollbar-thumb { /* Изменено */
+html.dark-theme .chat_log::-webkit-scrollbar-thumb {
     background: #555;
 }
 
-html.dark-theme .chat_log::-webkit-scrollbar-thumb:hover { /* Изменено */
+html.dark-theme .chat_log::-webkit-scrollbar-thumb:hover {
     background: #777;
 }
 
-html.dark-theme .chat_message-item { /* Изменено */
+html.dark-theme .chat_message-item {
     box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    color: #f0f0f0; /* Светлый текст */
+    color: #f0f0f0;
 }
 
-html.dark-theme .my_message { /* Изменено: вернул оригинальный цвет, но темный аналог */
-    background-color: #4a4a4a; /* Темный аналог для #e2f7cb */
+html.dark-theme .my_message {
+    background-color: #4a4a4a;
 }
 
-html.dark-theme .other_message { /* Изменено: вернул оригинальный цвет, но темный аналог */
-    background-color: #4a4a4a; /* Темный аналог для #e2f7cb */
+html.dark-theme .other_message {
+    background-color: #4a4a4a;
 }
 
-html.dark-theme .chat_message-header { /* Изменено */
+html.dark-theme .chat_message-header {
     color: #b0b0b0;
 }
 
-html.dark-theme .chat_sender-username { /* Изменено: вернул оригинальные цвета, но темные аналоги */
-    color: #00e600; /* Яркий зеленый акцент из _base_dark.css */
+html.dark-theme .chat_sender-username {
+    color: #00e600;
 }
 
-html.dark-theme .other_message .chat_sender-username { /* Изменено */
-    color: #00e600; /* Яркий зеленый акцент из _base_dark.css */
+html.dark-theme .other_message .chat_sender-username {
+    color: #00e600;
 }
 
-html.dark-theme .chat_message-timestamp { /* Изменено */
+html.dark-theme .chat_message-timestamp {
     color: #b0b0b0;
 }
 
-html.dark-theme .chat_input-area { /* Изменено */
-    background-color: #252526; /* Из _base_dark.css */
-    border-top-color: #3a3a3a; /* Из _base_dark.css */
+html.dark-theme .chat_input-area {
+    background-color: #252526;
+    border-top-color: #3a3a3a;
 }
 
-html.dark-theme #chat_message-input { /* Изменено */
+html.dark-theme #chat_message-input {
     background-color: #3a3a3a;
     border-color: #4a4a4a;
     color: #f0f0f0;
 }
 
-html.dark-theme #chat_message-input::placeholder { /* Изменено */
+html.dark-theme #chat_message-input::placeholder {
     color: #b0b0b0;
 }
 
-html.dark-theme #chat_message-input:focus { /* Изменено */
-    border-color: #00e600; /* Используем акцентный цвет из _base_dark.css */
+html.dark-theme #chat_message-input:focus {
+    border-color: #00e600;
     box-shadow: 0 0 0 3px rgba(0,230,0,0.25);
 }
 
-html.dark-theme .chat_attachments-preview { /* Изменено */
+html.dark-theme .chat_attachments-preview {
     background-color: #3a3a3a;
     border-color: #4a4a4a;
 }
 
-html.dark-theme .chat_preview-item { /* Изменено */
+html.dark-theme .chat_preview-item {
     background-color: #4a4a4a;
     border-color: #5a5a5a;
 }
 
-html.dark-theme .chat_preview-item .chat_file-icon { /* Изменено */
+html.dark-theme .chat_preview-item .chat_file-icon {
     color: #b0b0b0;
 }
 
-html.dark-theme .chat_preview-item .chat_remove-file { /* Изменено */
+html.dark-theme .chat_preview-item .chat_remove-file {
     background-color: rgba(255, 255, 255, 0.2);
     color: #f0f0f0;
 }
 
-html.dark-theme .chat_preview-item .chat_remove-file:hover { /* Изменено */
+html.dark-theme .chat_preview-item .chat_remove-file:hover {
     background-color: rgba(255, 255, 255, 0.4);
 }
 
-html.dark-theme .chat_preview-item .chat_file-name { /* Изменено */
+html.dark-theme .chat_preview-item .chat_file-name {
     background-color: rgba(0, 0, 0, 0.5);
     color: #f0f0f0;
 }
 
-html.dark-theme .chat_actions .btn-primary { /* Изменено */
-    background-color: #00e600; /* Акцентный цвет из _base_dark.css */
+html.dark-theme .chat_actions .btn-primary {
+    background-color: #00e600;
     border-color: #00e600;
 }
 
-html.dark-theme .chat_actions .btn-primary:hover { /* Изменено */
+html.dark-theme .chat_actions .btn-primary:hover {
     background-color: #00cc00;
     border-color: #00cc00;
 }
 
-html.dark-theme .chat_actions .btn-secondary { /* Изменено */
-    background-color: #6c757d; /* Вернул оригинальный */
+html.dark-theme .chat_actions .btn-secondary {
+    background-color: #6c757d;
     border-color: #6c757d;
 }
 
-html.dark-theme .chat_actions .btn-secondary:hover { /* Изменено */
+html.dark-theme .chat_actions .btn-secondary:hover {
     background-color: #5a6268;
     border-color: #545b62;
 }
 
-html.dark-theme .chat_no-messages { /* Изменено */
+html.dark-theme .chat_no-messages {
     color: #b0b0b0;
 }
 
-/* СТИЛИ ДЛЯ ИНДИКАТОРА ПРОЧТЕНИЯ (ДОБАВЛЕНО ДЛЯ ТЕМНОЙ ТЕМЫ) */
 html.dark-theme .chat_read-status {
-    color: #b0b0b0; /* Более светлый серый для темной темы */
+    color: #b0b0b0;
 }
-
 
 html.dark-theme .chat_message-actions .btn {
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 html.dark-theme .chat_message-actions .chat_edit-button {
-    background-color: #4CAF50; /* Темно-зеленый для редактирования */
+    background-color: #4CAF50;
     border-color: #4CAF50;
     color: #e0e0e0;
 }
@@ -170,7 +168,7 @@ html.dark-theme .chat_message-actions .chat_edit-button:hover {
 }
 
 html.dark-theme .chat_message-actions .chat_delete-button {
-    background-color: #f44336; /* Красный для удаления */
+    background-color: #f44336;
     border-color: #f44336;
     color: #e0e0e0;
 }
@@ -180,6 +178,6 @@ html.dark-theme .chat_message-actions .chat_delete-button:hover {
     border-color: #d32f2f;
 }
 
-html.dark-theme #typing-indicator { /* Скорректированные стили для темной темы */
-    color: #b0b0b0; /* Более светлый серый для темной темы */
+html.dark-theme #typing-indicator {
+    color: #b0b0b0;
 }

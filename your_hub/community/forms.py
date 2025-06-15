@@ -1,4 +1,3 @@
-# community/forms.py
 from django import forms
 from .models import Community, CommunityPost, CommunityComment
 
@@ -19,22 +18,15 @@ class CommunityCreationForm(forms.ModelForm):
         }
 
     def clean_name(self):
-        # Дополнительная проверка на уникальность названия, если нужно более сложное поведение,
-        # чем стандартный unique=True в модели. Пока достаточно уникальности на уровне модели.
         name = self.cleaned_data['name']
-        # Можно добавить проверку на минимальную длину или запрещенные символы
         return name
 
-# Новая форма для редактирования сообщества
 class CommunityUpdateForm(forms.ModelForm):
     class Meta:
         model = Community
-        # В этой форме можно редактировать описание.
-        # Название сообщества 'name' сделаем readonly, если требуется.
-        # Если название должно быть редактируемым, просто включите 'name' в fields.
         fields = ['name', 'description'] 
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Название сообщества', 'readonly': 'readonly'}), # Название пока readonly
+            'name': forms.TextInput(attrs={'placeholder': 'Название сообщества', 'readonly': 'readonly'}),
             'description': forms.Textarea(attrs={'placeholder': 'Краткое описание вашего сообщества'}),
         }
         labels = {
@@ -42,13 +34,9 @@ class CommunityUpdateForm(forms.ModelForm):
             'description': 'Описание',
         }
         help_texts = {
-            'name': 'Название сообщества нельзя изменить после создания.', # Или изменить, если сделаем его редактируемым
+            'name': 'Название сообщества нельзя изменить после создания.',
             'description': 'Обновите описание вашего сообщества.',
         }
-
-
-
-# НОВЫЕ ФОРМЫ ДЛЯ ПОСТОВ СООБЩЕСТВ И КОММЕНТАРИЕВ
 
 
 class CommunityPostForm(forms.ModelForm):
@@ -59,7 +47,7 @@ class CommunityPostForm(forms.ModelForm):
         model = CommunityPost
         fields = ['title', 'content'] 
         widgets = {
-            'title': forms.TextInput(attrs={ # <-- ДОБАВЛЕНО
+            'title': forms.TextInput(attrs={
                 'placeholder': 'Заголовок публикации',
                 'class': 'community-post-title-input'
             }),

@@ -4,7 +4,6 @@
 {% block title %}Группа: {{ group_chat.name }}{% endblock %}
 
 {% block extra_head %}
-    {# Стили для страницы комнаты чата #}
     <link rel="stylesheet" href="{% static 'css/chat/_chat_room.css' %}">
     <link rel="stylesheet" href="{% static 'css/chat/_chat_room_dark.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -13,18 +12,16 @@
 {% block content %}
 <div class="chat_room-container"
      data-chat-type="group" {# Теперь всегда 'group' #}
-     data-chat-id="{{ group_chat.id }}"> {# ID группового чата #}
+     data-chat-id="{{ group_chat.id }}">
     <h1>
         <div class="chat_header-left-elements">
             <a href="{% url 'chat:chat_list' %}" class="chat_back-button" title="Назад к чатам"><i class="fas fa-arrow-left"></i></a>
         </div>
 
-        {# Заголовок чата: название группы #}
-        <span class="chat_header-name"><i class="fas fa-users"></i> {{ group_chat.name }}ㅤ</span> {# Невидимый символ для пробела #}
+        <span class="chat_header-name"><i class="fas fa-users"></i> {{ group_chat.name }}ㅤ</span>
         <div class="group-participants-count">
             {{ group_chat.participants.count }} участник{{ group_chat.participants.count|pluralize:"а,ов" }}
         </div>
-        {# Можно добавить ссылку на информацию о группе: <a href="{% url 'chat:group_info' group_chat.id %}">Подробнее</a> #}
 
         <div id="typing-indicator" style="display: none; font-style: italic; color: gray; margin-top: -30px; margin-bottom: 5px; text-align: center;"></div>
     </h1>
@@ -35,7 +32,6 @@
                  data-message-id="{{ message.id }}"
                  data-read-by-current="{% if message.sender == request.user or request.user in message.read_by.all %}true{% else %}false{% endif %}">
                 <div class="chat_message-header">
-                    {# В групповом чате всегда показываем имя отправителя, если это не текущий пользователь #}
                     {% if message.sender != request.user %}
                         <span class="chat_sender-username group_chat_sender">{{ message.sender.username }}</span>
                     {% else %}

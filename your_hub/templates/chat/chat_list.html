@@ -51,21 +51,6 @@
                                             {% endif %}
                                         </span>
                                     </div>
-                                    <span class="chat_timestamp">
-                                        {% if chat_room.messages.last %}
-                                            {% with last_msg_time=chat_room.messages.last.timestamp %}
-                                                {% if last_msg_time|date:"Y-m-d" == today_date %}
-                                                    {{ last_msg_time|date:"H:i" }}
-                                                {% elif last_msg_time|date:"Y" == today_date|date:"Y" %}
-                                                    {{ last_msg_time|date:"d M" }}
-                                                {% else %}
-                                                    {{ last_msg_time|date:"d.m.Y" }}
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% else %}
-                                            &nbsp;
-                                        {% endif %}
-                                    </span>
                                 {% endif %}
                             {% empty %}
                                 <img src="{% static 'images/default_avatar.png' %}" alt="Аватар" class="chat_avatar">

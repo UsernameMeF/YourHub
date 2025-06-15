@@ -1,6 +1,5 @@
 /* SOCIAL_NETWORK/your_hub/static/css/core/_index_dark.css */
 
-/* ==== Темная тема для главной страницы (Заглушки постов) ==== */
 html.dark-theme .post-placeholder {
     background-color: #252526;
     border-color: #3a3a3a;
@@ -16,9 +15,6 @@ html.dark-theme .post-placeholder p {
 }
 /* SOCIAL_NETWORK/your_hub/static/css/core/_index_dark.css */
 
-/* ... (существующие стили) ... */
-
-/* ==== Темная тема для элементов управления лентой ==== */
 html.dark-theme .feed-controls {
     background-color: #333;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -83,7 +79,6 @@ html.dark-theme .view-toggle-button.active:hover {
     color: #0a0a0a;
 }
 
-/* ==== Темная тема для КОМПАКТНОГО вида поста ==== */
 html.dark-theme .posts-container.compact-view .post-card {
     border-bottom-color: #3a3a3a;
 }
@@ -103,16 +98,16 @@ html.dark-theme .posts-container.compact-view .post-image-thumbnail {
 }
 
 html.dark-theme .page-title {
-    color: #00ff00; /* Темная тема: ярко-зеленый цвет, как в ваших примерах */
-    text-shadow: 1px 1px 3px rgba(0,255,0,0.3); /* Более выраженная тень */
+    color: #00ff00;
+    text-shadow: 1px 1px 3px rgba(0,255,0,0.3);
 }
 
 
-/* --- Dark theme for tag-search-bar Styles (Modernized) --- */
 html.dark-theme .tag-search-bar-container {
-    background-color: #252526; /* Темный фон */
+    background-color: #252526;
     border: 1px solid #3a3a3a;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Более заметная тень в темной теме */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-sizing: border-box;
 }
 
 html.dark-theme .tag-search-bar-input {
@@ -126,12 +121,12 @@ html.dark-theme .tag-search-bar-input::placeholder {
 }
 
 html.dark-theme .tag-search-bar-input:focus {
-    border-color: #00e600; /* Зеленый акцент для тёмной темы */
+    border-color: #00e600;
     box-shadow: 0 0 0 3px rgba(0, 230, 0, 0.25);
 }
 
 html.dark-theme .tag-search-bar-button {
-    background-color: #00e600; /* Зеленая кнопка */
+    background-color: #00e600;
     color: #fff;
 }
 
@@ -144,7 +139,7 @@ html.dark-theme .tag-search-bar-button:active {
 }
 
 html.dark-theme .tag-search-bar-clear-button {
-    background-color: #555555; /* Темно-серый для кнопки очистки */
+    background-color: #555555;
     color: #ffffff;
 }
 
@@ -156,7 +151,6 @@ html.dark-theme .tag-search-bar-clear-button:active {
     background-color: #444444;
 }
 
-/* Переменные для темной темы (если не определены глобально) */
 html.dark-theme {
     --primary-color: #00e600;
     --primary-hover-color: #00ff00;
@@ -179,4 +173,3 @@ html.dark-theme {
     --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.2);
     --shadow-button-hover: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
-

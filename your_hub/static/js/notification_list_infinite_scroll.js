@@ -12,10 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     let currentPage = parseInt(notificationListUl.dataset.page) || 1;
-    let hasNextPage = notificationListUl.dataset.hasNext === 'True'; // Преобразуем строку в булево
+    let hasNextPage = notificationListUl.dataset.hasNext === 'True';
     let isLoading = false;
 
-    // Функция для загрузки уведомлений
     function loadNotifications() {
         if (isLoading || !hasNextPage) {
             return;
@@ -25,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loadMoreButton) loadMoreButton.style.display = 'none';
 
         currentPage++;
-        const url = `/notifications/?page=${currentPage}`; // Используем ваш текущий URL страницы уведомлений
+        const url = `/notifications/?page=${currentPage}`;
 
         fetch(url, {
             headers: {
-                'X-Requested-With': 'XMLHttpRequest' // Важно для Django, чтобы определить AJAX-запрос
+                'X-Requested-With': 'XMLHttpRequest'
             }
         })
         .then(response => {
@@ -42,8 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notificationListUl) {
                 notificationListUl.insertAdjacentHTML('beforeend', data.notifications_html);
                 hasNextPage = data.has_next_page;
-                // Перепривязываем слушатели для новых элементов
-                attachMarkAsReadListeners(); 
+                attachMarkAsReadListeners();
             }
             if (!hasNextPage && loadMoreButton) {
                 loadMoreButton.style.display = 'none';
@@ -51,18 +49,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!hasNextPage && loadingSpinner) {
                 loadingSpinner.style.display = 'none';
             }
-            // Если после загрузки новых уведомлений все еще нет ни одного, показываем сообщение
             if (notificationListUl.children.length === 0 && noNotificationsMessage) {
                 noNotificationsMessage.style.display = 'block';
             } else if (notificationListUl.children.length > 0 && noNotificationsMessage) {
-                 noNotificationsMessage.style.display = 'none';
+                noNotificationsMessage.style.display = 'none';
             }
 
         })
         .catch(error => {
             console.error('Error loading more notifications:', error);
             if (loadingSpinner) loadingSpinner.style.display = 'none';
-            if (loadMoreButton && hasNextPage) loadMoreButton.style.display = 'block'; // Показать кнопку при ошибке
+            if (loadMoreButton && hasNextPage) loadMoreButton.style.display = 'block';
         })
         .finally(() => {
             isLoading = false;
@@ -70,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Intersection Observer для бесконечной прокрутки
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && hasNextPage && !isLoading) {
@@ -78,28 +74,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, {
-        root: null, // viewport
+        root: null,
         rootMargin: '0px',
-        threshold: 0.1 // Когда 10% элемента видно
+        threshold: 0.1
     });
 
-    // Если есть уведомления, начинаем наблюдать за последним элементом
     if (notificationListUl && notificationListUl.lastElementChild) {
         observer.observe(notificationListUl.lastElementChild);
     } else if (loadMoreButton) {
-        // Если нет уведомлений или observer не нужен, но есть кнопка, показываем ее, если есть следующая страница
         if (hasNextPage) loadMoreButton.style.display = 'block';
     }
 
-    // Если нужна кнопка "Загрузить еще" как запасной вариант или основной:
     if (loadMoreButton) {
         loadMoreButton.addEventListener('click', loadNotifications);
     }
-
-    // Перемещаем функции markNotificationAsRead и updateGlobalUnreadNotificationCount
-    // сюда или убедитесь, что они доступны глобально
-    // Я уже перенес их в notifications.js и сделал updateGlobalUnreadNotificationCount глобальной.
-    // Убедитесь, что attachMarkAsReadListeners также вызывается в notifications.js и доступна здесь.
-    // Если она в notifications.js, то она уже глобальна.
-    // attachMarkAsReadListeners() - вызывается в notifications.js при DOMContentLoaded и после добавления новых уведомлений.
 });

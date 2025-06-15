@@ -4,16 +4,15 @@
 {% block title %}Чат с {% for participant in chat_room.participants.all %}{% if participant != request.user %}{{ participant.username }}{% endif %}{% endfor %}{% endblock %}
 
 {% block extra_head %}
-    {# Стили для страницы комнаты чата #}
     <link rel="stylesheet" href="{% static 'css/chat/_chat_room.css' %}">
     <link rel="stylesheet" href="{% static 'css/chat/_chat_room_dark.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<div class="chat_room-container"> {# Изменено #}
+<div class="chat_room-container">
     <h1>
-        <div class="chat_header-left-elements"> {# Новый контейнер для кнопки и аватарки #}
+        <div class="chat_header-left-elements">
             <a href="{% url 'chat:chat_list' %}" class="chat_back-button" title="Назад к чатам"><i class="fas fa-arrow-left"></i></a>
             {% for participant in chat_room.participants.all %}
                 {% if participant != request.user %}
@@ -21,7 +20,6 @@
                 {% endif %}
             {% endfor %}
         </div>
-        {# Имя пользователя остается в центре заголовка #}
         {% for participant in chat_room.participants.all %}
             {% if participant != request.user %}
                 <a href="{% url 'users:user_profile' user_id=participant.id %}">{{ participant.username }}</a>
@@ -30,10 +28,7 @@
         <div id="typing-indicator" style="display: none; font-style: italic; color: gray; margin-top: -30px; margin-bottom: 5px; text-align: center;"></div>
     </h1>
 
-    {# Место для индикатора "печатает..." #}
-
-    <div id="chat_log" class="chat_log"> {# Изменено #}
-        {# Здесь будут загружаться и отображаться сообщения #}
+    <div id="chat_log" class="chat_log">
         {% for message in messages %}
             <div class="chat_message-item {% if message.sender == request.user %}my_message{% else %}other_message{% endif %}"
                  data-message-id="{{ message.id }}"
@@ -64,17 +59,15 @@
                             </div>
                         {% endfor %}
                     </div>
-                    {# ИНДИКАТОР ПРОЧТЕНИЯ #}
                     {% if message.sender == request.user %}
                         <div class="chat_read-status" data-read-count="{{ message.read_by.count }}">
-                            {# Логика для личных и групповых чатов #}
-                            {% if chat_room.participants.count == 2 %} {# Личный чат #}
-                                {% if message.read_by.count == 2 %} {# Прочитано отправителем и собеседником #}
+                            {% if chat_room.participants.count == 2 %}
+                                {% if message.read_by.count == 2 %}
                                     <i class="fas fa-check-double"></i>
-                                {% else %} {# Прочитано только отправителем #}
+                                {% else %}
                                     <i class="fas fa-check"></i>
                                 {% endif %}
-                            {% else %} {# Групповой чат или неопределенный #}
+                            {% else %}
                                 {% if message.read_by.count > 1 %}
                                     <i class="fas fa-check-double"></i> <span>{{ message.read_by.count }}</span>
                                 {% else %}
@@ -84,7 +77,6 @@
                         </div>
                     {% endif %}
                 </div>
-                {# Кнопки редактирования/удаления #}
                 {% if message.sender == request.user %}
                 <div class="chat_message-actions">
                     <button class="chat_edit-button btn btn-sm btn-info" data-message-id="{{ message.id }}"><i class="fas fa-edit"></i> Редактировать</button>
@@ -100,7 +92,6 @@
     <div class="chat_input-area">
         <textarea id="chat_message-input" placeholder="Введите ваше сообщение..." rows="3"></textarea>
         <div class="chat_attachments-preview" id="chat_attachments-preview">
-            {# Здесь будут отображаться предпросмотры выбранных файлов #}
         </div>
         <div class="chat_actions">
             <input type="file" id="chat_file-input" multiple hidden accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
@@ -115,102 +106,79 @@
 
 
 {% block extra_js %}
-{# Скрытые элементы для передачи данных из Django в JavaScript #}
 <div id="room-id" data-room-id="{{ chat_room.id }}" style="display: none;">{{ chat_room.id|json_script:"room-id" }}</div>
 <div id="current-user-id" data-current-user-id="{{ request.user.id }}" style="display: none;">{{ request.user.id|json_script:"current-user-id" }}</div>
-{# ДОБАВЛЕНО: Передаем количество участников чата для логики JS #}
-<div id="chat-participants-count" data-count="{{ chat_room.participants.count }}" style="display: none;"></div> 
+<div id="chat-participants-count" data-count="{{ chat_room.participants.count }}" style="display: none;"></div>
 
 <script id="room-id-data" type="application/json">{{ chat_room.id }}</script>
 <script id="room-type-data" type="application/json">"private"</script>
 
 <script>
-    // Получаем room_id из контекста Django
-    // Получаем room_id и roomType из скрытых <script> тегов
     const roomId = JSON.parse(document.getElementById('room-id-data').textContent);
-    const roomType = JSON.parse(document.getElementById('room-type-data').textContent); // Теперь это "private"
-    // Добавление current_user_username для сравнения
+    const roomType = JSON.parse(document.getElementById('room-type-data').textContent);
     const current_user_username = "{{ request.user.username|escapejs }}";
     const currentUserId = "{{ request.user.id }}";
-    // Получаем количество участников чата
     const chatParticipantsCount = parseInt(document.getElementById('chat-participants-count').dataset.count);
 
-    // Получаем элементы DOM
     const chatLog = document.getElementById('chat_log');
     const messageInput = document.getElementById('chat_message-input');
     const messageSubmit = document.getElementById('chat_message-submit');
     const fileInput = document.getElementById('chat_file-input');
     const attachFileButton = document.getElementById('chat_attach-file-button');
     const attachmentsPreview = document.getElementById('chat_attachments-preview');
-    const cancelEditButton = document.getElementById('chat_cancel-edit-button'); // Новая кнопка отмены
-    
-    // Переменная для хранения ID редактируемого сообщения
-    let editingMessageId = null; 
-    // Переменная для хранения исходных вложений редактируемого сообщения (их URL-ы)
+    const cancelEditButton = document.getElementById('chat_cancel-edit-button');
+
+    let editingMessageId = null;
     let originalAttachments = [];
 
-    // Элементы для индикатора "печатает..."
     const typingStatusContainer = document.getElementById('typing-indicator');
     let typingTimeout = null;
     let isTypingLocally = false;
     const typingUsers = new Set();
 
-    let selectedFiles = []; // Для новых файлов, которые будут загружены
-    let currentAttachments = []; // Для файлов, которые уже прикреплены к сообщению (для редактирования)
+    let selectedFiles = [];
+    let currentAttachments = [];
 
-    // WebSocket-соединение
     const chatSocket = new WebSocket(
-        'ws://127.0.0.1:8001/chat/' // Явный IP и порт 8001
-        + roomType + '/'           // ДОБАВЛЕНО: 'private/'
-        + roomId + '/'             // ИСПОЛЬЗУЕМ roomId, а не room_id (для последовательности)
+        'ws://127.0.0.1:8001/chat/'
+        + roomType + '/'
+        + roomId + '/'
     );
 
-    // --- Логика статуса "просмотрено" ---
-
-    // Set для хранения ID сообщений, которые уже были отмечены как прочитанные текущим пользователем
-    const readMessagesCache = new Set(); 
+    const readMessagesCache = new Set();
 
     const intersectionObserverOptions = {
-        root: chatLog, // Наблюдаем за сообщениями внутри chatLog
-        rootMargin: '0px', // Отступ от краев chatLog
-        threshold: 0.8 // Сообщение считается видимым, если 80% его площади видно
+        root: chatLog,
+        rootMargin: '0px',
+        threshold: 0.8
     };
 
     const messageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) { // Если элемент вошел в область видимости
+            if (entry.isIntersecting) {
                 const messageElement = entry.target;
                 const messageId = messageElement.dataset.messageId;
-                // Проверяем, что сообщение не отправлено текущим пользователем
-                // И что оно еще не помечено как прочитанное текущим пользователем
                 if (messageElement.classList.contains('other_message') && !readMessagesCache.has(messageId) && chatSocket.readyState === WebSocket.OPEN) {
                     console.log(`Message ${messageId} is visible and not read by current user. Sending read_receipt.`);
                     chatSocket.send(JSON.stringify({
                         'type': 'read_receipt',
                         'message_id': messageId
                     }));
-                    readMessagesCache.add(messageId); // Добавляем в кэш, чтобы не отправлять повторно
-                    // Опционально: можно отменить наблюдение за этим сообщением, если оно больше не нужно
-                    // observer.unobserve(messageElement); 
+                    readMessagesCache.add(messageId);
                 }
             }
         });
     }, intersectionObserverOptions);
 
-    // Функция для добавления нового сообщения в Observer
     function addMessageToObserver(messageElement) {
-        // Мы хотим наблюдать только за сообщениями, отправленными ДРУГИМИ пользователями
-        // и которые еще не были помечены как прочитанные текущим пользователем
         if (messageElement.classList.contains('other_message') && messageElement.dataset.readByCurrent === 'false') {
             messageObserver.observe(messageElement);
         }
     }
 
-    // Инициируем наблюдение за уже существующими сообщениями при загрузке
     function observeMessagesForReadReceipts() {
         const messages = chatLog.querySelectorAll('.chat_message-item');
         messages.forEach(messageElement => {
-            // Добавляем в кэш все сообщения, которые уже помечены как прочитанные отправителем или мной
             if (messageElement.dataset.readByCurrent === 'true') {
                 readMessagesCache.add(messageElement.dataset.messageId);
             }
@@ -218,19 +186,15 @@
         });
     }
 
-    // --- Обработчики событий WebSocket ---
-
     chatSocket.onopen = function(e) {
         console.log('WebSocket connected');
         scrollToBottom();
-        // При подключении, сразу инициируем проверку видимости сообщений для прочтения
         observeMessagesForReadReceipts();
     };
 
     chatSocket.onclose = function(e) {
         console.error('WebSocket closed unexpectedly:', e);
-        // Очистить observer при закрытии соединения
-        messageObserver.disconnect(); // Отключаем observer при закрытии сокета
+        messageObserver.disconnect();
     };
 
     chatSocket.onmessage = function(e) {
@@ -247,20 +211,19 @@
                 timestamp: data.timestamp,
                 attachments: data.attachments || [],
                 read_count: data.read_count || 0,
-                is_edited: data.is_edited || false // Добавляем is_edited
+                is_edited: data.is_edited || false
             });
             chatLog.appendChild(newMessageElement);
             scrollToBottom();
-            // Начинаем наблюдать за новым сообщением
-            addMessageToObserver(newMessageElement); 
-            addMessageActionListeners(newMessageElement); // Добавляем слушатели для новых сообщений
+            addMessageToObserver(newMessageElement);
+            addMessageActionListeners(newMessageElement);
         } else if (data.type === 'typing_status') {
             handleTypingStatus(data.username, data.is_typing);
-        } else if (data.type === 'read_receipt_notification') { // НОВЫЙ ТИП: уведомление о прочтении
+        } else if (data.type === 'read_receipt_notification') {
             handleReadReceiptNotification(data.message_id, data.reader_id, data.read_count);
-        } else if (data.type === 'message_edited') { // Обработка отредактированного сообщения
+        } else if (data.type === 'message_edited') {
             handleMessageEdited(data.message_id, data.new_content);
-        } else if (data.type === 'message_deleted') { // Обработка удаленного сообщения
+        } else if (data.type === 'message_deleted') {
             handleMessageDeleted(data.message_id);
         }
     };
@@ -269,24 +232,21 @@
         console.error('WebSocket error:', e);
     };
 
-    // --- Функции для отображения сообщений (ОБНОВЛЕННАЯ) ---
-
     function createMessageElement(message) {
         const messageClass = message.sender_id == currentUserId ? 'my_message' : 'other_message';
         const messageElement = document.createElement('div');
         messageElement.classList.add('chat_message-item', messageClass);
-        messageElement.dataset.messageId = message.id; // Добавляем data-атрибут для ID сообщения
-        // Устанавливаем data-read-by-current при создании элемента
+        messageElement.dataset.messageId = message.id;
         messageElement.dataset.readByCurrent = message.sender_id == currentUserId || (message.read_count > 0 && message.sender_id != currentUserId) ? 'true' : 'false';
 
         let attachmentsHtml = '';
-        let attachmentsData = []; // Для хранения данных вложений, чтобы можно было их загрузить для редактирования
+        let attachmentsData = [];
         if (message.attachments && message.attachments.length > 0) {
             attachmentsHtml += '<div class="chat_message-attachments">';
             message.attachments.forEach(function(attachment) {
                 const attachmentFileName = attachment.original_filename || attachment.file_url.split('/').pop();
                 attachmentsData.push({
-                    id: attachment.id, // Добавляем ID вложения
+                    id: attachment.id,
                     file_url: attachment.file_url,
                     file_type: attachment.file_type,
                     original_filename: attachmentFileName
@@ -302,31 +262,26 @@
             });
             attachmentsHtml += '</div>';
         }
-        messageElement.dataset.attachments = JSON.stringify(attachmentsData); // Сохраняем вложения в data-атрибут
+        messageElement.dataset.attachments = JSON.stringify(attachmentsData);
 
         const senderDisplayName = message.sender_id == currentUserId ? 'Вы' : message.sender_username;
         const isMyMessage = message.sender_id == currentUserId;
 
-        // Определяем HTML для статуса прочтения
         let readStatusHtml = '';
         if (isMyMessage) {
             const readCount = message.read_count || 0;
-            let iconClass = 'fa-check'; // По умолчанию одна галочка
+            let iconClass = 'fa-check';
             let countSpan = '';
 
-            // Логика для личных чатов (2 участника):
-            if (chatParticipantsCount === 2) { 
-                if (readCount >= chatParticipantsCount) { // readCount = 2 (отправитель + 1 собеседник)
+            if (chatParticipantsCount === 2) {
+                if (readCount >= chatParticipantsCount) {
                     iconClass = 'fa-check-double';
                 }
-                // Для личных чатов не показываем цифру
-                countSpan = ''; 
-            } else { // Логика для группового чата (если chatParticipantsCount > 2)
-                // Если у нас групповой чат, то две галочки, если прочитали более 1 человека
-                // и показываем количество
-                if (readCount > 1) { 
+                countSpan = '';
+            } else {
+                if (readCount > 1) {
                     iconClass = 'fa-check-double';
-                    countSpan = `<span>${readCount}</span>`; 
+                    countSpan = `<span>${readCount}</span>`;
                 }
             }
 
@@ -336,21 +291,19 @@
                 </div>`;
         }
 
-        // HTML для статуса редактирования
         const editedStatusHtml = message.is_edited ? '<span class="chat_edited-status">(отредактировано)</span>' : '';
 
         messageElement.innerHTML = `
             <div class="chat_message-header">
                 <span class="chat_sender-username">${senderDisplayName}</span>
                 <span class="chat_message-timestamp">${message.timestamp}</span>
-                ${editedStatusHtml} 
+                ${editedStatusHtml}
             </div>
             <div class="chat_message-content-wrapper">
                 ${message.content ? `<div class="chat_message-content">${message.content.replace(/\n/g, '<br>')}</div>` : ''}
                 ${attachmentsHtml}
-                ${readStatusHtml} {# Вставляем статус прочтения #}
+                ${readStatusHtml}
             </div>
-            {# Кнопки редактирования/удаления #}
             ${isMyMessage ? `
             <div class="chat_message-actions">
                 <button class="chat_edit-button btn btn-sm btn-info" data-message-id="${message.id}"><i class="fas fa-edit"></i> Редактировать</button>
@@ -361,7 +314,6 @@
     }
 
     function scrollToBottom() {
-        // Проверяем наличие сообщений перед прокруткой, чтобы избежать ошибок на пустом чате
         if (chatLog.querySelector('.chat_message-item')) {
             chatLog.scrollTop = chatLog.scrollHeight;
         }
@@ -426,48 +378,43 @@
         }
     }
 
-    // Функция для обработки уведомлений о прочтении от WebSocket
     function handleReadReceiptNotification(messageId, readerId, readCount) {
         const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
         if (messageElement) {
-            // Обновляем статус прочтения только для СООБЩЕНИЙ, ОТПРАВЛЕННЫХ ТЕКУЩИМ ПОЛЬЗОВАТЕЛЕМ
             if (messageElement.classList.contains('my_message')) {
                 const readStatusElement = messageElement.querySelector('.chat_read-status');
                 if (readStatusElement) {
-                    readStatusElement.dataset.readCount = readCount; // Обновляем data-атрибут
+                    readStatusElement.dataset.readCount = readCount;
                     const icon = readStatusElement.querySelector('i');
-                    let countSpan = readStatusElement.querySelector('span'); // Находим существующий span
+                    let countSpan = readStatusElement.querySelector('span');
 
-                    // Логика для личных чатов (2 участника):
-                    if (chatParticipantsCount === 2) { 
-                        if (readCount >= chatParticipantsCount) { // readCount = 2 (прочитано отправителем + собеседником)
+                    if (chatParticipantsCount === 2) {
+                        if (readCount >= chatParticipantsCount) {
                             icon.classList.remove('fa-check');
                             icon.classList.add('fa-check-double');
-                            if (countSpan) { // Убеждаемся, что span отсутствует для личных чатов
+                            if (countSpan) {
                                 countSpan.remove();
                             }
-                        } else { // readCount = 1 (прочитано только отправителем)
+                        } else {
                             icon.classList.remove('fa-check-double');
                             icon.classList.add('fa-check');
                             if (countSpan) {
                                 countSpan.remove();
                             }
                         }
-                    } else { // Логика для группового чата (если chatParticipantsCount > 2)
-                        // Если у нас групповой чат, то две галочки, если прочитали более 1 человека
-                        // и показываем количество
-                        if (readCount > 1) { 
+                    } else {
+                        if (readCount > 1) {
                             icon.classList.remove('fa-check');
                             icon.classList.add('fa-check-double');
-                            if (!countSpan) { 
+                            if (!countSpan) {
                                 countSpan = document.createElement('span');
                                 readStatusElement.appendChild(countSpan);
                             }
                             countSpan.textContent = readCount;
-                        } else { 
+                        } else {
                             icon.classList.remove('fa-check-double');
                             icon.classList.add('fa-check');
-                            if (countSpan) { 
+                            if (countSpan) {
                                 countSpan.remove();
                             }
                         }
@@ -477,87 +424,70 @@
         }
     }
 
-    // --- Функции для редактирования и удаления сообщений ---
 
-    // Обработчик события для отредактированного сообщения через WebSocket
-    function handleMessageEdited(messageId, newContent, attachments) { // Добавлен аргумент 'attachments'
-    const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
-    if (messageElement) {
-        const contentElement = messageElement.querySelector('.chat_message-content');
-        if (contentElement) {
-            // Обновляем текстовое содержимое
-            contentElement.innerHTML = newContent.replace(/\n/g, '<br>');
+    function handleMessageEdited(messageId, newContent, attachments) {
+        const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            const contentElement = messageElement.querySelector('.chat_message-content');
+            if (contentElement) {
+                contentElement.innerHTML = newContent.replace(/\n/g, '<br>');
 
-            // Обновляем статус "отредактировано"
-            let editedStatus = messageElement.querySelector('.chat_edited-status');
-            if (!editedStatus) {
-                editedStatus = document.createElement('span');
-                editedStatus.classList.add('chat_edited-status');
-                messageElement.querySelector('.chat_message-header').appendChild(editedStatus);
-            }
-            editedStatus.textContent = '(отредактировано)';
-        }
-
-        // --- ЛОГИКА ОБНОВЛЕНИЯ ВЛОЖЕНИЙ ---
-        const messageContentWrapper = messageElement.querySelector('.chat_message-content-wrapper'); // Контейнер, который содержит .chat_message-content и вложения
-
-        // Находим существующий контейнер вложений, если он есть
-        let attachmentsContainer = messageContentWrapper.querySelector('.chat_attachments-wrapper'); // Используем новый класс для обертки вложений
-        
-        // Удаляем все старые вложения и, возможно, их контейнер
-        if (attachmentsContainer) {
-            attachmentsContainer.innerHTML = ''; // Очищаем содержимое контейнера
-        }
-
-        // Если есть новые вложения, или если они были, но теперь их нет,
-        // нужно управлять видимостью контейнера
-        if (attachments && attachments.length > 0) {
-            if (!attachmentsContainer) {
-                // Если контейнера не было, создаем его
-                attachmentsContainer = document.createElement('div');
-                attachmentsContainer.classList.add('chat_attachments-wrapper'); // Новый класс для обертки
-                // Вставляем контейнер вложений после контента сообщения
-                // Если contentElement существует, вставляем после него, иначе в начало wrapper
-                if (contentElement) {
-                    contentElement.after(attachmentsContainer);
-                } else {
-                    messageContentWrapper.appendChild(attachmentsContainer);
+                let editedStatus = messageElement.querySelector('.chat_edited-status');
+                if (!editedStatus) {
+                    editedStatus = document.createElement('span');
+                    editedStatus.classList.add('chat_edited-status');
+                    messageElement.querySelector('.chat_message-header').appendChild(editedStatus);
                 }
+                editedStatus.textContent = '(отредактировано)';
             }
 
-            attachments.forEach(attachment => {
-                const attachmentItem = document.createElement('div');
-                attachmentItem.classList.add('chat_attachment-item');
-                attachmentItem.dataset.attachmentId = attachment.id;
+            const messageContentWrapper = messageElement.querySelector('.chat_message-content-wrapper');
+            let attachmentsContainer = messageContentWrapper.querySelector('.chat_attachments-wrapper');
 
-                let innerHtml = '';
-                if (attachment.file_type === 'image') {
-                    innerHtml = `<img src="${attachment.file_url}" alt="${attachment.original_filename}" class="chat_image" onclick="window.open(this.src)">`;
-                } else if (attachment.file_type === 'video') {
-                    innerHtml = `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не поддерживает видео тег.</video>`;
-                } else if (attachment.file_type === 'document') {
-                    innerHtml = `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachment.original_filename}</a>`;
-                }
-                attachmentItem.innerHTML = innerHtml;
-                attachmentsContainer.appendChild(attachmentItem);
-            });
-        } else {
-            // Если вложений нет, и контейнер существует, удаляем его
             if (attachmentsContainer) {
-                attachmentsContainer.remove();
+                attachmentsContainer.innerHTML = '';
+            }
+
+            if (attachments && attachments.length > 0) {
+                if (!attachmentsContainer) {
+                    attachmentsContainer = document.createElement('div');
+                    attachmentsContainer.classList.add('chat_attachments-wrapper');
+                    if (contentElement) {
+                        contentElement.after(attachmentsContainer);
+                    } else {
+                        messageContentWrapper.appendChild(attachmentsContainer);
+                    }
+                }
+
+                attachments.forEach(attachment => {
+                    const attachmentItem = document.createElement('div');
+                    attachmentItem.classList.add('chat_attachment-item');
+                    attachmentItem.dataset.attachmentId = attachment.id;
+
+                    let innerHtml = '';
+                    if (attachment.file_type === 'image') {
+                        innerHtml = `<img src="${attachment.file_url}" alt="${attachment.original_filename}" class="chat_image" onclick="window.open(this.src)">`;
+                    } else if (attachment.file_type === 'video') {
+                        innerHtml = `<video controls class="chat_video"><source src="${attachment.file_url}" type="video/mp4">Ваш браузер не поддерживает видео тег.</video>`;
+                    } else if (attachment.file_type === 'document') {
+                        innerHtml = `<a href="${attachment.file_url}" target="_blank" class="chat_document-link"><i class="fas fa-file-alt"></i> ${attachment.original_filename}</a>`;
+                    }
+                    attachmentItem.innerHTML = innerHtml;
+                    attachmentsContainer.appendChild(attachmentItem);
+                });
+            } else {
+                if (attachmentsContainer) {
+                    attachmentsContainer.remove();
+                }
             }
         }
-        // --- КОНЕЦ ЛОГИКИ ОБНОВЛЕНИЯ ВЛОЖЕНИЙ ---
-    }
     }
 
-    // Обработчик события для удаленного сообщения через WebSocket
     function handleMessageDeleted(messageId) {
         const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
         if (messageElement) {
             messageElement.remove();
         }
-        // Если чат стал пустым, показать сообщение "Пока нет сообщений..."
         if (chatLog.children.length === 0) {
             const noMessagesP = document.createElement('p');
             noMessagesP.classList.add('chat_no-messages');
@@ -566,7 +496,6 @@
         }
     }
 
-    // Инициализация слушателей для кнопок редактирования/удаления
     function addMessageActionListeners(container) {
         const editButtons = container.querySelectorAll('.chat_edit-button');
         editButtons.forEach(button => {
@@ -585,33 +514,27 @@
         });
     }
 
-    // Функция для начала редактирования сообщения
     async function editMessage(messageId) {
         const messageElement = chatLog.querySelector(`.chat_message-item[data-message-id="${messageId}"]`);
         if (!messageElement) return;
 
         editingMessageId = messageId;
-        messageSubmit.textContent = 'Сохранить'; // Меняем текст кнопки
-        cancelEditButton.style.display = 'inline-block'; // Показываем кнопку отмены
-        attachFileButton.style.display = 'inline-block'; // Показываем кнопку прикрепления (если скрывалась)
+        messageSubmit.textContent = 'Сохранить';
+        cancelEditButton.style.display = 'inline-block';
+        attachFileButton.style.display = 'inline-block';
 
         const messageContentElement = messageElement.querySelector('.chat_message-content');
         messageInput.value = messageContentElement ? messageContentElement.innerText : '';
-        
-        // Загружаем вложения для редактирования
+
         currentAttachments = JSON.parse(messageElement.dataset.attachments || '[]');
-        // Создаем "фиктивные" File объекты из URL для отображения в preview и для FormData
-        // Это необходимо, чтобы существующие вложения можно было "удалять" из предпросмотра
-        // и отправлять обратно на сервер.
         selectedFiles = currentAttachments.map(att => {
-            // Создаем простой объект, имитирующий File, с необходимыми свойствами
             return {
                 name: att.original_filename,
-                size: 0, // Размер не важен для уже загруженных
-                type: att.file_type === 'image' ? 'image/jpeg' : (att.file_type === 'video' ? 'video/mp4' : 'application/octet-stream'), // Пример MIME типа
-                url: att.file_url, // Оригинальный URL вложения
-                id: att.id, // ID вложения в БД
-                isExisting: true // Флаг, чтобы отличать от новых загруженных файлов
+                size: 0,
+                type: att.file_type === 'image' ? 'image/jpeg' : (att.file_type === 'video' ? 'video/mp4' : 'application/octet-stream'),
+                url: att.file_url,
+                id: att.id,
+                isExisting: true
             };
         });
         updateAttachmentsPreview();
@@ -619,31 +542,29 @@
         messageInput.focus();
     }
 
-    // Функция для отмены редактирования
     cancelEditButton.onclick = function() {
         editingMessageId = null;
         messageInput.value = '';
-        selectedFiles = []; // Очищаем выбранные файлы
-        currentAttachments = []; // Очищаем текущие вложения
+        selectedFiles = [];
+        currentAttachments = [];
         updateAttachmentsPreview();
-        messageSubmit.textContent = 'Отправить'; // Возвращаем текст кнопки
-        cancelEditButton.style.display = 'none'; // Скрываем кнопку отмены
+        messageSubmit.textContent = 'Отправить';
+        cancelEditButton.style.display = 'none';
     };
 
-    // Функция для удаления сообщения
     async function deleteMessage(messageId) {
         if (!confirm('Вы уверены, что хотите удалить это сообщение?')) {
             return;
         }
 
         try {
-            const response = await fetch(`/chat/${roomType}/${roomId}/delete_message/${messageId}/`, { // ИЗМЕНЕНО
+            const response = await fetch(`/chat/${roomType}/${roomId}/delete_message/${messageId}/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({}) // Пустой body для POST
+                body: JSON.stringify({})
             });
 
             if (!response.ok) {
@@ -651,7 +572,6 @@
                 throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
-            // Успешно удалено, WebSocket consumer отправит 'message_deleted' всем
             console.log(`Message ${messageId} deleted successfully.`);
         } catch (error) {
             console.error('Error deleting message:', error);
@@ -659,10 +579,7 @@
         }
     }
 
-
-    // --- Обработчики отправки сообщений (ОБНОВЛЕННАЯ) ---
-
-    messageSubmit.onclick = async function(e) { // Делаем функцию асинхронной
+    messageSubmit.onclick = async function(e) {
         if (chatSocket.readyState !== WebSocket.OPEN) {
             console.error('WebSocket is not open. Cannot send message.');
             alert('Соединение с чатом не установлено. Пожалуйста, обновите страницу.');
@@ -676,10 +593,8 @@
         }
 
         if (editingMessageId) {
-            // Режим редактирования
             await sendEditMessage(message, editingMessageId);
         } else {
-            // Режим отправки нового сообщения
             if (selectedFiles.length > 0) {
                 await uploadFiles(message);
             } else {
@@ -692,7 +607,7 @@
             }
         }
         resetTypingStatus();
-        cancelEditButton.click(); // Сбрасываем режим редактирования после отправки/сохранения
+        cancelEditButton.click();
     };
 
     messageInput.onkeyup = function(e) {
@@ -702,26 +617,23 @@
         }
     };
 
-    // Функция для отправки отредактированного сообщения
     async function sendEditMessage(newContent, messageId) {
         console.log('sendEditMessage called with:');
-        console.log('roomType:', roomType); // Добавьте
-        console.log('roomId:', roomId);     // Добавьте
-        console.log('messageId:', messageId); // Добавьте
-        console.log('newContent:', newContent); // Добавьте
+        console.log('roomType:', roomType);
+        console.log('roomId:', roomId);
+        console.log('messageId:', messageId);
+        console.log('newContent:', newContent);
 
         const formData = new FormData();
         formData.append('message_content', newContent);
-        
-        // Отдельно добавляем существующие вложения (те, которые не были удалены)
+
         const existingAttachmentIds = selectedFiles
             .filter(file => file.isExisting)
             .map(file => file.id);
         formData.append('existing_attachments', JSON.stringify(existingAttachmentIds));
 
-        // Добавляем новые файлы, которые были выбраны
         selectedFiles.filter(file => !file.isExisting).forEach(file => {
-            formData.append('new_files', file); // Используем 'new_files' для новых
+            formData.append('new_files', file);
         });
 
         try {
@@ -740,9 +652,7 @@
 
             const result = await response.json();
             console.log('Message edited successfully:', result);
-            // WebSocket consumer отправит 'message_edited' всем
-            
-            // Сбрасываем состояние
+
             editingMessageId = null;
             messageInput.value = '';
             selectedFiles = [];
@@ -756,16 +666,12 @@
         }
     }
 
-
-    // --- Логика загрузки файлов (AJAX) ---
-
     attachFileButton.onclick = function() {
         fileInput.click();
     };
 
     fileInput.onchange = function(e) {
         const newFiles = Array.from(e.target.files);
-        // Добавляем новые файлы к уже выбранным (или существующим для редактирования)
         selectedFiles = selectedFiles.concat(newFiles);
         updateAttachmentsPreview();
     };
@@ -783,7 +689,7 @@
             previewItem.classList.add('chat_preview-item');
 
             let fileContent;
-            let fileSrc = file.isExisting ? file.url : URL.createObjectURL(file); // Используем URL для существующих или blob для новых
+            let fileSrc = file.isExisting ? file.url : URL.createObjectURL(file);
 
             if (file.type.startsWith('image/')) {
                 fileContent = document.createElement('img');
@@ -803,7 +709,6 @@
             removeButton.classList.add('chat_remove-file');
             removeButton.innerHTML = '&times;';
             removeButton.onclick = () => {
-                // Если файл новый, отзываем URL
                 if (!file.isExisting && fileContent.src.startsWith('blob:')) {
                     URL.revokeObjectURL(fileContent.src);
                 }
@@ -849,7 +754,7 @@
         });
 
         try {
-            const response = await fetch(`/chat/${roomType}/${roomId}/upload_attachment/`, { 
+            const response = await fetch(`/chat/${roomType}/${roomId}/upload_attachment/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -872,7 +777,7 @@
             console.error('Error uploading files:', error);
             alert('Ошибка при загрузке файлов: ' + error.message);
         } finally {
-            resetTypingStatus(); 
+            resetTypingStatus();
         }
     }
 
@@ -891,8 +796,6 @@
         return cookieValue;
     }
 
-    // --- Скрипт для AJAX-пагинации истории сообщений ---
-
     let isLoadingMessages = false;
     let hasMoreMessages = true;
 
@@ -902,7 +805,7 @@
         }
 
         isLoadingMessages = true;
-        
+
         const firstMessageElement = chatLog.querySelector('.chat_message-item');
         const beforeMessageId = firstMessageElement ? firstMessageElement.dataset.messageId : null;
 
@@ -929,7 +832,6 @@
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
                 data.messages.forEach(message => {
-                    // Передаем read_by_count и is_edited при рендеринге старых сообщений
                     const msgElement = createMessageElement({
                         id: message.id,
                         sender_id: message.sender_id,
@@ -939,21 +841,18 @@
                         timestamp: message.timestamp,
                         attachments: message.attachments || [],
                         read_count: message.read_count || 0,
-                        is_edited: message.is_edited || false // Получаем is_edited для старых сообщений
+                        is_edited: message.is_edited || false
                     });
                     fragment.appendChild(msgElement);
-                    addMessageToObserver(msgElement); // Добавляем в Observer
-                    addMessageActionListeners(msgElement); // Добавляем слушатели
+                    addMessageToObserver(msgElement);
+                    addMessageActionListeners(msgElement);
                 });
-                // Вставляем сообщения сверху
-                chatLog.insertBefore(fragment, chatLog.firstChild); 
-                
+                chatLog.insertBefore(fragment, chatLog.firstChild);
+
                 const newScrollHeight = chatLog.scrollHeight;
                 chatLog.scrollTop = oldScrollTop + (newScrollHeight - oldScrollHeight);
 
-                // После загрузки старых сообщений, инициируем наблюдение за ними
-                // и отправляем read_receipts для видимых непрочитанных
-                if (chatSocket.readyState === WebSocket.OPEN) { 
+                if (chatSocket.readyState === WebSocket.OPEN) {
                     observeMessagesForReadReceipts();
                 }
             } else {
@@ -972,7 +871,6 @@
                 loadingIndicator.parentNode.removeChild(loadingIndicator);
             }
             isLoadingMessages = false;
-            // Рекурсивный вызов, если контента недостаточно, чтобы скроллить
             if (hasMoreMessages && chatLog.scrollTop === 0 && chatLog.scrollHeight <= chatLog.clientHeight) {
                 loadOldMessages();
             }
@@ -985,12 +883,9 @@
         }
     });
 
-    // Инициализация после загрузки DOM
     document.addEventListener('DOMContentLoaded', () => {
         scrollToBottom();
-        // observeMessagesForReadReceipts() будет вызван в chatSocket.onopen
-        // Добавляем слушатели для уже существующих сообщений
-        addMessageActionListeners(chatLog); 
+        addMessageActionListeners(chatLog);
     });
 
 </script>

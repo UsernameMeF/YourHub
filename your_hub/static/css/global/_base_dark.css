@@ -1,9 +1,8 @@
 /* SOCIAL_NETWORK/your_hub/static/css/global/_base_dark.css */
 
-/* ==== Стили Темной Темы (Переопределяют базовые элементы сайта) ==== */
 html.dark-theme body {
-    background-color: #1a1a1a; /* Очень темный фон */
-    color: #f0f0f0; /* Светлый текст */
+    background-color: #1a1a1a;
+    color: #f0f0f0;
 }
 
 html.dark-theme .header {
@@ -13,7 +12,7 @@ html.dark-theme .header {
 }
 
 html.dark-theme .site-title {
-    color: #00e600; /* Яркий зеленый акцент */
+    color: #00e600;
 }
 html.dark-theme .site-title:hover {
     color: #00ff00;

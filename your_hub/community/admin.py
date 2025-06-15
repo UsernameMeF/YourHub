@@ -1,8 +1,6 @@
-# community/admin.py
 from django.contrib import admin
 from .models import Community, CommunityMembership, CommunityPost, CommunityComment
 
-# Регистрируем модель Community
 @admin.register(Community)
 class CommunityAdmin(admin.ModelAdmin):
     list_display = ('name', 'creator', 'created_at', 'members_count_display')
@@ -15,42 +13,36 @@ class CommunityAdmin(admin.ModelAdmin):
     members_count_display.short_description = "Кол-во участников"
 
 
-# Регистрируем модель CommunityMembership
 @admin.register(CommunityMembership)
 class CommunityMembershipAdmin(admin.ModelAdmin):
     list_display = ('user', 'community', 'date_joined', 'is_admin')
     list_filter = ('date_joined', 'is_admin', 'community')
     search_fields = ('user__username', 'community__name')
     readonly_fields = ('date_joined',)
-    raw_id_fields = ('user', 'community') # Удобно для выбора связанных объектов
+    raw_id_fields = ('user', 'community')
 
 
-# Регистрируем модель CommunityPost
 @admin.register(CommunityPost)
 class CommunityPostAdmin(admin.ModelAdmin):
     list_display = ('community', 'posted_by', 'content_snippet', 'created_at', 'total_likes', 'total_dislikes', 'views_count', 'is_edited')
     list_filter = ('created_at', 'is_edited', 'community')
     search_fields = ('community__name', 'posted_by__username', 'content')
     readonly_fields = ('created_at', 'views_count')
-    # Добавляем Inline для вложений, чтобы их можно было добавлять прямо из поста
-    inlines = [] # Позже добавим CommunityPostAttachmentInline
+    inlines = []
     
     def content_snippet(self, obj):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
     content_snippet.short_description = "Содержимое (фрагмент)"
 
 
-
-# Регистрируем модель CommunityComment
 @admin.register(CommunityComment)
 class CommunityCommentAdmin(admin.ModelAdmin):
     list_display = ('post', 'author', 'text_snippet', 'created_at')
     list_filter = ('created_at', 'post__community')
     search_fields = ('author__username', 'text', 'post__content')
     readonly_fields = ('created_at',)
-    raw_id_fields = ('post', 'author') # Удобно для выбора связанных объектов
+    raw_id_fields = ('post', 'author')
 
     def text_snippet(self, obj):
         return obj.text[:50] + '...' if len(obj.text) > 50 else obj.text
     text_snippet.short_description = "Текст (фрагмент)"
-

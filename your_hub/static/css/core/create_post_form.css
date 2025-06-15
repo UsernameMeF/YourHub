@@ -18,7 +18,6 @@
     font-weight: 700;
 }
 
-/* Стили для обертки полей формы */
 .form-field-wrapper {
     margin-bottom: 20px;
 }
@@ -30,14 +29,13 @@
     color: #555;
 }
 
-/* Стили для полей ввода (input, textarea) */
 .form-input-field {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1em;
-    box-sizing: border-box; /* Учитываем padding в общей ширине */
+    box-sizing: border-box;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -47,16 +45,14 @@
     outline: none;
 }
 
-/* Стили для сообщений об ошибках */
 .errorlist, .error-message {
     color: #dc3545;
     font-size: 0.85em;
     margin-top: 5px;
-    padding-left: 5px; /* Небольшой отступ */
-    list-style-type: none; /* Убрать маркеры для ul.errorlist */
+    padding-left: 5px;
+    list-style-type: none;
 }
 
-/* Стили для текста помощи */
 .help-text {
     font-size: 0.85em;
     color: #6c757d;
@@ -64,7 +60,6 @@
     padding-left: 5px;
 }
 
-/* --- Стили для секции загрузки изображений --- */
 .image-upload-section {
     margin-top: 30px;
     padding: 20px;
@@ -83,15 +78,15 @@
 
 .image-previews-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 120px для более крупных превью */
-    gap: 15px; /* Увеличим расстояние */
-    margin-bottom: 20px; /* Отступ от кнопки добавления */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
     padding: 10px 0;
 }
 
 .image-preview-item {
     position: relative;
-    width: 120px; /* Фиксированный размер для предпросмотра */
+    width: 120px;
     height: 120px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -106,24 +101,24 @@
 .image-preview-item img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: cover; /* Чтобы изображение полностью заполняло контейнер, обрезая лишнее */
+    object-fit: cover;
     display: block;
 }
 
 .remove-image-button {
     position: absolute;
-    top: -5px; /* Немного выйти за пределы для удобства */
-    right: -5px; /* Немного выйти за пределы для удобства */
+    top: -5px;
+    right: -5px;
     background-color: #dc3545;
     color: white;
-    border: 2px solid #fff; /* Белая обводка */
+    border: 2px solid #fff;
     border-radius: 50%;
-    width: 28px; /* Чуть больше размер */
+    width: 28px;
     height: 28px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2em; /* Больше крестик */
+    font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
     line-height: 1;
@@ -136,11 +131,10 @@
     transform: scale(1.1);
 }
 
-/* Стили для кнопки "Добавить изображение" */
 .add-image-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #28a745; /* Зеленый цвет для добавления */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -148,7 +142,7 @@
     font-size: 1em;
     font-weight: 600;
     transition: background-color 0.2s ease;
-    min-width: 180px; /* Добавим минимальную ширину */
+    min-width: 180px;
     text-align: center;
 }
 
@@ -161,18 +155,16 @@
     cursor: not-allowed;
 }
 
-/* Стили для скрытого инпута type="file", который используется JS */
 .hidden-input-file {
     display: none;
 }
 
-/* --- Стили для кнопок действия формы --- */
 .form-actions {
     margin-top: 30px;
-    text-align: right; /* Выравнивание кнопок по правому краю */
+    text-align: right;
     display: flex;
-    justify-content: flex-end; /* Растянуть для использования gap */
-    gap: 15px; /* Промежуток между кнопками */
+    justify-content: flex-end;
+    gap: 15px;
 }
 
 .form-button {
@@ -200,7 +192,7 @@
 }
 
 .form-button.cancel {
-    background-color: #6c757d; /* Серый цвет для отмены */
+    background-color: #6c757d;
     color: white;
     border-color: #6c757d;
 }
@@ -210,7 +202,6 @@
     border-color: #5a6268;
 }
 
-/* Стиль для ошибок загрузки изображений (будет выводиться JS) */
 .image-upload-section .error-message {
     color: #dc3545;
     font-size: 0.9em;

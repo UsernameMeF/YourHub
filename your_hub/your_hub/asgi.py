@@ -1,5 +1,5 @@
 import os
-# ОБЯЗАТЕЛЬНО В ТАКОМ ПОРЯДКЕ
+#important 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_hub.settings')
 
 from django.core.asgi import get_asgi_application
@@ -9,7 +9,6 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
-# Импортируем маршруты из обоих приложений
 from chat import routing as chat_routing
 from notifications import routing as notifications_routing 
 

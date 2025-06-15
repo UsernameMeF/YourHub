@@ -1,6 +1,6 @@
-/* community_list.css - Переиспользуем стили chat_list.css, но с префиксом community_ */
-.main-container.community-list-container { /* Уточняем селектор */
-    position: relative; /* ОЧЕНЬ ВАЖНО: Делаем родительский контейнер позиционированным */
+/* community_list.css */
+.main-container.community-list-container {
+    position: relative;
     max-width: 900px;
     margin: 20px auto;
     padding: 20px;
@@ -91,23 +91,22 @@
     text-decoration: underline;
 }
 
-.top-right-actions { /* НОВЫЙ КОНТЕЙНЕР ДЛЯ КНОПОК */
-    position: absolute; /* Абсолютное позиционирование */
-    top: 20px; /* Отступ от верха, равен padding родителя */
-    right: 20px; /* Отступ от правого края, равен padding родителя */
-    z-index: 10; /* Убедимся, что кнопки поверх других элементов */
-    display: flex; /* Делаем flex-контейнером */
-    gap: 10px; /* Отступ между кнопками */
-    flex-wrap: wrap; /* Позволяет кнопкам переноситься на новую строку при нехватке места */
-    justify-content: flex-end; /* Выравнивание кнопок по правому краю внутри этого контейнера */
+.top-right-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
-/* Общие стили для кнопок, чтобы они выглядели одинаково */
-.btn { /* Используем общий класс, если его нет, можно создать */
+.btn {
     display: inline-flex;
     align-items: center;
     padding: 10px 15px;
-    border: 1px solid transparent; /* Пока прозрачный, цвет будет в специфичных классах */
+    border: 1px solid transparent;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
@@ -115,18 +114,17 @@
     transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
-    color: white; /* Цвет текста для кнопок */
+    color: white;
 }
 
 .btn i {
     margin-right: 8px;
     font-size: 18px;
-    color: inherit; /* Цвет иконки наследуется от цвета текста кнопки */
+    color: inherit;
 }
 
-/* Стили для кнопки "Создать сообщество" */
 .create-community-btn {
-    background-color: #23e2dd; /* Акцентный цвет */
+    background-color: #23e2dd;
     border-color: #23e2dd;
 }
 
@@ -148,9 +146,9 @@
     display: inline-flex;
     align-items: center;
     padding: 10px 15px;
-    border: 1px solid #23e2dd; /* Рамка в акцентный цвет */
+    border: 1px solid #23e2dd;
     border-radius: 8px;
-    background-color: #23e2dd; /* Акцентный цвет */
+    background-color: #23e2dd;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -160,22 +158,22 @@
     white-space: nowrap;
 }
 
-.find-community-btn.absolute-top-right { /* НОВЫЕ СТИЛИ ДЛЯ ПОЗИЦИОНИРОВАНИЯ */
-    position: absolute; /* Абсолютное позиционирование */
-    top: 20px; /* Отступ от верха, равен padding родителя */
-    right: 20px; /* Отступ от правого края, равен padding родителя */
-    z-index: 10; /* Убедимся, что кнопка поверх других элементов */
+.find-community-btn.absolute-top-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
 }
 
 .find-community-btn:hover {
-    background-color: #1bcabc; /* Темнее при наведении */
+    background-color: #1bcabc;
     border-color: #1bcabc;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .find-community-btn:active {
-    background-color: #1a9e9a; /* Еще темнее при нажатии */
+    background-color: #1a9e9a;
     border-color: #1a9e9a;
     transform: translateY(0);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -187,29 +185,27 @@
     color: inherit;
 }
 
-
-/* Адаптивность */
 @media (max-width: 600px) {
     .main-container.community-list-container {
-        padding-top: 70px; /* Добавляем отступ сверху, чтобы кнопки не перекрывали заголовок */
+        padding-top: 70px;
     }
     .top-right-actions {
-        position: static; /* Отключаем абсолютное позиционирование на мобильных */
-        width: 100%; /* Растягиваем на всю ширину */
-        margin-bottom: 20px; /* Отступ снизу */
-        flex-direction: column; /* Кнопки в столбец */
-        align-items: stretch; /* Растягиваем кнопки по ширине */
-        order: -1; /* Помещаем перед заголовком, если контейнер main-container flex-column */
-        padding: 0 20px; /* Добавляем горизонтальный padding, чтобы кнопки не прилипали к краям экрана */
-        box-sizing: border-box; /* Для корректного padding */
-        top: auto; /* Сбрасываем top/right */
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: stretch;
+        order: -1;
+        padding: 0 20px;
+        box-sizing: border-box;
+        top: auto;
         right: auto;
     }
-    .btn { /* Общие стили для кнопок на мобильных */
-        width: 100%; /* Каждая кнопка занимает 100% ширины */
-        justify-content: center; /* Центрируем содержимое */
+    .btn {
+        width: 100%;
+        justify-content: center;
     }
     .community-list-title {
-        text-align: center; /* Центрируем заголовок */
+        text-align: center;
     }
 }

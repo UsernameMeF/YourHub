@@ -4,14 +4,10 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.apps import apps
 
-# Флаг для предотвращения рекурсии
 _DND_SYNC_IN_PROGRESS_PROFILE = False
 
-@receiver(post_save, sender=apps.get_model('users', 'Profile')) # Использование apps.get_model
+@receiver(post_save, sender=apps.get_model('users', 'Profile'))
 def sync_profile_status_with_dnd_setting(sender, instance, **kwargs):
-    """
-    Синхронизирует поле статуса в Profile с флагом do_not_disturb в UserNotificationSettings.
-    """
     global _DND_SYNC_IN_PROGRESS_PROFILE
     if _DND_SYNC_IN_PROGRESS_PROFILE:
         return
@@ -20,11 +16,9 @@ def sync_profile_status_with_dnd_setting(sender, instance, **kwargs):
     try:
         UserNotificationSettings = apps.get_model('notifications', 'UserNotificationSettings')
         settings, created = UserNotificationSettings.objects.get_or_create(user=instance.user)
-        # Если статус профиля "Не беспокоить" и в настройках он ВЫКЛЮЧЕН, синхронизируем настройки
         if instance.status == 'dnd' and not settings.do_not_disturb:
             settings.do_not_disturb = True
             settings.save(update_fields=['do_not_disturb'])
-        # Если статус профиля НЕ "Не беспокоить" и в настройках он ВКЛЮЧЕН, синхронизируем настройки
         elif instance.status != 'dnd' and settings.do_not_disturb:
             settings.do_not_disturb = False
             settings.save(update_fields=['do_not_disturb'])
