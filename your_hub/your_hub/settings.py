@@ -32,7 +32,7 @@ MEDIA_URL = '/media/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['yourhub.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 # DJANGO_CHANNELS & REDIS
 ASGI_APPLICATION = 'your_hub.asgi.application'
