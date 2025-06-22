@@ -32,7 +32,7 @@ MEDIA_URL = '/media/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == "True"
 
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ['.onrender.com', '.pythonanywhere.com']
 
 # DJANGO_CHANNELS & REDIS
 ASGI_APPLICATION = 'your_hub.asgi.application'
