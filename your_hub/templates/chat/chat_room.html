@@ -139,10 +139,13 @@
     let selectedFiles = [];
     let currentAttachments = [];
 
+    // Определяем протокол WebSocket (wss для HTTPS на продакшене, ws для HTTP)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Получаем текущий хост (например, yourhub.onrender.com)
+    const host = window.location.host;
+
     const chatSocket = new WebSocket(
-        'ws://127.0.0.1:8001/chat/'
-        + roomType + '/'
-        + roomId + '/'
+        `<span class="math-inline">\{wsProtocol\}//</span>{host}/chat/<span class="math-inline">\{roomType\}/</span>{roomId}/` // ИТОГОВЫЙ ПУТЬ ОСТАЁТСЯ ТЕМ ЖЕ
     );
 
     const readMessagesCache = new Set();

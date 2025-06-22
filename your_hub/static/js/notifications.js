@@ -12,8 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Определяем протокол WebSocket (wss для HTTPS на продакшене, ws для HTTP)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Получаем текущий хост (например, yourhub.onrender.com)
+    const host = window.location.host;
+
     const notificationSocket = new WebSocket(
-        'ws://127.0.0.1:8001/ws/notifications/'
+        `<span class="math-inline">\{wsProtocol\}//</span>{host}/ws/notifications/`
     );
 
     notificationSocket.onopen = function(e) {

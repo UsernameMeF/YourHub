@@ -39,9 +39,9 @@ ASGI_APPLICATION = 'your_hub.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.pubsub.RedisPubSubChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)], # Адрес вашего Redis сервера
+            "URL": os.getenv('REDIS_URL', 'redis://localhost:6379/0'), # Адрес вашего Redis сервера
         },
     },
 }

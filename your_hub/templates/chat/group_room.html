@@ -155,11 +155,13 @@
     let selectedFiles = []; // Для нових файлів, які будуть завантажені
     let currentAttachments = []; // Для файлів, які вже прикріплені до повідомлення (для редагування)
 
-    // WebSocket-з'єднання
+    // Определяем протокол WebSocket (wss для HTTPS на продакшене, ws для HTTP)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Получаем текущий хост (например, yourhub.onrender.com)
+    const host = window.location.host;
+
     const chatSocket = new WebSocket(
-        'ws://127.0.0.1:8001/chat/'
-        + roomType + '/'            // ОСЬ ЦЕ ПОВИННО БУТИ
-        + roomId + '/'
+        `<span class="math-inline">\{wsProtocol\}//</span>{host}/chat/<span class="math-inline">\{roomType\}/</span>{roomId}/` // ИТОГОВЫЙ ПУТЬ ОСТАЁТСЯ ТЕМ ЖЕ
     );
 
     // --- Логіка статусу "переглянуто" ---
