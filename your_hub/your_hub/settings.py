@@ -32,16 +32,16 @@ MEDIA_URL = '/media/'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == "True"
 
-ALLOWED_HOSTS = ['.onrender.com', '.pythonanywhere.com']
+ALLOWED_HOSTS = ['.onrender.com', '.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 # DJANGO_CHANNELS & REDIS
 ASGI_APPLICATION = 'your_hub.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'BACKEND': 'channels_redis.pubsub.RedisPubSubChannelLayer',
         'CONFIG': {
-            "URL": os.getenv('REDIS_URL', 'redis://localhost:6379/0'), # Адрес вашего Redis сервера
+            "hosts": [('127.0.0.1', 6379)], # Адрес вашего Redis сервера
         },
     },
 }
